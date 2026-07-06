@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -sL \"https://docs.google.com/spreadsheets/d/e/2PACX-1vRK3EBk-mmlkd8OLq9FWcZ54hSeR5ohjt0yTSeImXg7FRX3SzIhNB1JAKuaM3RuvooLbIilWycyiqeH/pub?gid=459638642&single=true&output=csv\" -o \"C:/Users/Suthas/AppData/Local/Temp/claude/d--OneDrive-Documents-GitHub-PM-Schedule-Dashboard/d6cfcd40-9cd1-490b-a92c-7048ff02de1f/scratchpad/data.csv\")",
+      "Bash(awk -F',' '{print $1}' data.csv)",
+      "Bash(python3 -)",
+      "Bash(node -e ' *)",
+      "Skill(dataviz)",
+      "Skill(dataviz:*)",
+      "PowerShell(npm install)",
+      "PowerShell(npm run build)",
+      "Skill(run)",
+      "Skill(run:*)",
+      "PowerShell(npm run dev)",
+      "Bash(timeout 60 bash -c 'until curl -sf -o /dev/null http://localhost:3000; do sleep 2; done')",
+      "Bash(curl -s http://localhost:3000/api/schedule)",
+      "PowerShell(npm i --no-save playwright)",
+      "PowerShell(npx playwright install chromium)",
+      "Bash(node scripts/validate_palette.js \"#0ca30c,#2a78d6,#fab219,#d03b3b\" --mode light)",
+      "Bash(node scripts/validate_palette.js \"#0ca30c,#3987e5,#fab219,#d03b3b\" --mode dark)",
+      "Bash(node \"C:/Users/Suthas/AppData/Local/Temp/claude/d--OneDrive-Documents-GitHub-PM-Schedule-Dashboard/d6cfcd40-9cd1-490b-a92c-7048ff02de1f/scratchpad/verify.mjs\")",
+      "PowerShell(npm prune)"
+    ]
+  }
+}
