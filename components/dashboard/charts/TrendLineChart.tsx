@@ -18,15 +18,15 @@ interface TrendPoint {
   week: string;
   month: string;
   Scheduled: number;
-  Completed: number;
+  Finished: number;
 }
 
 const SERIES = [
   { key: "Scheduled" as const, colorLight: "#2a78d6", colorDark: "#3987e5" },
-  { key: "Completed" as const, colorLight: "#008300", colorDark: "#008300" },
+  { key: "Finished" as const, colorLight: "#008300", colorDark: "#008300" },
 ];
 
-/** Cumulative scheduled vs completed jobs across the fiscal-year weeks. */
+/** Cumulative scheduled vs finished jobs across the fiscal-year weeks. */
 export function TrendLineChart({
   jobs,
   data,
@@ -38,15 +38,15 @@ export function TrendLineChart({
 
   const points = useMemo<TrendPoint[]>(() => {
     let scheduled = 0;
-    let completed = 0;
+    let finished = 0;
     return data.weeks.map((w) => {
       for (const j of jobs) {
         if (j.week.index === w.index) {
           scheduled++;
-          if (j.status === "Completed") completed++;
+          if (j.status === "Finished") finished++;
         }
       }
-      return { week: w.label, month: w.month, Scheduled: scheduled, Completed: completed };
+      return { week: w.label, month: w.month, Scheduled: scheduled, Finished: finished };
     });
   }, [jobs, data.weeks]);
 

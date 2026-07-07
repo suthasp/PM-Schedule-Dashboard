@@ -19,7 +19,7 @@ export const LS_KEYS = {
  * validated reference palette; "In Progress" uses the categorical blue slot.
  */
 export const STATUS_COLORS: Record<JobStatus, { light: string; dark: string }> = {
-  Completed: { light: "#0ca30c", dark: "#0ca30c" },
+  Finished: { light: "#0ca30c", dark: "#0ca30c" },
   Remaining: { light: "#fab219", dark: "#fab219" },
   Overdue: { light: "#d03b3b", dark: "#d03b3b" },
   "In Progress": { light: "#2a78d6", dark: "#3987e5" },
@@ -27,7 +27,7 @@ export const STATUS_COLORS: Record<JobStatus, { light: string; dark: string }> =
 
 /** Soft row/background tints per status for grid rows and badges. */
 export const STATUS_TINTS: Record<JobStatus, { light: string; dark: string }> = {
-  Completed: { light: "rgba(12,163,12,0.10)", dark: "rgba(12,163,12,0.16)" },
+  Finished: { light: "rgba(12,163,12,0.10)", dark: "rgba(12,163,12,0.16)" },
   Remaining: { light: "rgba(250,178,25,0.14)", dark: "rgba(250,178,25,0.14)" },
   Overdue: { light: "rgba(208,59,59,0.10)", dark: "rgba(208,59,59,0.18)" },
   "In Progress": { light: "rgba(42,120,214,0.10)", dark: "rgba(57,135,229,0.16)" },

@@ -19,7 +19,7 @@ Open http://localhost:3000.
 - Data auto-refreshes every 5 minutes (configurable in **Settings**).
 - The sheet's two header rows (months + `WK##` week columns) are parsed into a
   fiscal-year timeline. Each non-empty week cell becomes one **PM job occurrence**:
-  - `F` → **Completed**
+  - `F` → **Finished**
   - `P` in a past week → **Overdue**
   - `P` in the current week → **In Progress**
   - `P` in a future week → **Remaining**

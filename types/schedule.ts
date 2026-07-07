@@ -1,8 +1,8 @@
 /** Derived status of a single scheduled PM occurrence. */
-export type JobStatus = "Completed" | "In Progress" | "Remaining" | "Overdue";
+export type JobStatus = "Finished" | "In Progress" | "Remaining" | "Overdue";
 
 export const JOB_STATUSES: readonly JobStatus[] = [
-  "Completed",
+  "Finished",
   "In Progress",
   "Remaining",
   "Overdue",
@@ -32,7 +32,7 @@ export interface TaskRow {
   /** Derived rollup status across this task's scheduled weeks (null if none scheduled). */
   status: JobStatus | null;
   jobCount: number;
-  completedCount: number;
+  finishedCount: number;
 }
 
 /** A single scheduled PM occurrence: one non-empty week cell of a task row. */
@@ -101,7 +101,7 @@ export const DEFAULT_FILTERS: Filters = {
 
 export interface KpiSummary {
   total: number;
-  completed: number;
+  finished: number;
   inProgress: number;
   remaining: number;
   overdue: number;

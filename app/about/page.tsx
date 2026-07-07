@@ -16,7 +16,7 @@ export default function AboutPage(): ReactNode {
         <h3 className="font-semibold">How statuses are derived</h3>
         <ul className="text-secondary mt-1 list-disc space-y-1 pl-5">
           <li>
-            A week cell marked <strong>F</strong> is <strong>Completed</strong>.
+            A week cell marked <strong>F</strong> is <strong>Finished</strong>.
           </li>
           <li>
             A planned mark (<strong>P</strong>) in a past week is <strong>Overdue</strong>.

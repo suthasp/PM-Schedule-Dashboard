@@ -14,7 +14,7 @@ import { currentWeekMondayTime, isoWeekMonday, isoWeekOf, toIsoDate } from "@/ut
 const WEEK_HEADER = /^WK\s*(\d{1,2})$/i;
 
 /** Marks that mean "done" in the sheet's week cells. */
-const COMPLETED_MARKS = new Set(["F", "DONE", "C", "OK"]);
+const FINISHED_MARKS = new Set(["F", "DONE", "C", "OK"]);
 
 function findHeader(headers: string[], patterns: RegExp[], fallbackIndex: number): string {
   for (const pattern of patterns) {
@@ -88,7 +88,7 @@ function buildWeeks(monthRow: string[], headerRow: string[], now: Date): WeekInf
 }
 
 function statusFor(mark: string, weekStart: string, nowWeekMonday: number): JobStatus {
-  if (COMPLETED_MARKS.has(mark.trim().toUpperCase())) return "Completed";
+  if (FINISHED_MARKS.has(mark.trim().toUpperCase())) return "Finished";
   const weekTime = new Date(`${weekStart}T00:00:00Z`).getTime();
   if (weekTime < nowWeekMonday) return "Overdue";
   if (weekTime === nowWeekMonday) return "In Progress";
@@ -141,7 +141,7 @@ export function transformCsv(rows: string[][], now: Date = new Date()): Schedule
     });
     const taskId = `task-${rowIdx}`;
 
-    let completedCount = 0;
+    let finishedCount = 0;
     let overdue = false;
     let inProgress = false;
     let remaining = false;
@@ -152,7 +152,7 @@ export function transformCsv(rows: string[][], now: Date = new Date()): Schedule
       const mark = idx !== undefined ? (row[idx] ?? "").trim() : "";
       if (!mark) continue;
       const status = statusFor(mark, week.startDate, nowWeekMonday);
-      if (status === "Completed") completedCount++;
+      if (status === "Finished") finishedCount++;
       else if (status === "Overdue") overdue = true;
       else if (status === "In Progress") inProgress = true;
       else remaining = true;
@@ -178,9 +178,9 @@ export function transformCsv(rows: string[][], now: Date = new Date()): Schedule
             ? "In Progress"
             : remaining
               ? "Remaining"
-              : "Completed";
+              : "Finished";
 
-    tasks.push({ id: taskId, values, status, jobCount: taskJobs.length, completedCount });
+    tasks.push({ id: taskId, values, status, jobCount: taskJobs.length, finishedCount });
     jobs.push(...taskJobs);
   });
 
@@ -269,12 +269,12 @@ function matchesDims(task: TaskRow, filters: Filters): boolean {
 }
 
 export function summarize(jobs: PMJob[]): KpiSummary {
-  let completed = 0;
+  let finished = 0;
   let inProgress = 0;
   let remaining = 0;
   let overdue = 0;
   for (const j of jobs) {
-    if (j.status === "Completed") completed++;
+    if (j.status === "Finished") finished++;
     else if (j.status === "In Progress") inProgress++;
     else if (j.status === "Remaining") remaining++;
     else overdue++;
@@ -282,10 +282,10 @@ export function summarize(jobs: PMJob[]): KpiSummary {
   const total = jobs.length;
   return {
     total,
-    completed,
+    finished,
     inProgress,
     remaining,
     overdue,
-    completionRate: total === 0 ? 0 : (completed / total) * 100,
+    completionRate: total === 0 ? 0 : (finished / total) * 100,
   };
 }

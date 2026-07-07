@@ -17,7 +17,7 @@ import { JOB_STATUSES, type PMJob, type ScheduleData } from "@/types/schedule";
 
 interface MonthDatum {
   month: string;
-  Completed: number;
+  Finished: number;
   "In Progress": number;
   Remaining: number;
   Overdue: number;
@@ -40,7 +40,7 @@ export function MonthlyBarChart({
       data.months.map((month) => {
         const row: MonthDatum = {
           month,
-          Completed: 0,
+          Finished: 0,
           "In Progress": 0,
           Remaining: 0,
           Overdue: 0,

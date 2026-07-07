@@ -10,7 +10,7 @@ import { formatNumber } from "@/utils/format";
 interface CellDatum {
   week: WeekInfo;
   count: number;
-  completed: number;
+  finished: number;
 }
 
 /**
@@ -29,17 +29,17 @@ export function CalendarHeatmap({
   const [hovered, setHovered] = useState<CellDatum | null>(null);
 
   const cells = useMemo<CellDatum[]>(() => {
-    const counts = new Map<number, { count: number; completed: number }>();
+    const counts = new Map<number, { count: number; finished: number }>();
     for (const j of jobs) {
-      const entry = counts.get(j.week.index) ?? { count: 0, completed: 0 };
+      const entry = counts.get(j.week.index) ?? { count: 0, finished: 0 };
       entry.count++;
-      if (j.status === "Completed") entry.completed++;
+      if (j.status === "Finished") entry.finished++;
       counts.set(j.week.index, entry);
     }
     return data.weeks.map((week) => ({
       week,
       count: counts.get(week.index)?.count ?? 0,
-      completed: counts.get(week.index)?.completed ?? 0,
+      finished: counts.get(week.index)?.finished ?? 0,
     }));
   }, [jobs, data.weeks]);
 
@@ -109,7 +109,7 @@ export function CalendarHeatmap({
           {hovered
             ? `${hovered.week.label} · ${hovered.week.month} ${hovered.week.year} — ${formatNumber(
                 hovered.count,
-              )} jobs, ${formatNumber(hovered.completed)} completed`
+              )} jobs, ${formatNumber(hovered.finished)} finished`
             : "Hover a week for details · click to filter by month"}
         </span>
         <span className="text-muted flex items-center gap-1">

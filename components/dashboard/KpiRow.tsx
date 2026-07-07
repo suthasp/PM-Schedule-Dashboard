@@ -45,7 +45,7 @@ export function KpiRow({ kpis }: { kpis: KpiSummary }): ReactNode {
         active={filters.status === "all"}
         onClick={() => toggleFilter("status", "all")}
       />
-      {statusTile("Completed", kpis.completed, "Completed", CheckCircle2)}
+      {statusTile("Finished", kpis.finished, "Finished", CheckCircle2)}
       {statusTile("In Progress", kpis.inProgress, "In Progress", Loader2)}
       {statusTile("Remaining", kpis.remaining, "Remaining", Clock)}
       {statusTile("Overdue", kpis.overdue, "Overdue", AlertTriangle)}
@@ -54,7 +54,7 @@ export function KpiRow({ kpis }: { kpis: KpiSummary }): ReactNode {
         value={formatPercent(kpis.completionRate)}
         icon={TrendingUp}
         color="#0ca30c"
-        sub={`${formatNumber(kpis.completed)} of ${formatNumber(kpis.total)}`}
+        sub={`${formatNumber(kpis.finished)} of ${formatNumber(kpis.total)}`}
       />
     </div>
   );
