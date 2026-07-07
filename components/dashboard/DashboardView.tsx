@@ -9,6 +9,7 @@ import { StatusPieChart } from "@/components/dashboard/charts/StatusPieChart";
 import { TrendLineChart } from "@/components/dashboard/charts/TrendLineChart";
 import { FilterBar } from "@/components/dashboard/FilterBar";
 import { KpiRow } from "@/components/dashboard/KpiRow";
+import { SiteSummaryRow } from "@/components/dashboard/SiteSummaryRow";
 import { useFilters } from "@/components/providers/FilterProvider";
 import { useSettings } from "@/components/providers/SettingsProvider";
 import { ChartCard } from "@/components/ui/ChartCard";
@@ -59,6 +60,8 @@ export function DashboardView({ data }: { data: ScheduleData }): ReactNode {
 
       <div ref={captureRef} className="space-y-4">
         <KpiRow kpis={kpis} />
+
+        <SiteSummaryRow data={data} />
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
           <ChartCard title="PM Status" subtitle="Share of jobs by derived status">

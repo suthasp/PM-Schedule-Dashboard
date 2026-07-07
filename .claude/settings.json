@@ -22,7 +22,11 @@
       "PowerShell(npm prune)",
       "Bash(timeout 90 bash -c 'until curl -sf -o /dev/null http://localhost:3000; do sleep 2; done')",
       "Bash(node \"C:/Users/Suthas/AppData/Local/Temp/claude/d--OneDrive-Documents-GitHub-PM-Schedule-Dashboard/d6cfcd40-9cd1-490b-a92c-7048ff02de1f/scratchpad/verify-collapse.mjs\")",
-      "Bash(curl -s -o /dev/null -w \"%{http_code} %{content_type}\\\\n\" http://localhost:3000/icon.svg)"
+      "Bash(curl -s -o /dev/null -w \"%{http_code} %{content_type}\\\\n\" http://localhost:3000/icon.svg)",
+      "Bash(curl -s -o /dev/null -w \"api:%{http_code}\\\\n\" http://localhost:3000/api/schedule)",
+      "Bash(curl -sL -o /dev/null -w \"google:%{http_code}\\\\n\" \"https://docs.google.com/spreadsheets/d/e/2PACX-1vRK3EBk-mmlkd8OLq9FWcZ54hSeR5ohjt0yTSeImXg7FRX3SzIhNB1JAKuaM3RuvooLbIilWycyiqeH/pub?gid=459638642&single=true&output=csv\")",
+      "Bash(netstat -ano)",
+      "PowerShell(Remove-Item -Recurse -Force .next -Confirm:$false)"
     ]
   }
 }
