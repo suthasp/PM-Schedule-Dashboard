@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  AlertTriangle,
-  CheckCircle2,
-  ClipboardList,
-  Clock,
-  Loader2,
-  TrendingUp,
-} from "lucide-react";
+import { AlertTriangle, CheckCircle2, ClipboardList, Clock, TrendingUp } from "lucide-react";
 import type { ReactNode } from "react";
 import { useFilters } from "@/components/providers/FilterProvider";
 import { DashboardCard } from "@/components/ui/DashboardCard";
@@ -15,7 +8,7 @@ import { STATUS_COLORS } from "@/lib/constants";
 import type { JobStatus, KpiSummary } from "@/types/schedule";
 import { formatNumber, formatPercent } from "@/utils/format";
 
-/** Six KPI tiles; the four status tiles toggle the global status filter. */
+/** Five KPI tiles; the three status tiles toggle the global status filter. */
 export function KpiRow({ kpis }: { kpis: KpiSummary }): ReactNode {
   const { filters, toggleFilter } = useFilters();
 
@@ -36,7 +29,7 @@ export function KpiRow({ kpis }: { kpis: KpiSummary }): ReactNode {
   );
 
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5">
       <DashboardCard
         label="Total PM Jobs"
         value={formatNumber(kpis.total)}
@@ -46,7 +39,6 @@ export function KpiRow({ kpis }: { kpis: KpiSummary }): ReactNode {
         onClick={() => toggleFilter("status", "all")}
       />
       {statusTile("Finished", kpis.finished, "Finished", CheckCircle2)}
-      {statusTile("In Progress", kpis.inProgress, "In Progress", Loader2)}
       {statusTile("Remaining", kpis.remaining, "Remaining", Clock)}
       {statusTile("Overdue", kpis.overdue, "Overdue", AlertTriangle)}
       <DashboardCard

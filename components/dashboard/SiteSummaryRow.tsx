@@ -16,7 +16,6 @@ interface SiteSummary {
 }
 
 /** Header colors (700-ish shades so white text stays readable). */
-const ALL_SITES_COLOR = "#166534";
 const SITE_COLORS = [
   "#1d4ed8",
   "#0e7490",
@@ -76,7 +75,7 @@ function StatRow({
  * Clicking a card toggles the global site filter for the whole app.
  */
 export function SiteSummaryRow({ data }: { data: ScheduleData }): ReactNode {
-  const { filters, setFilter, toggleFilter } = useFilters();
+  const { filters, toggleFilter } = useFilters();
 
   // Respect every filter except the site itself, so all cards stay comparable.
   const scopedJobs = useMemo(() => {
@@ -85,10 +84,7 @@ export function SiteSummaryRow({ data }: { data: ScheduleData }): ReactNode {
   }, [data.jobs, filters]);
 
   const cards = useMemo<SiteSummary[]>(
-    () => [
-      { site: "ALL SITES", ...summarizeSite(scopedJobs, null) },
-      ...data.sites.map((site) => ({ site, ...summarizeSite(scopedJobs, site) })),
-    ],
+    () => data.sites.map((site) => ({ site, ...summarizeSite(scopedJobs, site) })),
     [scopedJobs, data.sites],
   );
 
@@ -98,11 +94,8 @@ export function SiteSummaryRow({ data }: { data: ScheduleData }): ReactNode {
       style={{ gridTemplateColumns: "repeat(auto-fit, minmax(118px, 1fr))" }}
     >
       {cards.map((c, i) => {
-        const isAll = i === 0;
-        const headerColor = isAll
-          ? ALL_SITES_COLOR
-          : SITE_COLORS[(i - 1) % SITE_COLORS.length] ?? ALL_SITES_COLOR;
-        const active = isAll ? filters.site === "all" : filters.site === c.site;
+        const headerColor = SITE_COLORS[i % SITE_COLORS.length] ?? "#1d4ed8";
+        const active = filters.site === c.site;
         return (
           <motion.button
             key={c.site}
@@ -110,9 +103,7 @@ export function SiteSummaryRow({ data }: { data: ScheduleData }): ReactNode {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.25, delay: i * 0.02 }}
-            onClick={() =>
-              isAll ? setFilter("site", "all") : toggleFilter("site", c.site)
-            }
+            onClick={() => toggleFilter("site", c.site)}
             aria-pressed={active}
             className={`card overflow-hidden text-left transition-shadow hover:shadow-soft-lg ${
               active ? "ring-2 ring-accent dark:ring-accent-dark" : ""

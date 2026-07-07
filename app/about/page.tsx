@@ -22,10 +22,7 @@ export default function AboutPage(): ReactNode {
             A planned mark (<strong>P</strong>) in a past week is <strong>Overdue</strong>.
           </li>
           <li>
-            A planned mark in the current week is <strong>In Progress</strong>.
-          </li>
-          <li>
-            A planned mark in a future week is <strong>Remaining</strong>.
+            A planned mark in the current or a future week is <strong>Remaining</strong>.
           </li>
         </ul>
       </div>

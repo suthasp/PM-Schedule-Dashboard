@@ -91,7 +91,6 @@ function statusFor(mark: string, weekStart: string, nowWeekMonday: number): JobS
   if (FINISHED_MARKS.has(mark.trim().toUpperCase())) return "Finished";
   const weekTime = new Date(`${weekStart}T00:00:00Z`).getTime();
   if (weekTime < nowWeekMonday) return "Overdue";
-  if (weekTime === nowWeekMonday) return "In Progress";
   return "Remaining";
 }
 
@@ -143,7 +142,6 @@ export function transformCsv(rows: string[][], now: Date = new Date()): Schedule
 
     let finishedCount = 0;
     let overdue = false;
-    let inProgress = false;
     let remaining = false;
     const taskJobs: PMJob[] = [];
 
@@ -154,7 +152,6 @@ export function transformCsv(rows: string[][], now: Date = new Date()): Schedule
       const status = statusFor(mark, week.startDate, nowWeekMonday);
       if (status === "Finished") finishedCount++;
       else if (status === "Overdue") overdue = true;
-      else if (status === "In Progress") inProgress = true;
       else remaining = true;
       taskJobs.push({
         id: `${taskId}-${week.label}`,
@@ -174,11 +171,9 @@ export function transformCsv(rows: string[][], now: Date = new Date()): Schedule
         ? null
         : overdue
           ? "Overdue"
-          : inProgress
-            ? "In Progress"
-            : remaining
-              ? "Remaining"
-              : "Finished";
+          : remaining
+            ? "Remaining"
+            : "Finished";
 
     tasks.push({ id: taskId, values, status, jobCount: taskJobs.length, finishedCount });
     jobs.push(...taskJobs);
@@ -270,12 +265,10 @@ function matchesDims(task: TaskRow, filters: Filters): boolean {
 
 export function summarize(jobs: PMJob[]): KpiSummary {
   let finished = 0;
-  let inProgress = 0;
   let remaining = 0;
   let overdue = 0;
   for (const j of jobs) {
     if (j.status === "Finished") finished++;
-    else if (j.status === "In Progress") inProgress++;
     else if (j.status === "Remaining") remaining++;
     else overdue++;
   }
@@ -283,7 +276,6 @@ export function summarize(jobs: PMJob[]): KpiSummary {
   return {
     total,
     finished,
-    inProgress,
     remaining,
     overdue,
     completionRate: total === 0 ? 0 : (finished / total) * 100,

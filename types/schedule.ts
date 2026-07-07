@@ -1,9 +1,8 @@
 /** Derived status of a single scheduled PM occurrence. */
-export type JobStatus = "Finished" | "In Progress" | "Remaining" | "Overdue";
+export type JobStatus = "Finished" | "Remaining" | "Overdue";
 
 export const JOB_STATUSES: readonly JobStatus[] = [
   "Finished",
-  "In Progress",
   "Remaining",
   "Overdue",
 ] as const;
@@ -102,7 +101,6 @@ export const DEFAULT_FILTERS: Filters = {
 export interface KpiSummary {
   total: number;
   finished: number;
-  inProgress: number;
   remaining: number;
   overdue: number;
   completionRate: number;

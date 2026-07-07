@@ -28,7 +28,9 @@
       "Bash(netstat -ano)",
       "PowerShell(Remove-Item -Recurse -Force .next -Confirm:$false)",
       "PowerShell(git fetch origin)",
-      "Bash(vercel --version)"
+      "Bash(vercel --version)",
+      "PowerShell(npx tsc --noEmit)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" --max-time 20 http://127.0.0.1:3000)"
     ]
   }
 }
