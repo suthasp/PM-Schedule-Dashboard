@@ -37,7 +37,7 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }): ReactNode 
         type="button"
         aria-label="Toggle navigation"
         onClick={onMenuClick}
-        className="flex h-9 w-9 items-center justify-center rounded-xl border hairline lg:hidden"
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border hairline transition-colors hover:bg-black/5 dark:hover:bg-white/5"
       >
         <Menu size={18} aria-hidden />
       </button>

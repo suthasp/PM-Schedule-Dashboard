@@ -16,9 +16,17 @@ const NAV_ITEMS = [
 interface SidebarProps {
   open: boolean;
   onClose: () => void;
+  /** Desktop icon-rail mode (toggled by the header hamburger). */
+  collapsed?: boolean;
 }
 
-function NavLinks({ onNavigate }: { onNavigate?: () => void }): ReactNode {
+function NavLinks({
+  collapsed = false,
+  onNavigate,
+}: {
+  collapsed?: boolean;
+  onNavigate?: () => void;
+}): ReactNode {
   const pathname = usePathname();
   return (
     <nav className="flex flex-col gap-1 px-3">
@@ -29,14 +37,18 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }): ReactNode {
             key={href}
             href={href}
             onClick={onNavigate}
+            title={collapsed ? label : undefined}
+            aria-label={label}
             className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+              collapsed ? "justify-center px-0" : ""
+            } ${
               active
                 ? "bg-accent/10 text-accent dark:bg-accent-dark/15 dark:text-accent-dark"
                 : "text-secondary hover:bg-black/5 dark:hover:bg-white/5"
             }`}
           >
-            <Icon size={18} strokeWidth={2} aria-hidden />
-            {label}
+            <Icon size={18} strokeWidth={2} className="shrink-0" aria-hidden />
+            {!collapsed && <span className="truncate">{label}</span>}
           </Link>
         );
       })}
@@ -44,31 +56,37 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }): ReactNode {
   );
 }
 
-export function Sidebar({ open, onClose }: SidebarProps): ReactNode {
-  const brand = (
-    <div className="flex items-center gap-2.5 px-6 py-5">
-      <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent text-white dark:bg-accent-dark">
+function Brand({ collapsed = false }: { collapsed?: boolean }): ReactNode {
+  return (
+    <div className={`flex items-center gap-2.5 py-5 ${collapsed ? "justify-center px-0" : "px-6"}`}>
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent text-white dark:bg-accent-dark">
         <Wrench size={18} aria-hidden />
       </span>
-      <div className="leading-tight">
-        <p className="text-sm font-bold">PM Schedule</p>
-        <p className="text-muted text-xs">Maintenance Ops</p>
-      </div>
+      {!collapsed && (
+        <div className="leading-tight">
+          <p className="whitespace-nowrap text-sm font-bold">PM Schedule</p>
+          <p className="text-muted whitespace-nowrap text-xs">Maintenance Ops</p>
+        </div>
+      )}
     </div>
   );
+}
 
+export function Sidebar({ open, onClose, collapsed = false }: SidebarProps): ReactNode {
   return (
     <>
-      {/* Desktop sidebar */}
+      {/* Desktop sidebar: full rail or icon rail */}
       <aside
-        className="no-print sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r lg:flex"
+        className={`no-print sticky top-0 hidden h-screen shrink-0 flex-col overflow-hidden border-r transition-[width] duration-200 ease-out lg:flex ${
+          collapsed ? "w-[68px]" : "w-60"
+        }`}
         style={{ backgroundColor: "var(--surface)", borderColor: "var(--hairline)" }}
       >
-        {brand}
-        <NavLinks />
+        <Brand collapsed={collapsed} />
+        <NavLinks collapsed={collapsed} />
       </aside>
 
-      {/* Mobile drawer */}
+      {/* Mobile drawer (always full width when open) */}
       <AnimatePresence>
         {open && (
           <>
@@ -89,7 +107,7 @@ export function Sidebar({ open, onClose }: SidebarProps): ReactNode {
               exit={{ x: -280 }}
               transition={{ type: "tween", duration: 0.2 }}
             >
-              {brand}
+              <Brand />
               <NavLinks onNavigate={onClose} />
             </motion.aside>
           </>

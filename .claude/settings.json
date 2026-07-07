@@ -19,7 +19,9 @@
       "Bash(node scripts/validate_palette.js \"#0ca30c,#2a78d6,#fab219,#d03b3b\" --mode light)",
       "Bash(node scripts/validate_palette.js \"#0ca30c,#3987e5,#fab219,#d03b3b\" --mode dark)",
       "Bash(node \"C:/Users/Suthas/AppData/Local/Temp/claude/d--OneDrive-Documents-GitHub-PM-Schedule-Dashboard/d6cfcd40-9cd1-490b-a92c-7048ff02de1f/scratchpad/verify.mjs\")",
-      "PowerShell(npm prune)"
+      "PowerShell(npm prune)",
+      "Bash(timeout 90 bash -c 'until curl -sf -o /dev/null http://localhost:3000; do sleep 2; done')",
+      "Bash(node \"C:/Users/Suthas/AppData/Local/Temp/claude/d--OneDrive-Documents-GitHub-PM-Schedule-Dashboard/d6cfcd40-9cd1-490b-a92c-7048ff02de1f/scratchpad/verify-collapse.mjs\")"
     ]
   }
 }
