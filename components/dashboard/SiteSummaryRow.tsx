@@ -93,7 +93,10 @@ export function SiteSummaryRow({ data }: { data: ScheduleData }): ReactNode {
   );
 
   return (
-    <div className="flex gap-3 overflow-x-auto pb-1">
+    <div
+      className="grid gap-2"
+      style={{ gridTemplateColumns: "repeat(auto-fit, minmax(118px, 1fr))" }}
+    >
       {cards.map((c, i) => {
         const isAll = i === 0;
         const headerColor = isAll
@@ -111,17 +114,17 @@ export function SiteSummaryRow({ data }: { data: ScheduleData }): ReactNode {
               isAll ? setFilter("site", "all") : toggleFilter("site", c.site)
             }
             aria-pressed={active}
-            className={`card min-w-[148px] flex-1 shrink-0 overflow-hidden text-left transition-shadow hover:shadow-soft-lg ${
+            className={`card overflow-hidden text-left transition-shadow hover:shadow-soft-lg ${
               active ? "ring-2 ring-accent dark:ring-accent-dark" : ""
             }`}
           >
             <div
-              className="truncate px-3 py-1.5 text-xs font-bold text-white"
+              className="truncate px-2.5 py-1.5 text-[11px] font-bold text-white"
               style={{ backgroundColor: headerColor }}
             >
               {c.site}
             </div>
-            <div className="space-y-1 px-3 py-2 text-xs">
+            <div className="space-y-1 px-2.5 py-2 text-[11px]">
               <StatRow label="%Finished" value={formatPercent(c.pct)} color="#0ca30c" />
               <StatRow label="Finished" value={formatNumber(c.finished)} color="#0ca30c" />
               <StatRow label="Remain" value={formatNumber(c.remain)} color="#d03b3b" />
