@@ -104,6 +104,37 @@ body {
   --ag-odd-row-background-color: #1e1e1d;
 }
 
+/* Compact week-column headers so "WK28" fits the narrow columns */
+.ag-theme-quartz .week-header,
+.ag-theme-quartz-dark .week-header {
+  padding-left: 3px;
+  padding-right: 3px;
+  font-size: 11px;
+}
+.ag-theme-quartz .week-header .ag-header-cell-label,
+.ag-theme-quartz-dark .week-header .ag-header-cell-label {
+  justify-content: center;
+}
+
+/* Current fiscal week: vertical band through the grid */
+.ag-theme-quartz .current-week-cell,
+.ag-theme-quartz-dark .current-week-cell {
+  background-color: rgba(42, 120, 214, 0.09);
+  border-left: 1px solid rgba(42, 120, 214, 0.5) !important;
+  border-right: 1px solid rgba(42, 120, 214, 0.5) !important;
+}
+.ag-theme-quartz-dark .current-week-cell {
+  background-color: rgba(57, 135, 229, 0.16);
+}
+.ag-theme-quartz .current-week-header,
+.ag-theme-quartz-dark .current-week-header {
+  color: var(--accent);
+  font-weight: 700;
+  background-color: rgba(42, 120, 214, 0.12);
+  border-left: 1px solid rgba(42, 120, 214, 0.5);
+  border-right: 1px solid rgba(42, 120, 214, 0.5);
+}
+
 /* Print: dashboard only */
 @media print {
   .no-print {

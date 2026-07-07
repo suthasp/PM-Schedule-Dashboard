@@ -1,6 +1,7 @@
 import type { ColDef } from "ag-grid-community";
 import { STATUS_COLORS, STATUS_TINTS } from "@/lib/constants";
 import type { JobStatus, ScheduleData } from "@/types/schedule";
+import { currentWeekMondayTime } from "@/utils/weeks";
 
 /** Flat row shape fed to AG Grid. */
 export interface GridRow {
@@ -29,6 +30,12 @@ function parseDateMs(raw: string): number | null {
  * sorting and formatting.
  */
 export function buildColumnDefs(data: ScheduleData, dark: boolean): ColDef<GridRow>[] {
+  // Highlight the fiscal week containing today.
+  const nowMonday = currentWeekMondayTime(new Date());
+  const currentWeekLabel = data.weeks.find(
+    (w) => new Date(`${w.startDate}T00:00:00Z`).getTime() === nowMonday,
+  )?.label;
+
   const dataCols = data.columns.map<ColDef<GridRow>>(({ header, kind }) => {
     const base: ColDef<GridRow> = {
       colId: header,
@@ -44,6 +51,7 @@ export function buildColumnDefs(data: ScheduleData, dark: boolean): ColDef<GridR
     switch (kind) {
       case "week": {
         const weekInfo = data.weeks.find((w) => w.label === header);
+        const isCurrentWeek = header === currentWeekLabel;
         return {
           ...base,
           headerName: header,
@@ -52,7 +60,8 @@ export function buildColumnDefs(data: ScheduleData, dark: boolean): ColDef<GridR
           minWidth: 44,
           floatingFilter: false,
           filter: false,
-          cellClass: "text-center font-semibold",
+          cellClass: `text-center font-semibold${isCurrentWeek ? " current-week-cell" : ""}`,
+          headerClass: isCurrentWeek ? "week-header current-week-header" : "week-header",
           cellStyle: (p) => {
             const status = p.data?.weekStatus[header];
             if (!status) return null;
