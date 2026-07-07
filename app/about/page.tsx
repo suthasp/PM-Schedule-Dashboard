@@ -25,7 +25,7 @@ export default function AboutPage(): ReactNode {
             A planned mark in the current week is <strong>In Progress</strong>.
           </li>
           <li>
-            A planned mark in a future week is <strong>Pending</strong>.
+            A planned mark in a future week is <strong>Remaining</strong>.
           </li>
         </ul>
       </div>

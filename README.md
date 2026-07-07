@@ -22,7 +22,7 @@ Open http://localhost:3000.
   - `F` → **Completed**
   - `P` in a past week → **Overdue**
   - `P` in the current week → **In Progress**
-  - `P` in a future week → **Pending**
+  - `P` in a future week → **Remaining**
 - New columns added to the sheet appear in the PM Schedule grid automatically —
   column types (text / number / percent / date / boolean / week) are auto-detected.
 

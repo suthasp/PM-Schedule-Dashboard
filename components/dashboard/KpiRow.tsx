@@ -47,7 +47,7 @@ export function KpiRow({ kpis }: { kpis: KpiSummary }): ReactNode {
       />
       {statusTile("Completed", kpis.completed, "Completed", CheckCircle2)}
       {statusTile("In Progress", kpis.inProgress, "In Progress", Loader2)}
-      {statusTile("Pending", kpis.pending, "Pending", Clock)}
+      {statusTile("Remaining", kpis.remaining, "Remaining", Clock)}
       {statusTile("Overdue", kpis.overdue, "Overdue", AlertTriangle)}
       <DashboardCard
         label="Completion Rate"

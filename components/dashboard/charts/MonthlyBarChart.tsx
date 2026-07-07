@@ -19,7 +19,7 @@ interface MonthDatum {
   month: string;
   Completed: number;
   "In Progress": number;
-  Pending: number;
+  Remaining: number;
   Overdue: number;
   [key: string]: string | number;
 }
@@ -42,7 +42,7 @@ export function MonthlyBarChart({
           month,
           Completed: 0,
           "In Progress": 0,
-          Pending: 0,
+          Remaining: 0,
           Overdue: 0,
         };
         for (const j of jobs) {
