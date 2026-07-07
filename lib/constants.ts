@@ -10,7 +10,7 @@ export const DEFAULT_REFRESH_MINUTES = 5;
 
 export const LS_KEYS = {
   settings: "pmsd:settings",
-  gridColumnState: "pmsd:grid-column-state",
+  gridColumnState: "pmsd:grid-column-state-v2",
   sidebarCollapsed: "pmsd:sidebar-collapsed",
 } as const;
 

@@ -29,24 +29,6 @@ function parseDateMs(raw: string): number | null {
  * sorting and formatting.
  */
 export function buildColumnDefs(data: ScheduleData, dark: boolean): ColDef<GridRow>[] {
-  const statusCol: ColDef<GridRow> = {
-    colId: "__status",
-    headerName: "Status",
-    pinned: "left",
-    width: 130,
-    valueGetter: (p) => p.data?.status ?? "",
-    filter: "agTextColumnFilter",
-    floatingFilter: true,
-    cellStyle: (p) => {
-      const status = p.data?.status;
-      if (!status) return null;
-      return {
-        color: STATUS_COLORS[status][dark ? "dark" : "light"],
-        fontWeight: "600",
-      };
-    },
-  };
-
   const dataCols = data.columns.map<ColDef<GridRow>>(({ header, kind }) => {
     const base: ColDef<GridRow> = {
       colId: header,
@@ -128,5 +110,14 @@ export function buildColumnDefs(data: ScheduleData, dark: boolean): ColDef<GridR
     }
   });
 
-  return [statusCol, ...dataCols];
+  // Pin the Site column first, where the Status column used to be.
+  const siteIdx = dataCols.findIndex((c) => c.colId === data.fields.site);
+  if (siteIdx >= 0) {
+    const siteCol = dataCols[siteIdx];
+    if (siteCol) {
+      dataCols.splice(siteIdx, 1);
+      return [{ ...siteCol, pinned: "left", width: 120, minWidth: 100 }, ...dataCols];
+    }
+  }
+  return dataCols;
 }
