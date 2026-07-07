@@ -26,7 +26,9 @@
       "Bash(curl -s -o /dev/null -w \"api:%{http_code}\\\\n\" http://localhost:3000/api/schedule)",
       "Bash(curl -sL -o /dev/null -w \"google:%{http_code}\\\\n\" \"https://docs.google.com/spreadsheets/d/e/2PACX-1vRK3EBk-mmlkd8OLq9FWcZ54hSeR5ohjt0yTSeImXg7FRX3SzIhNB1JAKuaM3RuvooLbIilWycyiqeH/pub?gid=459638642&single=true&output=csv\")",
       "Bash(netstat -ano)",
-      "PowerShell(Remove-Item -Recurse -Force .next -Confirm:$false)"
+      "PowerShell(Remove-Item -Recurse -Force .next -Confirm:$false)",
+      "PowerShell(git fetch origin)",
+      "Bash(vercel --version)"
     ]
   }
 }
