@@ -24,6 +24,13 @@ export const STATUS_COLORS: Record<JobStatus, { light: string; dark: string }> =
   Overdue: { light: "#d03b3b", dark: "#d03b3b" },
 };
 
+/** Solid chip fills for week-mark cells in the schedule grid. */
+export const STATUS_CHIPS: Record<JobStatus, { bg: string; fg: string }> = {
+  Finished: { bg: "#0ca30c", fg: "#ffffff" },
+  Remaining: { bg: "#fab219", fg: "#0d366b" },
+  Overdue: { bg: "#d03b3b", fg: "#ffffff" },
+};
+
 /** Soft row/background tints per status for grid rows and badges. */
 export const STATUS_TINTS: Record<JobStatus, { light: string; dark: string }> = {
   Finished: { light: "rgba(12,163,12,0.10)", dark: "rgba(12,163,12,0.16)" },

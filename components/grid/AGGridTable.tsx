@@ -20,7 +20,7 @@ import {
 } from "react";
 import { useFilters } from "@/components/providers/FilterProvider";
 import { useSettings } from "@/components/providers/SettingsProvider";
-import { LS_KEYS, STATUS_TINTS } from "@/lib/constants";
+import { LS_KEYS } from "@/lib/constants";
 import type { ScheduleData, TaskRow } from "@/types/schedule";
 import { buildColumnDefs, type GridRow } from "@/utils/columns";
 import { groupJobsByTask } from "@/utils/transform";
@@ -149,15 +149,6 @@ export function AGGridTable({ data, tasks }: AGGridTableProps): ReactNode {
     }
   }, []);
 
-  const getRowStyle = useCallback(
-    (params: { data?: GridRow }): { backgroundColor: string } | undefined => {
-      const status = params.data?.status;
-      if (!status) return undefined;
-      return { backgroundColor: STATUS_TINTS[status][dark ? "dark" : "light"] };
-    },
-    [dark],
-  );
-
   return (
     <div className="space-y-3">
       <div className="no-print flex flex-wrap items-center gap-2">
@@ -241,7 +232,6 @@ export function AGGridTable({ data, tasks }: AGGridTableProps): ReactNode {
           onColumnVisible={persistColumnState}
           onColumnPinned={persistColumnState}
           onSortChanged={persistColumnState}
-          getRowStyle={getRowStyle}
           animateRows
           tooltipShowDelay={400}
         />

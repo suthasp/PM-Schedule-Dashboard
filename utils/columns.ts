@@ -1,5 +1,5 @@
 import type { ColDef } from "ag-grid-community";
-import { STATUS_COLORS, STATUS_TINTS } from "@/lib/constants";
+import { STATUS_CHIPS } from "@/lib/constants";
 import type { JobStatus, ScheduleData } from "@/types/schedule";
 import { currentWeekMondayTime } from "@/utils/weeks";
 
@@ -65,10 +65,12 @@ export function buildColumnDefs(data: ScheduleData, dark: boolean): ColDef<GridR
           cellStyle: (p) => {
             const status = p.data?.weekStatus[header];
             if (!status) return null;
-            const mode = dark ? "dark" : "light";
+            // Solid chip cells (nurse-roster style): saturated fill, bold centered mark.
+            const chip = STATUS_CHIPS[status];
             return {
-              backgroundColor: STATUS_TINTS[status][mode],
-              color: STATUS_COLORS[status][mode],
+              backgroundColor: chip.bg,
+              color: chip.fg,
+              fontWeight: "700",
               textAlign: "center",
             };
           },
