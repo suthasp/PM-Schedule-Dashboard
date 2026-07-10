@@ -81,6 +81,8 @@ export interface ScheduleData {
 export interface Filters {
   year: number | "all";
   month: string | "all";
+  /** Week header label, e.g. "WK27". */
+  week: string | "all";
   site: string | "all";
   status: JobStatus | "all";
   category: string | "all";
@@ -91,6 +93,7 @@ export interface Filters {
 export const DEFAULT_FILTERS: Filters = {
   year: "all",
   month: "all",
+  week: "all",
   site: "all",
   status: "all",
   category: "all",

@@ -116,6 +116,17 @@ div.ag-theme-quartz {
 .ag-theme-quartz .ag-floating-filter-input .ag-input-field-input {
   color: #0b0b0b;
 }
+/* Tooltips (e.g. week-header month/date hints) — readable on both themes */
+.ag-theme-quartz .ag-tooltip {
+  background-color: #ffffff;
+  color: #0b0b0b;
+  border: 1px solid #dbeafe;
+}
+.ag-theme-quartz-dark .ag-tooltip {
+  background-color: #262626;
+  color: #ffffff;
+  border: 1px solid #2b3a55;
+}
 div.ag-theme-quartz-dark {
   --ag-background-color: #1a1a19;
   --ag-header-background-color: #1e3a8a;

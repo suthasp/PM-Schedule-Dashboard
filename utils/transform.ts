@@ -219,6 +219,7 @@ export function transformCsv(rows: string[][], now: Date = new Date()): Schedule
 export function jobMatchesFilters(job: PMJob, filters: Filters): boolean {
   if (filters.year !== "all" && job.week.year !== filters.year) return false;
   if (filters.month !== "all" && job.week.month !== filters.month) return false;
+  if (filters.week !== "all" && job.week.label !== filters.week) return false;
   if (filters.site !== "all" && job.site !== filters.site) return false;
   if (filters.status !== "all" && job.status !== filters.status) return false;
   if (filters.category !== "all" && job.category !== filters.category) return false;
@@ -251,7 +252,14 @@ export function groupJobsByTask(jobs: PMJob[]): Map<string, PMJob[]> {
 export function taskMatchesFilters(task: TaskRow, taskJobs: PMJob[], filters: Filters): boolean {
   if (taskJobs.length > 0) return taskJobs.some((j) => jobMatchesFilters(j, filters));
   // Unscheduled rows: only dimension + search filters apply.
-  if (filters.status !== "all" || filters.month !== "all" || filters.year !== "all") return false;
+  if (
+    filters.status !== "all" ||
+    filters.month !== "all" ||
+    filters.week !== "all" ||
+    filters.year !== "all"
+  ) {
+    return false;
+  }
   const text = Object.values(task.values).join(" ").toLowerCase();
   if (filters.search && !text.includes(filters.search.toLowerCase())) return false;
   return matchesDims(task, filters);

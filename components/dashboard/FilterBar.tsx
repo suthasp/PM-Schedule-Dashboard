@@ -51,10 +51,24 @@ export function FilterBar({ data }: { data: ScheduleData }): ReactNode {
 
   const set = <K extends keyof Filters>(key: K) => (value: Filters[K]) => setFilter(key, value);
 
+  // Weeks narrow to the chosen month; changing month drops a stale week pick.
+  const weekOptions = data.weeks
+    .filter((w) => filters.month === "all" || w.month === filters.month)
+    .map((w) => w.label);
+
   return (
-    <div className="card no-print grid grid-cols-2 gap-3 p-4 sm:grid-cols-3 lg:grid-cols-7">
+    <div className="card no-print grid grid-cols-2 gap-3 p-4 sm:grid-cols-3 lg:grid-cols-8">
       <FilterSelect<number> label="Year" value={filters.year} options={data.years} onChange={set("year")} />
-      <FilterSelect<string> label="Month" value={filters.month} options={data.months} onChange={set("month")} />
+      <FilterSelect<string>
+        label="Month"
+        value={filters.month}
+        options={data.months}
+        onChange={(v) => {
+          setFilter("month", v);
+          setFilter("week", "all");
+        }}
+      />
+      <FilterSelect<string> label="Week" value={filters.week} options={weekOptions} onChange={set("week")} />
       <FilterSelect<string> label="Site / Data Hall" value={filters.site} options={data.sites} onChange={set("site")} />
       <FilterSelect<JobStatus>
         label="Status"
