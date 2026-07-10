@@ -37,6 +37,14 @@ export const STATUS_CHIPS: Record<JobStatus, { bg: string; fg: string }> = {
   Overdue: { bg: "#d03b3b", fg: "#ffffff" },
 };
 
+/** Plan-vs-Actual table: solid group-header fills + theme-aware number ink. */
+export const PLAN_ACTUAL_TABLE = {
+  plan: { header: "#a16207", ink: { light: "#a16207", dark: "#fab219" } },
+  actual: { header: "#1d4ed8", ink: { light: "#1d4ed8", dark: "#6da7ec" } },
+  pct: { header: "#6d28d9" },
+  duty: { header: "#9a3412", ink: { light: "#9a3412", dark: "#eb6834" } },
+} as const;
+
 /** Solid chip fills for the Problem sheet's Criteria column. */
 export const CRITERIA_CHIPS: Record<string, { bg: string; fg: string }> = {
   MINOR: { bg: "#fab219", fg: "#0d366b" },

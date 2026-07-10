@@ -10,6 +10,7 @@ import { TrendLineChart } from "@/components/dashboard/charts/TrendLineChart";
 import { WeeklyBarChart } from "@/components/dashboard/charts/WeeklyBarChart";
 import { FilterBar } from "@/components/dashboard/FilterBar";
 import { KpiRow } from "@/components/dashboard/KpiRow";
+import { PlanActualTable } from "@/components/dashboard/PlanActualTable";
 import { SiteSummaryRow } from "@/components/dashboard/SiteSummaryRow";
 import { useFilters } from "@/components/providers/FilterProvider";
 import { useSettings } from "@/components/providers/SettingsProvider";
@@ -63,6 +64,13 @@ export function DashboardView({ data }: { data: ScheduleData }): ReactNode {
         <KpiRow kpis={kpis} />
 
         <SiteSummaryRow data={data} />
+
+        <ChartCard
+          title="Plan vs Actual by Site"
+          subtitle="Scheduled vs finished jobs per duty cycle — click a row to filter by site"
+        >
+          <PlanActualTable data={data} />
+        </ChartCard>
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
           <ChartCard title="PM Status" subtitle="Share of jobs by derived status">
