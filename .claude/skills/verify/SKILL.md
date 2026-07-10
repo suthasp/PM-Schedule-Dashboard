@@ -29,6 +29,26 @@ $edge = "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
 
 `--virtual-time-budget` is needed so client-side data fetching (TanStack Query → /api/* CSV proxies) completes before capture.
 
+Headless Edge follows the OS color scheme (dark on this machine). To test a specific theme or interact with the page (type into filters, click), use playwright-core driving the installed Edge — no browser download needed:
+
+```powershell
+npm install --no-save playwright-core   # not in package.json; re-run after any npm install
+```
+
+```js
+// resolve from the project since scripts live in the scratchpad
+import { createRequire } from "module";
+const require = createRequire("d:/OneDrive/Documents/GitHub/PM_Schedule_Dashboard/package.json");
+const { chromium } = require("playwright-core");
+const browser = await chromium.launch({
+  executablePath: "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+  headless: true,
+});
+const ctx = await browser.newContext({ colorScheme: "light", viewport: { width: 1720, height: 1000 } });
+// AG Grid floating-filter inputs: target via aria-label, e.g. input[aria-label="CN Site Filter Input"]
+// (the first input by index is often a disabled number-filter input)
+```
+
 ## Flows worth driving
 
 - `/` dashboard: charts render, KPI tiles clickable (global filter)

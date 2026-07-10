@@ -111,6 +111,11 @@ div.ag-theme-quartz {
 .ag-theme-quartz .ag-floating-filter {
   background-color: #eff6ff;
 }
+/* Filter inputs sit on white — don't inherit the white header foreground */
+.ag-theme-quartz .ag-floating-filter .ag-input-field-input,
+.ag-theme-quartz .ag-floating-filter-input .ag-input-field-input {
+  color: #0b0b0b;
+}
 div.ag-theme-quartz-dark {
   --ag-background-color: #1a1a19;
   --ag-header-background-color: #1e3a8a;
