@@ -66,6 +66,15 @@ export function DashboardView({ data }: { data: ScheduleData }): ReactNode {
         <SiteSummaryRow data={data} />
 
         <ChartCard
+          title={`Weekly PM Trend — ${data.weeks[0]?.label ?? ""}/${data.weeks[0]?.year ?? ""} – ${
+            data.weeks[data.weeks.length - 1]?.label ?? ""
+          }/${data.weeks[data.weeks.length - 1]?.year ?? ""}`}
+          subtitle="Jobs per week, stacked by status — click a bar to filter by month"
+        >
+          <WeeklyBarChart jobs={jobs} data={data} />
+        </ChartCard>
+
+        <ChartCard
           title="Plan vs Actual by Site"
           subtitle="Scheduled vs finished jobs per duty cycle — click a row to filter by site"
         >
@@ -113,15 +122,6 @@ export function DashboardView({ data }: { data: ScheduleData }): ReactNode {
             />
           </ChartCard>
         </div>
-
-        <ChartCard
-          title={`Weekly PM Trend — ${data.weeks[0]?.label ?? ""}/${data.weeks[0]?.year ?? ""} – ${
-            data.weeks[data.weeks.length - 1]?.label ?? ""
-          }/${data.weeks[data.weeks.length - 1]?.year ?? ""}`}
-          subtitle="Jobs per week, stacked by status — click a bar to filter by month"
-        >
-          <WeeklyBarChart jobs={jobs} data={data} />
-        </ChartCard>
 
         <ChartCard
           title="Weekly Calendar Heatmap"
