@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useMemo, type ReactNode } from "react";
 import { useFilters } from "@/components/providers/FilterProvider";
+import { STATUS_COLORS } from "@/lib/constants";
 import type { PMJob, ScheduleData } from "@/types/schedule";
 import { formatNumber, formatPercent } from "@/utils/format";
 import { jobMatchesFilters } from "@/utils/transform";
@@ -28,12 +29,6 @@ const SITE_COLORS = [
   "#1e40af",
   "#6d28d9",
 ] as const;
-
-function barColor(pct: number): string {
-  if (pct >= 80) return "#0ca30c";
-  if (pct >= 50) return "#fab219";
-  return "#d03b3b";
-}
 
 function summarizeSite(jobs: PMJob[], site: string | null): Omit<SiteSummary, "site"> {
   let total = 0;
@@ -131,7 +126,7 @@ export function SiteSummaryRow({ data }: { data: ScheduleData }): ReactNode {
               >
                 <div
                   className="h-full rounded-full transition-[width] duration-300"
-                  style={{ width: `${c.pct}%`, backgroundColor: barColor(c.pct) }}
+                  style={{ width: `${c.pct}%`, backgroundColor: STATUS_COLORS.Finished.light }}
                 />
               </div>
             </div>
