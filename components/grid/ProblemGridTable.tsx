@@ -21,7 +21,7 @@ import {
 } from "react";
 import { useFilters } from "@/components/providers/FilterProvider";
 import { useSettings } from "@/components/providers/SettingsProvider";
-import { LS_KEYS } from "@/lib/constants";
+import { CRITERIA_CHIPS, LS_KEYS } from "@/lib/constants";
 import type { ProblemData, ProblemRow } from "@/types/problem";
 import { parseDmyMs } from "@/utils/problemTransform";
 
@@ -60,6 +60,21 @@ function LinkCell(p: ICellRendererParams<ProblemRow>): ReactNode {
       Open
       <ExternalLink size={12} aria-hidden />
     </a>
+  );
+}
+
+function CriteriaCell(p: ICellRendererParams<ProblemRow>): ReactNode {
+  const value = typeof p.value === "string" ? p.value.trim() : "";
+  if (!value) return null;
+  const chip = CRITERIA_CHIPS[value.toUpperCase()];
+  if (!chip) return value;
+  return (
+    <span
+      className="inline-block rounded-full px-2 py-0.5 text-[11px] font-bold leading-4"
+      style={{ backgroundColor: chip.bg, color: chip.fg }}
+    >
+      {value}
+    </span>
   );
 }
 
@@ -123,6 +138,9 @@ function buildProblemColumnDefs(data: ProblemData): ColDef<ProblemRow>[] {
           cellRenderer: LinkCell,
         };
       default:
+        if (/^criteria/i.test(label)) {
+          return { ...base, width: 110, cellRenderer: CriteriaCell };
+        }
         return {
           ...base,
           flex: LONG_TEXT.test(label) ? 2 : undefined,

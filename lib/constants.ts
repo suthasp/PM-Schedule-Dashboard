@@ -37,6 +37,13 @@ export const STATUS_CHIPS: Record<JobStatus, { bg: string; fg: string }> = {
   Overdue: { bg: "#d03b3b", fg: "#ffffff" },
 };
 
+/** Solid chip fills for the Problem sheet's Criteria column. */
+export const CRITERIA_CHIPS: Record<string, { bg: string; fg: string }> = {
+  MINOR: { bg: "#fab219", fg: "#0d366b" },
+  MAJOR: { bg: "#eb6834", fg: "#ffffff" },
+  CRITICAL: { bg: "#d03b3b", fg: "#ffffff" },
+};
+
 /** Soft row/background tints per status for grid rows and badges. */
 export const STATUS_TINTS: Record<JobStatus, { light: string; dark: string }> = {
   Finished: { light: "rgba(12,163,12,0.10)", dark: "rgba(12,163,12,0.16)" },
