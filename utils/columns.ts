@@ -55,7 +55,7 @@ export function buildColumnDefs(data: ScheduleData, dark: boolean): ColDef<GridR
         return {
           ...base,
           headerName: header,
-          headerTooltip: weekInfo ? `${weekInfo.month} ${weekInfo.year} · w/c ${weekInfo.startDate}` : header,
+          headerTooltip: weekInfo ? `${weekInfo.month} ${weekInfo.year} · starts ${weekInfo.startDate}` : header,
           width: 52,
           minWidth: 44,
           floatingFilter: false,
