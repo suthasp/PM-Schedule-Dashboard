@@ -5,12 +5,18 @@ export const CSV_URL =
 
 export const DATA_QUERY_KEY = ["pm-schedule"] as const;
 
+export const PROBLEM_CSV_URL =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vSfnK8E3LpCNN7n4vjqdUywTC0zGp1rhkWi7ok-svB8Fnv94mN-0uvQXpGdfKaf_a17q6r836GXvELV/pub?gid=98007425&single=true&output=csv";
+
+export const PROBLEM_QUERY_KEY = ["problem-list"] as const;
+
 /** Default auto-refresh interval: 5 minutes. */
 export const DEFAULT_REFRESH_MINUTES = 5;
 
 export const LS_KEYS = {
   settings: "pmsd:settings",
   gridColumnState: "pmsd:grid-column-state-v2",
+  problemGridColumnState: "pmsd:problem-grid-column-state-v1",
   sidebarCollapsed: "pmsd:sidebar-collapsed",
 } as const;
 

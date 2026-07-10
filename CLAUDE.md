@@ -17,6 +17,8 @@ There is no test suite. TypeScript is strict and the codebase avoids `any`. Impo
 
 Executive dashboard for preventive-maintenance (PM) scheduling, driven live from a **published Google Sheet CSV** (fiscal-year matrix: one PM task per row, one `WK##` column per week). There is no database — all state is derived client-side from that CSV on every fetch.
 
+There is a second, simpler data source: the **Problem sheet** (`PROBLEM_CSV_URL`), a flat single-header-row issue tracker shown as an AG Grid on `/problem`. It has its own parallel pipeline (`app/api/problem/route.ts` → `services/problemService.ts` → `utils/problemTransform.ts` → `hooks/useProblemData.ts` → `components/grid/ProblemGridTable.tsx`) and does not participate in the global dimension filters — only the header search (grid quick filter).
+
 ## Data pipeline (the big picture)
 
 1. **`lib/constants.ts`** holds `CSV_URL` (the published Google Sheet). Change the data source here.

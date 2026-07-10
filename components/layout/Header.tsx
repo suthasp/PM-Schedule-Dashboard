@@ -1,8 +1,9 @@
 "use client";
 
+import { useIsFetching, useQueryClient } from "@tanstack/react-query";
 import { Menu, Moon, RefreshCw, Search, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { useFilters } from "@/components/providers/FilterProvider";
 import { useCurrentTime } from "@/hooks/useCurrentTime";
 import { useScheduleData } from "@/hooks/useScheduleData";
@@ -28,8 +29,15 @@ function ThemeToggle(): ReactNode {
 
 export function Header({ onMenuClick }: { onMenuClick: () => void }): ReactNode {
   const now = useCurrentTime();
-  const { query, lastUpdated, refresh } = useScheduleData();
+  const { lastUpdated } = useScheduleData();
   const { filters, setFilter } = useFilters();
+
+  // Refresh every dataset (PM schedule + Problem), not just the schedule query.
+  const queryClient = useQueryClient();
+  const fetching = useIsFetching() > 0;
+  const refresh = useCallback(() => {
+    void queryClient.invalidateQueries();
+  }, [queryClient]);
 
   return (
     <header className="glass no-print sticky top-0 z-30 flex flex-wrap items-center gap-3 px-4 py-3 md:px-6">
@@ -73,10 +81,10 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }): ReactNode 
         type="button"
         aria-label="Refresh data"
         onClick={refresh}
-        disabled={query.isFetching}
+        disabled={fetching}
         className="flex h-9 w-9 items-center justify-center rounded-xl border hairline transition-colors hover:bg-black/5 disabled:opacity-50 dark:hover:bg-white/5"
       >
-        <RefreshCw size={16} className={query.isFetching ? "animate-spin" : ""} aria-hidden />
+        <RefreshCw size={16} className={fetching ? "animate-spin" : ""} aria-hidden />
       </button>
 
       <ThemeToggle />
