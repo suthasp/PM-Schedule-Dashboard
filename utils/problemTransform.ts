@@ -19,7 +19,8 @@ export function parseDmyMs(raw: string): number | null {
 function detectKind(samples: string[]): ProblemColumnKind {
   const filled = samples.map((s) => s.trim()).filter((s) => s !== "");
   if (filled.length === 0) return "text";
-  if (filled.every((s) => /^https?:\/\//i.test(s))) return "link";
+  // Attachment columns mix URLs with the odd plain filename — majority of URLs wins.
+  if (filled.filter((s) => /^https?:\/\//i.test(s)).length > filled.length / 2) return "link";
   if (filled.every((s) => parseDmyMs(s) !== null)) return "date";
   if (filled.every((s) => /^-?[\d,]+(\.\d+)?$/.test(s))) return "number";
   return "text";

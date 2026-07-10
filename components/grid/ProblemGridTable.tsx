@@ -46,11 +46,13 @@ function parseNumeric(raw: string): number | null {
 }
 
 function LinkCell(p: ICellRendererParams<ProblemRow>): ReactNode {
-  const url = typeof p.value === "string" ? p.value.trim() : "";
-  if (!url) return null;
+  const value = typeof p.value === "string" ? p.value.trim() : "";
+  if (!value) return null;
+  // Link columns can still hold the odd plain filename — show it as text.
+  if (!/^https?:\/\//i.test(value)) return value;
   return (
     <a
-      href={url}
+      href={value}
       target="_blank"
       rel="noreferrer"
       className="inline-flex items-center gap-1 text-accent underline underline-offset-2 dark:text-accent-dark"
