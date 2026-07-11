@@ -26,6 +26,31 @@ function detectKind(samples: string[]): ProblemColumnKind {
   return "text";
 }
 
+/** Headers resolved for the Problem sheet's well-known dimensions (null if absent). */
+export interface ProblemFields {
+  site: string | null;
+  scope: string | null;
+  workStatus: string | null;
+  subCause: string | null;
+}
+
+/** Resolve well-known Problem columns by label, schema-agnostically. */
+export function resolveProblemFields(data: ProblemData): ProblemFields {
+  const find = (patterns: RegExp[]): string | null => {
+    for (const pattern of patterns) {
+      const hit = data.columns.find((c) => pattern.test(c.label));
+      if (hit) return hit.header;
+    }
+    return null;
+  };
+  return {
+    site: find([/^cn\s*site$/i, /site/i]),
+    scope: find([/scope/i]),
+    workStatus: find([/^work\s*status$/i]),
+    subCause: find([/^sub\s*cause/i]),
+  };
+}
+
 /**
  * Turn the published Problem sheet CSV into a grid-ready dataset. Unlike the
  * PM schedule this sheet is flat: one header row (cells may contain embedded

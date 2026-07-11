@@ -8,6 +8,7 @@ import { useChartTheme } from "@/hooks/useChartTheme";
 import { PROBLEM_SUMMARY } from "@/lib/constants";
 import type { ProblemData } from "@/types/problem";
 import { formatNumber, formatPercent } from "@/utils/format";
+import { resolveProblemFields } from "@/utils/problemTransform";
 
 interface SiteStat {
   site: string;
@@ -28,19 +29,9 @@ interface Summary {
   subCauses: { cause: string; count: number }[];
 }
 
-function findLabel(data: ProblemData, patterns: RegExp[]): string | null {
-  for (const pattern of patterns) {
-    const hit = data.columns.find((c) => pattern.test(c.label));
-    if (hit) return hit.header;
-  }
-  return null;
-}
-
 function summarize(data: ProblemData): Summary {
-  const siteField = findLabel(data, [/^cn\s*site$/i, /site/i]);
-  const statusField = findLabel(data, [/^work\s*status$/i]);
-  const scopeField = findLabel(data, [/scope/i]);
-  const causeField = findLabel(data, [/^sub\s*cause/i]);
+  const { site: siteField, workStatus: statusField, scope: scopeField, subCause: causeField } =
+    resolveProblemFields(data);
 
   const bySite = new Map<string, SiteStat>();
   const byCause = new Map<string, number>();
