@@ -10,6 +10,7 @@ import { TrendLineChart } from "@/components/dashboard/charts/TrendLineChart";
 import { WeeklyBarChart } from "@/components/dashboard/charts/WeeklyBarChart";
 import { FilterBar } from "@/components/dashboard/FilterBar";
 import { KpiRow } from "@/components/dashboard/KpiRow";
+import { MonthlySitePivot } from "@/components/dashboard/MonthlySitePivot";
 import { PlanActualTable } from "@/components/dashboard/PlanActualTable";
 import { SiteSummaryRow } from "@/components/dashboard/SiteSummaryRow";
 import { useFilters } from "@/components/providers/FilterProvider";
@@ -72,6 +73,13 @@ export function DashboardView({ data }: { data: ScheduleData }): ReactNode {
           subtitle="Jobs per week, stacked by status — click a bar to filter by month"
         >
           <WeeklyBarChart jobs={jobs} data={data} />
+        </ChartCard>
+
+        <ChartCard
+          title="PM CNO by Month"
+          subtitle="Plan / Done / Remain per site by fiscal month — click a month or site to filter"
+        >
+          <MonthlySitePivot data={data} />
         </ChartCard>
 
         <ChartCard

@@ -45,6 +45,15 @@ export const PLAN_ACTUAL_TABLE = {
   duty: { header: "#9a3412", ink: { light: "#9a3412", dark: "#eb6834" } },
 } as const;
 
+/** Monthly per-site pivot: translucent column tints that work on both themes. */
+export const MONTH_PIVOT_TINTS = {
+  plan: "rgba(74, 58, 167, 0.10)",
+  done: "rgba(12, 163, 12, 0.10)",
+  remain: "rgba(208, 59, 59, 0.10)",
+  monthFirstHalf: "rgba(42, 120, 214, 0.14)",
+  monthSecondHalf: "rgba(235, 104, 52, 0.14)",
+} as const;
+
 /** Problem summary dashboard: stat-tile fills (solid) and scope tints. */
 export const PROBLEM_SUMMARY = {
   problem: { bg: "#1d4ed8", fg: "#ffffff" },
