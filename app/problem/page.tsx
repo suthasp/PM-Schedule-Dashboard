@@ -12,6 +12,11 @@ const ProblemGridTable = dynamic(
   { ssr: false, loading: () => <GridSkeleton /> },
 );
 
+const ProblemSummary = dynamic(
+  () => import("@/components/problem/ProblemSummary").then((m) => m.ProblemSummary),
+  { ssr: false },
+);
+
 export default function ProblemPage(): ReactNode {
   const { query, refresh } = useProblemData();
 
@@ -21,5 +26,10 @@ export default function ProblemPage(): ReactNode {
       <ErrorPage title="Could not load problem data" message={query.error.message} onRetry={refresh} />
     );
   }
-  return <ProblemGridTable data={query.data} />;
+  return (
+    <div className="space-y-4">
+      <ProblemSummary data={query.data} />
+      <ProblemGridTable data={query.data} />
+    </div>
+  );
 }

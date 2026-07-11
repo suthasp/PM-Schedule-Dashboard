@@ -45,6 +45,16 @@ export const PLAN_ACTUAL_TABLE = {
   duty: { header: "#9a3412", ink: { light: "#9a3412", dark: "#eb6834" } },
 } as const;
 
+/** Problem summary dashboard: stat-tile fills (solid) and scope tints. */
+export const PROBLEM_SUMMARY = {
+  problem: { bg: "#1d4ed8", fg: "#ffffff" },
+  finished: { bg: "#0ca30c", fg: "#ffffff" },
+  inProgress: { bg: "#eb6834", fg: "#ffffff" },
+  scopeAmc: { bg: { light: "#cde2fb", dark: "#1d2f4d" }, ink: { light: "#184f95", dark: "#9ec5f4" } },
+  scopeR: { bg: { light: "#fdf0cd", dark: "#3d3113" }, ink: { light: "#8a5a00", dark: "#fab219" } },
+  scopeOut: { bg: { light: "#fbdccd", dark: "#43261a" }, ink: { light: "#9a3412", dark: "#eb9a7c" } },
+} as const;
+
 /** Solid chip fills for the Problem sheet's Criteria column. */
 export const CRITERIA_CHIPS: Record<string, { bg: string; fg: string }> = {
   MINOR: { bg: "#fab219", fg: "#0d366b" },
