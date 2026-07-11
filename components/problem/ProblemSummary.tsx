@@ -284,21 +284,23 @@ export function ProblemSummary({ data }: { data: ProblemData }): ReactNode {
                     ))}
                   </Pie>
                   <Tooltip
-                    content={({ active, payload }) =>
-                      active && payload?.[0] ? (
+                    content={({ active, payload }) => {
+                      const slice = active ? payload?.[0] : undefined;
+                      if (!slice) return null;
+                      return (
                         <ChartTooltip
                           rows={[
                             {
-                              name: String(payload[0].name),
-                              value: Number(payload[0].value),
+                              name: String(slice.name),
+                              value: Number(slice.value),
                               color:
-                                donut.find((d) => d.name === payload[0].name)?.color ??
+                                donut.find((d) => d.name === slice.name)?.color ??
                                 theme.ink.primary,
                             },
                           ]}
                         />
-                      ) : null
-                    }
+                      );
+                    }}
                   />
                 </PieChart>
               </ResponsiveContainer>
