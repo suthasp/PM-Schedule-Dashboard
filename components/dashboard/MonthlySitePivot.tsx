@@ -15,6 +15,15 @@ interface CellStat {
 const EMPTY: CellStat = { plan: 0, done: 0 };
 const hairline = { borderColor: "var(--hairline)" } as const;
 
+/** Sticky-left cells need an opaque surface under their tint so scrolled columns don't show through. */
+const stickyLeft = (tint?: string) =>
+  ({
+    ...hairline,
+    backgroundColor: "var(--surface)",
+    backgroundImage: tint ? `linear-gradient(${tint}, ${tint})` : undefined,
+    boxShadow: "1px 0 0 var(--hairline)",
+  }) as const;
+
 function TripleCells({ stat, bold = false }: { stat: CellStat; bold?: boolean }): ReactNode {
   const cls = `border-b px-2 py-1.5 text-center tabular-nums ${bold ? "font-bold" : ""}`;
   return (
@@ -79,7 +88,11 @@ export function MonthlySitePivot({ data }: { data: ScheduleData }): ReactNode {
       >
         <thead>
           <tr>
-            <th rowSpan={2} className="border-b px-3 py-1.5 text-left align-bottom" style={hairline}>
+            <th
+              rowSpan={2}
+              className="sticky left-0 z-10 border-b px-3 py-1.5 text-left align-bottom"
+              style={stickyLeft()}
+            >
               Month
             </th>
             <th
@@ -118,7 +131,7 @@ export function MonthlySitePivot({ data }: { data: ScheduleData }): ReactNode {
                 key={month}
                 className={active ? "ring-1 ring-inset ring-accent dark:ring-accent-dark" : ""}
               >
-                <td className="border-b p-0" style={{ backgroundColor: halfTint(idx), ...hairline }}>
+                <td className="sticky left-0 z-10 border-b p-0" style={stickyLeft(halfTint(idx))}>
                   <button
                     type="button"
                     onClick={() => toggleFilter("month", month)}
@@ -141,7 +154,7 @@ export function MonthlySitePivot({ data }: { data: ScheduleData }): ReactNode {
             );
           })}
           <tr className="font-bold">
-            <td className="border-t-2 px-3 py-1.5" style={hairline}>
+            <td className="sticky left-0 z-10 border-t-2 px-3 py-1.5" style={stickyLeft()}>
               Total
             </td>
             <td
