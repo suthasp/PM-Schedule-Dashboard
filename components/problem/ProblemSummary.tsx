@@ -70,8 +70,8 @@ function summarize(data: ProblemData): Summary {
     .sort((a, b) => b.total - a.total || a.site.localeCompare(b.site));
 
   const causesSorted = [...byCause.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
-  const subCauses = causesSorted.slice(0, 9).map(([cause, count]) => ({ cause, count }));
-  const othersCount = causesSorted.slice(9).reduce((sum, [, count]) => sum + count, 0);
+  const subCauses = causesSorted.slice(0, 10).map(([cause, count]) => ({ cause, count }));
+  const othersCount = causesSorted.slice(10).reduce((sum, [, count]) => sum + count, 0);
   if (othersCount > 0) subCauses.push({ cause: "Others", count: othersCount });
 
   return { total: data.rows.length, finished, inProgress: data.rows.length - finished, inAmc, inR, out, sites, subCauses };
@@ -228,7 +228,7 @@ export function ProblemSummary({ data }: { data: ProblemData }): ReactNode {
           </div>
         </ChartCard>
 
-        <ChartCard title="Sub Cause (Top 9)" subtitle="Most frequent problem causes">
+        <ChartCard title="Sub Cause (Top 10)" subtitle="Most frequent problem causes">
           <table className="w-full border-collapse text-xs">
             <thead>
               <tr className="border-b" style={hairline}>
