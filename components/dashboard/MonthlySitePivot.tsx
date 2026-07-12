@@ -2,7 +2,7 @@
 
 import { useMemo, type ReactNode } from "react";
 import { useFilters } from "@/components/providers/FilterProvider";
-import { MONTH_PIVOT_TINTS } from "@/lib/constants";
+import { MONTH_PIVOT_TINTS, SITE_COLORS } from "@/lib/constants";
 import type { ScheduleData } from "@/types/schedule";
 import { formatNumber } from "@/utils/format";
 import { jobMatchesFilters } from "@/utils/transform";
@@ -102,14 +102,23 @@ export function MonthlySitePivot({ data }: { data: ScheduleData }): ReactNode {
             >
               Plan
             </th>
-            {data.sites.map((site) => (
-              <th key={site} colSpan={3} className="border-l px-2 py-1.5" style={hairline}>
+            {data.sites.map((site, i) => (
+              <th
+                key={site}
+                colSpan={3}
+                className="border-l p-0"
+                style={{
+                  ...hairline,
+                  // Same fill as this site's summary card, so the two read as one system.
+                  backgroundColor: SITE_COLORS[i % SITE_COLORS.length],
+                }}
+              >
                 <button
                   type="button"
                   onClick={() => toggleFilter("site", site)}
                   aria-pressed={filters.site === site}
-                  className={`w-full whitespace-nowrap text-center font-bold text-accent transition-opacity dark:text-accent-dark ${
-                    filters.site !== "all" && filters.site !== site ? "opacity-40" : ""
+                  className={`w-full whitespace-nowrap px-2 py-1.5 text-center font-bold text-white transition-opacity ${
+                    filters.site !== "all" && filters.site !== site ? "opacity-50" : ""
                   }`}
                 >
                   {site}
