@@ -45,6 +45,23 @@ export const PLAN_ACTUAL_TABLE = {
   duty: { header: "#9a3412", ink: { light: "#9a3412", dark: "#eb6834" } },
 } as const;
 
+/**
+ * Site-card header fills: hue-spaced 700-level tones of equal weight, so
+ * every card differs while white text stays ≥4.5:1 on all of them.
+ */
+export const SITE_COLORS = [
+  "#2563eb", // royal blue
+  "#0f766e", // teal
+  "#7c3aed", // violet
+  "#0369a1", // deep sky
+  "#15803d", // green
+  "#b45309", // amber brown
+  "#be123c", // rose
+  "#a21caf", // fuchsia
+  "#4338ca", // indigo
+  "#57534e", // warm gray (spare)
+] as const;
+
 /** Monthly per-site pivot: translucent column tints that work on both themes. */
 export const MONTH_PIVOT_TINTS = {
   plan: "rgba(74, 58, 167, 0.10)",

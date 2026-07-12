@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { useMemo, type ReactNode } from "react";
 import { useFilters } from "@/components/providers/FilterProvider";
-import { STATUS_COLORS } from "@/lib/constants";
+import { SITE_COLORS, STATUS_COLORS } from "@/lib/constants";
 import type { PMJob, ScheduleData } from "@/types/schedule";
 import { formatNumber, formatPercent } from "@/utils/format";
 import { jobMatchesFilters } from "@/utils/transform";
@@ -15,20 +15,6 @@ interface SiteSummary {
   remain: number;
   pct: number;
 }
-
-/** Header colors (700-ish shades so white text stays readable). */
-const SITE_COLORS = [
-  "#1d4ed8",
-  "#0e7490",
-  "#7c3aed",
-  "#15803d",
-  "#b91c1c",
-  "#a16207",
-  "#be123c",
-  "#047857",
-  "#1e40af",
-  "#6d28d9",
-] as const;
 
 function summarizeSite(jobs: PMJob[], site: string | null): Omit<SiteSummary, "site"> {
   let total = 0;
