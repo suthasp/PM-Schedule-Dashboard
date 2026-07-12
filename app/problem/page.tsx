@@ -24,6 +24,11 @@ const ProblemSummary = dynamic(
   { ssr: false },
 );
 
+const ProblemSiteCards = dynamic(
+  () => import("@/components/problem/ProblemSiteCards").then((m) => m.ProblemSiteCards),
+  { ssr: false },
+);
+
 function uniqueSorted(values: (string | undefined)[]): string[] {
   return [...new Set(values.map((v) => (v ?? "").trim()).filter((v) => v !== ""))].sort((a, b) =>
     a.localeCompare(b),
@@ -67,7 +72,15 @@ function ProblemContent({ data }: { data: ProblemData }): ReactNode {
         filters={filters}
         onChange={setFilters}
       />
-      <ProblemSummary data={filtered} />
+      <ProblemSummary data={filtered}>
+        <ProblemSiteCards
+          data={data}
+          filters={filters}
+          onToggleSite={(site) =>
+            setFilters({ ...filters, site: filters.site === site ? "all" : site })
+          }
+        />
+      </ProblemSummary>
       <ProblemGridTable data={filtered} />
     </div>
   );

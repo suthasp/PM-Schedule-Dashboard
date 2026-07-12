@@ -136,8 +136,14 @@ function ScopeTile({
   );
 }
 
-/** Executive summary above the Problem grid: KPI + scope tiles, per-site and top-cause tables, status donut. */
-export function ProblemSummary({ data }: { data: ProblemData }): ReactNode {
+/** Executive summary above the Problem grid: KPI + scope tiles, per-site and top-cause tables, status donut. `children` renders between the tile row and the report cards. */
+export function ProblemSummary({
+  data,
+  children,
+}: {
+  data: ProblemData;
+  children?: ReactNode;
+}): ReactNode {
   const theme = useChartTheme();
   const s = useMemo(() => summarize(data), [data]);
 
@@ -176,6 +182,8 @@ export function ProblemSummary({ data }: { data: ProblemData }): ReactNode {
         <ScopeTile label="In (R)" value={s.inR} note="In(R) items" bg={PROBLEM_SUMMARY.scopeR.bg} ink={PROBLEM_SUMMARY.scopeR.ink} />
         <ScopeTile label="Out" value={s.out} note="Out of scope" bg={PROBLEM_SUMMARY.scopeOut.bg} ink={PROBLEM_SUMMARY.scopeOut.ink} />
       </div>
+
+      {children}
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <ChartCard title="Site Summary" subtitle="Problems per site with completion">
