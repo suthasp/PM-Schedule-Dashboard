@@ -5,6 +5,7 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  LabelList,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -21,6 +22,7 @@ interface WeekDatum {
   Finished: number;
   Remaining: number;
   Overdue: number;
+  total: number;
   [key: string]: string | number;
 }
 
@@ -49,11 +51,15 @@ export function WeeklyBarChart({
         Finished: 0,
         Remaining: 0,
         Overdue: 0,
+        total: 0,
       });
     }
     for (const j of jobs) {
       const row = byIndex.get(j.week.index);
-      if (row) row[j.status] = Number(row[j.status]) + 1;
+      if (row) {
+        row[j.status] = Number(row[j.status]) + 1;
+        row.total++;
+      }
     }
     return data.weeks
       .map((w) => byIndex.get(w.index))
@@ -80,7 +86,7 @@ export function WeeklyBarChart({
         ))}
       </ul>
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={rows} margin={{ top: 8, right: 8, left: -18, bottom: 0 }} barCategoryGap="18%">
+        <BarChart data={rows} margin={{ top: 16, right: 8, left: -18, bottom: 0 }} barCategoryGap="18%">
           <CartesianGrid vertical={false} stroke={theme.ink.grid} />
           <XAxis
             dataKey="label"
@@ -120,7 +126,16 @@ export function WeeklyBarChart({
               onClick={pickWeek}
               className="cursor-pointer"
               opacity={filters.status === "all" || filters.status === status ? 1 : 0.35}
-            />
+            >
+              {i === JOB_STATUSES.length - 1 && (
+                <LabelList
+                  dataKey="total"
+                  position="top"
+                  formatter={(v: number) => (v > 0 ? v : "")}
+                  style={{ fontSize: 8.5, fill: theme.ink.secondary }}
+                />
+              )}
+            </Bar>
           ))}
         </BarChart>
       </ResponsiveContainer>
