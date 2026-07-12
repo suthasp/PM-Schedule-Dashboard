@@ -56,8 +56,9 @@ export function ProblemSiteCards({
 
   return (
     <div
-      className="grid gap-2"
-      style={{ gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))" }}
+      className="grid gap-2 overflow-x-auto pb-1"
+      // Always one row: cards shrink to fit, and narrow screens scroll sideways.
+      style={{ gridTemplateColumns: `repeat(${cards.length}, minmax(118px, 1fr))` }}
     >
       {cards.map((c, i) => {
         const color = SITE_COLORS[i % SITE_COLORS.length] ?? SITE_COLORS[0];
