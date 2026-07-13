@@ -343,6 +343,7 @@ export function ProblemGridTable({ data }: ProblemGridTableProps): ReactNode {
           defaultColDef={defaultColDef}
           onGridReady={onGridReady}
           getRowId={(p) => p.data.id}
+          rowHeight={32}
           pagination
           paginationPageSize={25}
           paginationPageSizeSelector={[25, 50, 100, 200]}
