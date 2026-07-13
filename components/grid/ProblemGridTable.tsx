@@ -81,6 +81,14 @@ function CriteriaCell(p: ICellRendererParams<ProblemRow>): ReactNode {
 /** Free-text columns holding long Thai descriptions get room and tooltips. */
 const LONG_TEXT = /description|remark|รายละเอียด|แก้ไข|detail/i;
 
+/** Columns holding short codes (BMA05, 06-26, In(AMC)…) — sized to content. */
+const TIGHT_WIDTHS: [RegExp, number][] = [
+  [/^old\s*region$/i, 110],
+  [/^region\s*tra?ck/i, 130],
+  [/^punch/i, 100],
+  [/scope/i, 120],
+];
+
 function buildProblemColumnDefs(data: ProblemData): ColDef<ProblemRow>[] {
   const cols = data.columns.map<ColDef<ProblemRow>>(({ header, label, kind }) => {
     const base: ColDef<ProblemRow> = {
@@ -137,9 +145,13 @@ function buildProblemColumnDefs(data: ProblemData): ColDef<ProblemRow>[] {
           width: 110,
           cellRenderer: LinkCell,
         };
-      default:
+      default: {
         if (/^criteria/i.test(label)) {
           return { ...base, width: 110, cellRenderer: CriteriaCell };
+        }
+        const tight = TIGHT_WIDTHS.find(([pattern]) => pattern.test(label));
+        if (tight) {
+          return { ...base, width: tight[1], minWidth: 80 };
         }
         return {
           ...base,
@@ -147,6 +159,7 @@ function buildProblemColumnDefs(data: ProblemData): ColDef<ProblemRow>[] {
           minWidth: LONG_TEXT.test(label) ? 240 : 100,
           tooltipValueGetter: (p) => p.data?.values[header] ?? "",
         };
+      }
     }
   });
 
