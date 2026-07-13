@@ -116,6 +116,10 @@ export function buildColumnDefs(data: ScheduleData, dark: boolean): ColDef<GridR
         if (/duty\s*cycle/i.test(header)) {
           return { ...base, width: 110, minWidth: 80 };
         }
+        // Category holds short names (Network, Power…) — size to content.
+        if (header === data.fields.category) {
+          return { ...base, width: 130, minWidth: 100 };
+        }
         return {
           ...base,
           flex: header.toLowerCase().includes("instruction") ? 2 : undefined,
