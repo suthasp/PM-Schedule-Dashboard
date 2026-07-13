@@ -112,6 +112,10 @@ export function buildColumnDefs(data: ScheduleData, dark: boolean): ColDef<GridR
           },
         };
       default:
+        // Duty cycle holds one-or-two-letter codes (H, M, 2M…) — keep it tight.
+        if (/duty\s*cycle/i.test(header)) {
+          return { ...base, width: 110, minWidth: 80 };
+        }
         return {
           ...base,
           flex: header.toLowerCase().includes("instruction") ? 2 : undefined,
