@@ -16,11 +16,15 @@ export function parseDmyMs(raw: string): number | null {
   return Date.UTC(year, month - 1, day);
 }
 
-function detectKind(samples: string[]): ProblemColumnKind {
+function detectKind(header: string, samples: string[]): ProblemColumnKind {
   const filled = samples.map((s) => s.trim()).filter((s) => s !== "");
   if (filled.length === 0) return "text";
-  // Attachment columns mix URLs with the odd plain filename — majority of URLs wins.
-  if (filled.filter((s) => /^https?:\/\//i.test(s)).length > filled.length / 2) return "link";
+  // Attachment columns mix URLs with the odd plain filename or an unresolved
+  // Google "กำลังโหลด..." placeholder — a majority of URLs wins, and a
+  // URL-named header with at least one real URL counts too.
+  const urls = filled.filter((s) => /^https?:\/\//i.test(s)).length;
+  if (urls > filled.length / 2) return "link";
+  if (urls > 0 && /url/i.test(header)) return "link";
   if (filled.every((s) => parseDmyMs(s) !== null)) return "date";
   if (filled.every((s) => /^-?[\d,]+(\.\d+)?$/.test(s))) return "number";
   return "text";
@@ -82,11 +86,12 @@ export function transformProblemCsv(rows: string[][]): ProblemData {
   });
 
   const columns: ProblemColumnMeta[] = headers.map((header) => {
-    const samples = problemRows.slice(0, 60).map((r) => r.values[header] ?? "");
+    // Sample every row — link/date values can cluster far down the sheet.
+    const samples = problemRows.map((r) => r.values[header] ?? "");
     return {
       header,
       label: header.split("\n")[0]?.trim() || header,
-      kind: detectKind(samples),
+      kind: detectKind(header, samples),
     };
   });
 
