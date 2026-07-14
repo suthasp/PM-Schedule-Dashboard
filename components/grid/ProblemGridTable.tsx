@@ -30,12 +30,16 @@ import "ag-grid-community/styles/ag-theme-quartz.css";
 
 interface ProblemGridTableProps {
   data: ProblemData;
+  /** localStorage key base for column state (defaults to the Problem grid's). */
+  storageKeyBase?: string;
+  /** Noun shown in the row-count line, e.g. "problems". */
+  itemLabel?: string;
 }
 
 /** Column-state storage is keyed by the header signature so a sheet-schema change resets cleanly. */
-function storageKey(data: ProblemData): string {
+function storageKey(data: ProblemData, base: string): string {
   const headers = data.columns.map((c) => c.header);
-  return `${LS_KEYS.problemGridColumnState}:${headers.join("|").length}-${headers.length}`;
+  return `${base}:${headers.join("|").length}-${headers.length}`;
 }
 
 function parseNumeric(raw: string): number | null {
@@ -165,13 +169,21 @@ function buildProblemColumnDefs(data: ProblemData): ColDef<ProblemRow>[] {
 
   // Pin the row number and site columns for orientation while scrolling wide.
   return cols.map((c) => {
-    if (c.headerName === "No.") return { ...c, pinned: "left", width: 70, minWidth: 60 };
-    if (c.headerName === "CN Site") return { ...c, pinned: "left", width: 120, minWidth: 100 };
+    if (c.headerName === "No." || c.headerName === "Index") {
+      return { ...c, pinned: "left", width: 70, minWidth: 60 };
+    }
+    if (c.headerName === "CN Site" || c.headerName === "RN SiteID") {
+      return { ...c, pinned: "left", width: 120, minWidth: 100 };
+    }
     return c;
   });
 }
 
-export function ProblemGridTable({ data }: ProblemGridTableProps): ReactNode {
+export function ProblemGridTable({
+  data,
+  storageKeyBase = LS_KEYS.problemGridColumnState,
+  itemLabel = "problems",
+}: ProblemGridTableProps): ReactNode {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -194,17 +206,17 @@ export function ProblemGridTable({ data }: ProblemGridTableProps): ReactNode {
     const api = apiRef.current;
     if (!api) return;
     try {
-      window.localStorage.setItem(storageKey(data), JSON.stringify(api.getColumnState()));
+      window.localStorage.setItem(storageKey(data, storageKeyBase), JSON.stringify(api.getColumnState()));
     } catch {
       // storage unavailable — column layout just won't persist
     }
-  }, [data]);
+  }, [data, storageKeyBase]);
 
   const onGridReady = useCallback(
     (e: GridReadyEvent<ProblemRow>) => {
       apiRef.current = e.api;
       try {
-        const raw = window.localStorage.getItem(storageKey(data));
+        const raw = window.localStorage.getItem(storageKey(data, storageKeyBase));
         if (raw) {
           e.api.applyColumnState({
             state: JSON.parse(raw) as ColumnState[],
@@ -215,7 +227,7 @@ export function ProblemGridTable({ data }: ProblemGridTableProps): ReactNode {
         // corrupted state — ignore and use defaults
       }
     },
-    [data],
+    [data, storageKeyBase],
   );
 
   // Global search doubles as the grid quick filter.
@@ -225,10 +237,10 @@ export function ProblemGridTable({ data }: ProblemGridTableProps): ReactNode {
 
   const exportCsv = useCallback(() => {
     apiRef.current?.exportDataAsCsv({
-      fileName: `${settings.exportFilePrefix}-problems-${new Date().toISOString().slice(0, 10)}.csv`,
+      fileName: `${settings.exportFilePrefix}-${itemLabel}-${new Date().toISOString().slice(0, 10)}.csv`,
       allColumns: !settings.exportVisibleColumnsOnly,
     });
-  }, [settings]);
+  }, [settings, itemLabel]);
 
   const autoSize = useCallback(() => {
     apiRef.current?.autoSizeAllColumns();
@@ -239,11 +251,11 @@ export function ProblemGridTable({ data }: ProblemGridTableProps): ReactNode {
     apiRef.current?.resetColumnState();
     setHiddenCols(new Set());
     try {
-      window.localStorage.removeItem(storageKey(data));
+      window.localStorage.removeItem(storageKey(data, storageKeyBase));
     } catch {
       // ignore
     }
-  }, [data]);
+  }, [data, storageKeyBase]);
 
   const toggleColumn = useCallback(
     (colId: string) => {
@@ -275,7 +287,7 @@ export function ProblemGridTable({ data }: ProblemGridTableProps): ReactNode {
     <div className="space-y-3">
       <div className="no-print flex flex-wrap items-center gap-2">
         <p className="text-secondary mr-auto text-sm">
-          {data.rows.length.toLocaleString()} problems
+          {data.rows.length.toLocaleString()} {itemLabel}
         </p>
         <div className="relative">
           <button

@@ -10,6 +10,11 @@ export const PROBLEM_CSV_URL =
 
 export const PROBLEM_QUERY_KEY = ["problem-list"] as const;
 
+export const TRACKING_CSV_URL =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRK3EBk-mmlkd8OLq9FWcZ54hSeR5ohjt0yTSeImXg7FRX3SzIhNB1JAKuaM3RuvooLbIilWycyiqeH/pub?gid=145089885&single=true&output=csv";
+
+export const TRACKING_QUERY_KEY = ["data-tracking"] as const;
+
 /** Default auto-refresh interval: 5 minutes. */
 export const DEFAULT_REFRESH_MINUTES = 5;
 
@@ -17,6 +22,7 @@ export const LS_KEYS = {
   settings: "pmsd:settings",
   gridColumnState: "pmsd:grid-column-state-v2",
   problemGridColumnState: "pmsd:problem-grid-column-state-v1",
+  trackingGridColumnState: "pmsd:tracking-grid-column-state-v1",
   sidebarCollapsed: "pmsd:sidebar-collapsed",
 } as const;
 

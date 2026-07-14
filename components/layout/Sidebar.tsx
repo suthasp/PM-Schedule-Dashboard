@@ -1,7 +1,15 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { AlertTriangle, Info, LayoutDashboard, Settings, Table2, Wrench } from "lucide-react";
+import {
+  Activity,
+  AlertTriangle,
+  Info,
+  LayoutDashboard,
+  Settings,
+  Table2,
+  Wrench,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
@@ -9,6 +17,7 @@ import type { ReactNode } from "react";
 const NAV_ITEMS = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/schedule", label: "PM Schedule", icon: Table2 },
+  { href: "/tracking", label: "Data Tracking", icon: Activity },
   { href: "/problem", label: "Problem", icon: AlertTriangle },
   { href: "/settings", label: "Settings", icon: Settings },
   { href: "/about", label: "About", icon: Info },

@@ -17,7 +17,9 @@ There is no test suite. TypeScript is strict and the codebase avoids `any`. Impo
 
 Executive dashboard for preventive-maintenance (PM) scheduling, driven live from a **published Google Sheet CSV** (fiscal-year matrix: one PM task per row, one `WK##` column per week). There is no database — all state is derived client-side from that CSV on every fetch.
 
-There is a second, simpler data source: the **Problem sheet** (`PROBLEM_CSV_URL`), a flat single-header-row issue tracker shown as an AG Grid on `/problem`. It has its own parallel pipeline (`app/api/problem/route.ts` → `services/problemService.ts` → `utils/problemTransform.ts` → `hooks/useProblemData.ts` → `components/grid/ProblemGridTable.tsx`) and does not participate in the global dimension filters — only the header search (grid quick filter).
+There is a second, simpler data source: the **Problem sheet** (`PROBLEM_CSV_URL`), a flat single-header-row issue tracker shown as an AG Grid on `/problem`. It has its own parallel pipeline (`app/api/problem/route.ts` → `services/problemService.ts` → `utils/problemTransform.ts` → `hooks/useProblemData.ts` → `components/grid/ProblemGridTable.tsx`) and does not participate in the global dimension filters — only the header search (grid quick filter). The `/problem` page adds its own local filters (site / scope / status) plus summary cards on top of the grid.
+
+A third source, the **Data Tracking sheet** (`TRACKING_CSV_URL`, `/tracking`), is flat like the Problem sheet and **reuses that pipeline**: `transformProblemCsv` for parsing and `ProblemGridTable` for display (parameterised by `storageKeyBase` / `itemLabel`). Any new flat sheet should follow the same route.
 
 ## Data pipeline (the big picture)
 
