@@ -198,6 +198,7 @@ export function ProblemGridTable({
   const shouldAutoSizeRef = useRef(false);
   const [columnsMenuOpen, setColumnsMenuOpen] = useState(false);
   const [hiddenCols, setHiddenCols] = useState<ReadonlySet<string>>(new Set());
+  const [selectedCount, setSelectedCount] = useState(0);
 
   const columnDefs = useMemo<ColDef<ProblemRow>[]>(() => buildProblemColumnDefs(data), [data]);
 
@@ -255,10 +256,14 @@ export function ProblemGridTable({
     api.applyColumnState({ state: clamped });
   }, []);
 
+  // With rows ticked, export only those; otherwise the whole dataset.
   const exportCsv = useCallback(() => {
-    apiRef.current?.exportDataAsCsv({
+    const api = apiRef.current;
+    if (!api) return;
+    api.exportDataAsCsv({
       fileName: `${settings.exportFilePrefix}-${itemLabel}-${new Date().toISOString().slice(0, 10)}.csv`,
       allColumns: !settings.exportVisibleColumnsOnly,
+      onlySelected: api.getSelectedNodes().length > 0,
     });
   }, [settings, itemLabel]);
 
@@ -308,6 +313,7 @@ export function ProblemGridTable({
       <div className="no-print flex flex-wrap items-center gap-2">
         <p className="text-secondary mr-auto text-sm">
           {data.rows.length.toLocaleString()} {itemLabel}
+          {selectedCount > 0 ? ` · ${selectedCount.toLocaleString()} selected` : ""}
         </p>
         <div className="relative">
           <button
@@ -361,7 +367,7 @@ export function ProblemGridTable({
           className="flex h-9 items-center gap-1.5 rounded-xl bg-accent px-3 text-sm font-medium text-white transition-opacity hover:opacity-90 dark:bg-accent-dark"
         >
           <Download size={15} aria-hidden />
-          Export CSV
+          Export CSV{selectedCount > 0 ? ` (${selectedCount.toLocaleString()})` : ""}
         </button>
       </div>
 
@@ -383,6 +389,7 @@ export function ProblemGridTable({
           rowSelection={{ mode: "multiRow", checkboxes: true, headerCheckbox: true }}
           enableCellTextSelection
           onCellKeyDown={onCellKeyDown}
+          onSelectionChanged={(e) => setSelectedCount(e.api.getSelectedNodes().length)}
           onColumnMoved={persistColumnState}
           onColumnResized={persistColumnState}
           onColumnVisible={persistColumnState}
