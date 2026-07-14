@@ -27,6 +27,7 @@ export default function TrackingPage(): ReactNode {
       data={query.data}
       storageKeyBase={LS_KEYS.trackingGridColumnState}
       itemLabel="records"
+      autoSizeOnLoad
     />
   );
 }

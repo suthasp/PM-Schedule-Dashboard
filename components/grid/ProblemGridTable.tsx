@@ -34,6 +34,8 @@ interface ProblemGridTableProps {
   storageKeyBase?: string;
   /** Noun shown in the row-count line, e.g. "problems". */
   itemLabel?: string;
+  /** Size every column to its header + content on first visit (no saved layout). */
+  autoSizeOnLoad?: boolean;
 }
 
 /** Column-state storage is keyed by the header signature so a sheet-schema change resets cleanly. */
@@ -183,6 +185,7 @@ export function ProblemGridTable({
   data,
   storageKeyBase = LS_KEYS.problemGridColumnState,
   itemLabel = "problems",
+  autoSizeOnLoad = false,
 }: ProblemGridTableProps): ReactNode {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -192,6 +195,7 @@ export function ProblemGridTable({
   const { filters } = useFilters();
   const { settings } = useSettings();
   const apiRef = useRef<GridApi<ProblemRow> | null>(null);
+  const shouldAutoSizeRef = useRef(false);
   const [columnsMenuOpen, setColumnsMenuOpen] = useState(false);
   const [hiddenCols, setHiddenCols] = useState<ReadonlySet<string>>(new Set());
 
@@ -217,6 +221,8 @@ export function ProblemGridTable({
       apiRef.current = e.api;
       try {
         const raw = window.localStorage.getItem(storageKey(data, storageKeyBase));
+        // Decide now, before grid events start persisting layout state.
+        shouldAutoSizeRef.current = autoSizeOnLoad && !raw;
         if (raw) {
           e.api.applyColumnState({
             state: JSON.parse(raw) as ColumnState[],
@@ -225,15 +231,29 @@ export function ProblemGridTable({
         }
       } catch {
         // corrupted state — ignore and use defaults
+        shouldAutoSizeRef.current = autoSizeOnLoad;
       }
     },
-    [data, storageKeyBase],
+    [data, storageKeyBase, autoSizeOnLoad],
   );
 
   // Global search doubles as the grid quick filter.
   useEffect(() => {
     apiRef.current?.setGridOption("quickFilterText", filters.search);
   }, [filters.search, data.rows]);
+
+  // First visit (no saved layout): fit every column to its header + content.
+  const onFirstDataRendered = useCallback(() => {
+    const api = apiRef.current;
+    if (!api || !shouldAutoSizeRef.current) return;
+    shouldAutoSizeRef.current = false;
+    api.autoSizeAllColumns();
+    // Cap runaway text columns so one long cell can't eat the viewport.
+    const clamped = api
+      .getColumnState()
+      .map((s) => (s.width && s.width > 420 ? { ...s, width: 420 } : s));
+    api.applyColumnState({ state: clamped });
+  }, []);
 
   const exportCsv = useCallback(() => {
     apiRef.current?.exportDataAsCsv({
@@ -354,6 +374,7 @@ export function ProblemGridTable({
           columnDefs={columnDefs}
           defaultColDef={defaultColDef}
           onGridReady={onGridReady}
+          onFirstDataRendered={onFirstDataRendered}
           getRowId={(p) => p.data.id}
           rowHeight={32}
           pagination
