@@ -123,6 +123,10 @@ export function ProblemSiteCards({
                   {formatNumber(c.open)}
                 </span>
               </p>
+              <p className="flex items-baseline justify-between text-[11px]">
+                <span className="text-muted">Total</span>
+                <span className="font-bold tabular-nums">{formatNumber(c.total)}</span>
+              </p>
             </div>
           </motion.button>
         );
