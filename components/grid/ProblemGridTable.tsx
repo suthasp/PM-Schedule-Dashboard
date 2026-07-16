@@ -21,7 +21,7 @@ import {
 } from "react";
 import { useFilters } from "@/components/providers/FilterProvider";
 import { useSettings } from "@/components/providers/SettingsProvider";
-import { CRITERIA_CHIPS, LS_KEYS } from "@/lib/constants";
+import { CRITERIA_CHIPS, LS_KEYS, PROBLEM_SUMMARY } from "@/lib/constants";
 import type { ProblemData, ProblemRow } from "@/types/problem";
 import { parseDmyMs } from "@/utils/problemTransform";
 
@@ -79,6 +79,21 @@ function CriteriaCell(p: ICellRendererParams<ProblemRow>): ReactNode {
       className="inline-block rounded-full px-2 py-0.5 text-[11px] font-bold leading-4"
       style={{ backgroundColor: chip.bg, color: chip.fg }}
     >
+      {value}
+    </span>
+  );
+}
+
+function WorkStatusCell(p: ICellRendererParams<ProblemRow>): ReactNode {
+  const value = typeof p.value === "string" ? p.value.trim() : "";
+  if (!value) return null;
+  const color = /^finish/i.test(value)
+    ? PROBLEM_SUMMARY.finished.bg
+    : /progress/i.test(value)
+      ? PROBLEM_SUMMARY.inProgress.bg
+      : undefined;
+  return (
+    <span className="font-semibold" style={color ? { color } : undefined}>
       {value}
     </span>
   );
@@ -154,6 +169,9 @@ function buildProblemColumnDefs(data: ProblemData): ColDef<ProblemRow>[] {
       default: {
         if (/^criteria/i.test(label)) {
           return { ...base, width: 110, cellRenderer: CriteriaCell };
+        }
+        if (/^work\s*status$/i.test(label)) {
+          return { ...base, width: 130, cellRenderer: WorkStatusCell };
         }
         const tight = TIGHT_WIDTHS.find(([pattern]) => pattern.test(label));
         if (tight) {
