@@ -21,7 +21,7 @@ import {
 } from "react";
 import { useFilters } from "@/components/providers/FilterProvider";
 import { useSettings } from "@/components/providers/SettingsProvider";
-import { CRITERIA_CHIPS, LS_KEYS, PROBLEM_SUMMARY } from "@/lib/constants";
+import { CRITERIA_CHIPS, LS_KEYS, PENALTY_SUMMARY, PROBLEM_SUMMARY } from "@/lib/constants";
 import type { ProblemData, ProblemRow } from "@/types/problem";
 import { parseDmyMs } from "@/utils/problemTransform";
 
@@ -91,6 +91,21 @@ function WorkStatusCell(p: ICellRendererParams<ProblemRow>): ReactNode {
     ? PROBLEM_SUMMARY.finished.bg
     : /progress/i.test(value)
       ? PROBLEM_SUMMARY.inProgress.bg
+      : undefined;
+  return (
+    <span className="font-semibold" style={color ? { color } : undefined}>
+      {value}
+    </span>
+  );
+}
+
+function SlaStatusCell(p: ICellRendererParams<ProblemRow>): ReactNode {
+  const value = typeof p.value === "string" ? p.value.trim() : "";
+  if (!value) return null;
+  const color = /^within/i.test(value)
+    ? PENALTY_SUMMARY.slaWithin
+    : /^over/i.test(value)
+      ? PENALTY_SUMMARY.slaOver
       : undefined;
   return (
     <span className="font-semibold" style={color ? { color } : undefined}>
@@ -173,6 +188,9 @@ function buildProblemColumnDefs(data: ProblemData): ColDef<ProblemRow>[] {
         if (/^work\s*status$/i.test(label)) {
           return { ...base, width: 130, cellRenderer: WorkStatusCell };
         }
+        if (/^activity_sla$/i.test(label)) {
+          return { ...base, width: 110, cellRenderer: SlaStatusCell };
+        }
         const tight = TIGHT_WIDTHS.find(([pattern]) => pattern.test(label));
         if (tight) {
           return { ...base, width: tight[1], minWidth: 80 };
@@ -192,7 +210,7 @@ function buildProblemColumnDefs(data: ProblemData): ColDef<ProblemRow>[] {
   const pinnedSiteWidths = new Map([
     ["CN Site", 120],
     ["RN SiteID", 120],
-    ["TRUEOWNERGROUP", 150],
+    ["TRUEOWNERGROUP", 195],
   ]);
   return cols.map((c) => {
     const headerName = c.headerName ?? "";
