@@ -25,5 +25,5 @@ export function formatPercent(n: number, digits = 1): string {
 }
 
 export function formatCurrency(n: number): string {
-  return `฿${Math.round(n).toLocaleString()}`;
+  return Math.round(n).toLocaleString();
 }
