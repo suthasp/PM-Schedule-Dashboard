@@ -20,6 +20,11 @@ export const PENALTY_CSV_URL =
 
 export const PENALTY_QUERY_KEY = ["tickets-penalty"] as const;
 
+export const PENDING_CSV_URL =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vT_vPqObw-uOYA7tieLnMMg3XZ8SmfshzCO-I8qaAjshSOi2j_vC2OE28tcm19-_I54MDT0Uo273sP_/pub?gid=2146479152&single=true&output=csv";
+
+export const PENDING_QUERY_KEY = ["pending-ticket"] as const;
+
 /** Default auto-refresh interval: 5 minutes. */
 export const DEFAULT_REFRESH_MINUTES = 5;
 
@@ -29,6 +34,7 @@ export const LS_KEYS = {
   problemGridColumnState: "pmsd:problem-grid-column-state-v1",
   trackingGridColumnState: "pmsd:tracking-grid-column-state-v1",
   penaltyGridColumnState: "pmsd:penalty-grid-column-state-v1",
+  pendingGridColumnState: "pmsd:pending-grid-column-state-v1",
   sidebarCollapsed: "pmsd:sidebar-collapsed",
 } as const;
 
