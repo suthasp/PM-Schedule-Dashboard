@@ -333,7 +333,7 @@ export function PenaltySummary({ data }: { data: ProblemData }): ReactNode {
                     <span className="h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: d.color }} aria-hidden />
                     <span className="text-secondary">{d.name}</span>
                     <span className="font-semibold tabular-nums">
-                      {formatNumber(d.value)} ({formatPercent((d.value / slaTotal) * 100, 0)})
+                      {formatNumber(d.value)} ({formatPercent((d.value / slaTotal) * 100, 2)})
                     </span>
                   </li>
                 ))}
