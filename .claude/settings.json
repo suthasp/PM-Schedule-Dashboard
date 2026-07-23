@@ -30,7 +30,8 @@
       "PowerShell(git fetch origin)",
       "Bash(vercel --version)",
       "PowerShell(npx tsc --noEmit)",
-      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" --max-time 20 http://127.0.0.1:3000)"
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" --max-time 20 http://127.0.0.1:3000)",
+      "PowerShell($env:Path = [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"User\"\\); $sp = \"C:\\\\Users\\\\USER\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--OneDrive-Documents-GitHub-PM-Schedule-Dashboard\\\\6eb407ea-44dc-4889-9cdf-1c92ae535479\\\\scratchpad\"; node \"$sp\\\\shot-penalty-slapct.mjs\" \"$sp\\\\penalty-slawithin.png\")"
     ]
   }
 }

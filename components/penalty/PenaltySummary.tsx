@@ -196,7 +196,7 @@ export function PenaltySummary({ data }: { data: ProblemData }): ReactNode {
           fg={PENALTY_SUMMARY.waived.fg}
         />
         <StatTile
-          label="%Clearance"
+          label="%SLA Within"
           value={
             s.totalTickets > 0 ? formatPercent((s.slaWithin / s.totalTickets) * 100, 2) : "—"
           }
