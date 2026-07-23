@@ -1,4 +1,4 @@
-# PM Schedule Dashboard
+# CNO Dashboard
 
 Executive dashboard for preventive-maintenance scheduling, driven live from a published
 Google Sheet (fiscal-year PM matrix: one task per row, one column per week).
