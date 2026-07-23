@@ -21,7 +21,8 @@ interface PenaltyFields {
   ownerGroup: string | null;
   penaltyBaht: string | null;
   penaltyFlag: string | null;
-  ticketSla: string | null;
+  /** Column W — the activity-level SLA, not the ticket-level TICKET_SLA. */
+  activitySla: string | null;
   subCause: string | null;
 }
 
@@ -38,7 +39,7 @@ function resolvePenaltyFields(data: ProblemData): PenaltyFields {
     ownerGroup: find([/^trueownergroup$/i]),
     penaltyBaht: find([/^penaltybaht/i]),
     penaltyFlag: find([/^penalty_flag$/i]),
-    ticketSla: find([/^ticket_sla$/i]),
+    activitySla: find([/^activity_sla$/i]),
     subCause: find([/^sub_cause$/i]),
   };
 }
@@ -82,7 +83,7 @@ function summarize(data: ProblemData): Summary {
     const flag = fields.penaltyFlag ? (row.values[fields.penaltyFlag] ?? "").trim() : "";
     if (/waive/i.test(flag)) waived++;
 
-    const sla = fields.ticketSla ? (row.values[fields.ticketSla] ?? "").trim() : "";
+    const sla = fields.activitySla ? (row.values[fields.activitySla] ?? "").trim() : "";
     const isOver = /^over/i.test(sla);
     if (/^within/i.test(sla)) slaWithin++;
     else if (isOver) slaOver++;
@@ -283,7 +284,7 @@ export function PenaltySummary({ data }: { data: ProblemData }): ReactNode {
           </table>
         </ChartCard>
 
-        <ChartCard title="SLA Performance" subtitle="Ticket SLA: within vs over">
+        <ChartCard title="SLA Performance" subtitle="Activity SLA: within vs over">
           {slaTotal === 0 ? (
             <p className="text-muted py-16 text-center text-sm">No SLA data available.</p>
           ) : (
