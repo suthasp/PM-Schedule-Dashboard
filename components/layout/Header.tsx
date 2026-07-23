@@ -50,7 +50,7 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }): ReactNode 
         <Menu size={18} aria-hidden />
       </button>
 
-      <h1 className="text-base font-bold tracking-tight md:text-lg">PM Schedule Dashboard</h1>
+      <h1 className="text-base font-bold tracking-tight md:text-lg">CNO Dashboard</h1>
 
       <div className="relative ml-auto w-full max-w-xs sm:w-56 md:w-72">
         <Search

@@ -1,12 +1,12 @@
 import type { ReactNode } from "react";
 import { CSV_URL } from "@/lib/constants";
 
-export const metadata = { title: "About · PM Schedule Dashboard" };
+export const metadata = { title: "About · CNO Dashboard" };
 
 export default function AboutPage(): ReactNode {
   return (
     <div className="card mx-auto max-w-2xl space-y-4 p-6 text-sm leading-relaxed">
-      <h2 className="text-lg font-bold">About PM Schedule Dashboard</h2>
+      <h2 className="text-lg font-bold">About CNO Dashboard</h2>
       <p className="text-secondary">
         An executive dashboard for preventive-maintenance (PM) scheduling. Data is loaded live
         from a published Google Sheet — a fiscal-year matrix of PM tasks per site with one column

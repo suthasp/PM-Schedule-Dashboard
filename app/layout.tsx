@@ -5,7 +5,7 @@ import { AppShell } from "@/components/layout/AppShell";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "PM Schedule Dashboard",
+  title: "CNO Dashboard",
   description:
     "Executive dashboard for preventive-maintenance scheduling, driven live from Google Sheets.",
 };
