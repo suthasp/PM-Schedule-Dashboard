@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   Settings,
   Table2,
+  Ticket,
   Wrench,
 } from "lucide-react";
 import Link from "next/link";
@@ -19,6 +20,7 @@ const NAV_ITEMS = [
   { href: "/schedule", label: "PM Schedule", icon: Table2 },
   { href: "/tracking", label: "Data Tracking", icon: Activity },
   { href: "/problem", label: "Problem", icon: AlertTriangle },
+  { href: "/penalty", label: "Tickets Penalty", icon: Ticket },
   { href: "/settings", label: "Settings", icon: Settings },
   { href: "/about", label: "About", icon: Info },
 ] as const;

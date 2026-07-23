@@ -15,6 +15,11 @@ export const TRACKING_CSV_URL =
 
 export const TRACKING_QUERY_KEY = ["data-tracking"] as const;
 
+export const PENALTY_CSV_URL =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQFCrRs7oR8BNtfMjdLOI-3lc0HlrWQZJ_f7o69kga3na_WZg3Ant19YOfz4H5YZ-n1aZWCLNBkbRq1/pub?gid=0&single=true&output=csv";
+
+export const PENALTY_QUERY_KEY = ["tickets-penalty"] as const;
+
 /** Default auto-refresh interval: 5 minutes. */
 export const DEFAULT_REFRESH_MINUTES = 5;
 
@@ -23,6 +28,7 @@ export const LS_KEYS = {
   gridColumnState: "pmsd:grid-column-state-v2",
   problemGridColumnState: "pmsd:problem-grid-column-state-v1",
   trackingGridColumnState: "pmsd:tracking-grid-column-state-v1",
+  penaltyGridColumnState: "pmsd:penalty-grid-column-state-v1",
   sidebarCollapsed: "pmsd:sidebar-collapsed",
 } as const;
 
@@ -85,6 +91,16 @@ export const PROBLEM_SUMMARY = {
   scopeAmc: { bg: { light: "#cde2fb", dark: "#1d2f4d" }, ink: { light: "#184f95", dark: "#9ec5f4" } },
   scopeR: { bg: { light: "#fdf0cd", dark: "#3d3113" }, ink: { light: "#8a5a00", dark: "#fab219" } },
   scopeOut: { bg: { light: "#fbdccd", dark: "#43261a" }, ink: { light: "#9a3412", dark: "#eb9a7c" } },
+} as const;
+
+/** Tickets Penalty summary dashboard: stat-tile fills and SLA donut colors. */
+export const PENALTY_SUMMARY = {
+  tickets: { bg: "#1d4ed8", fg: "#ffffff" },
+  penalty: { bg: "#d03b3b", fg: "#ffffff" },
+  charged: { bg: "#eb6834", fg: "#ffffff" },
+  waived: { bg: "#0ca30c", fg: "#ffffff" },
+  slaWithin: "#0ca30c",
+  slaOver: "#d03b3b",
 } as const;
 
 /** Solid chip fills for the Problem sheet's Criteria column. */

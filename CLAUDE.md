@@ -21,6 +21,8 @@ There is a second, simpler data source: the **Problem sheet** (`PROBLEM_CSV_URL`
 
 A third source, the **Data Tracking sheet** (`TRACKING_CSV_URL`, `/tracking`), is flat like the Problem sheet and **reuses that pipeline**: `transformProblemCsv` for parsing and `ProblemGridTable` for display (parameterised by `storageKeyBase` / `itemLabel`). Any new flat sheet should follow the same route.
 
+A fourth source, the **Tickets Penalty sheet** (`PENALTY_CSV_URL`, `/penalty`), is a large flat SLA/penalty ticket log (32 columns) — same reused pipeline, plus `components/penalty/PenaltySummary.tsx` (KPI tiles, per-site penalty table, top causes, SLA donut) and `ProblemGridTable`'s `autoSizeOnLoad` prop, since a curated column-width list isn't practical at that width.
+
 ## Data pipeline (the big picture)
 
 1. **`lib/constants.ts`** holds `CSV_URL` (the published Google Sheet). Change the data source here.

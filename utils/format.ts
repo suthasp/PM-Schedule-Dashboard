@@ -23,3 +23,7 @@ export function formatNumber(n: number): string {
 export function formatPercent(n: number, digits = 1): string {
   return `${n.toFixed(digits)}%`;
 }
+
+export function formatCurrency(n: number): string {
+  return `฿${Math.round(n).toLocaleString()}`;
+}

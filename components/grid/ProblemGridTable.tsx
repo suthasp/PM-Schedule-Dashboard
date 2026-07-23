@@ -187,13 +187,22 @@ function buildProblemColumnDefs(data: ProblemData): ColDef<ProblemRow>[] {
     }
   });
 
-  // Pin the row number and site columns for orientation while scrolling wide.
+  // Pin the row-id and site columns for orientation while scrolling wide.
+  const pinnedIdWidths = new Map([["No.", 70], ["Index", 70], ["TICKETID", 150]]);
+  const pinnedSiteWidths = new Map([
+    ["CN Site", 120],
+    ["RN SiteID", 120],
+    ["TRUEOWNERGROUP", 150],
+  ]);
   return cols.map((c) => {
-    if (c.headerName === "No." || c.headerName === "Index") {
-      return { ...c, pinned: "left", width: 70, minWidth: 60 };
+    const headerName = c.headerName ?? "";
+    const idWidth = pinnedIdWidths.get(headerName);
+    if (idWidth !== undefined) {
+      return { ...c, pinned: "left", width: idWidth, minWidth: Math.min(60, idWidth) };
     }
-    if (c.headerName === "CN Site" || c.headerName === "RN SiteID") {
-      return { ...c, pinned: "left", width: 120, minWidth: 100 };
+    const siteWidth = pinnedSiteWidths.get(headerName);
+    if (siteWidth !== undefined) {
+      return { ...c, pinned: "left", width: siteWidth, minWidth: 100 };
     }
     return c;
   });
