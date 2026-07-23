@@ -24,6 +24,8 @@ interface PenaltyFields {
   /** Column W — the activity-level SLA, not the ticket-level TICKET_SLA. */
   activitySla: string | null;
   subCause: string | null;
+  creationDate: string | null;
+  severity: string | null;
 }
 
 function resolvePenaltyFields(data: ProblemData): PenaltyFields {
@@ -41,7 +43,65 @@ function resolvePenaltyFields(data: ProblemData): PenaltyFields {
     penaltyFlag: find([/^penalty_flag$/i]),
     activitySla: find([/^activity_sla$/i]),
     subCause: find([/^sub_cause$/i]),
+    creationDate: find([/^creationdate$/i]),
+    severity: find([/^truseverity_desc$/i, /severity/i]),
   };
+}
+
+const THAI_MONTHS_ABBR = [
+  "ม.ค.",
+  "ก.พ.",
+  "มี.ค.",
+  "เม.ย.",
+  "พ.ค.",
+  "มิ.ย.",
+  "ก.ค.",
+  "ส.ค.",
+  "ก.ย.",
+  "ต.ค.",
+  "พ.ย.",
+  "ธ.ค.",
+] as const;
+
+/** "2026-05-02 0:41:30" → { sortKey: 202605, label: "พ.ค." }, or null. */
+function parseCreationMonth(raw: string): { sortKey: number; label: string } | null {
+  const m = /^(\d{4})-(\d{2})-\d{2}/.exec(raw.trim());
+  if (!m) return null;
+  const year = Number(m[1]);
+  const month = Number(m[2]);
+  if (month < 1 || month > 12) return null;
+  return { sortKey: year * 12 + month, label: THAI_MONTHS_ABBR[month - 1] ?? m[2] };
+}
+
+interface MonthPivotRow {
+  key: string;
+  label: string;
+  counts: number[];
+  total: number;
+}
+
+interface MonthlyPivots {
+  months: string[];
+  owner: MonthPivotRow[];
+  sla: MonthPivotRow[];
+  severity: MonthPivotRow[];
+  monthTotals: number[];
+  grandTotal: number;
+}
+
+/** Build a month × dimension pivot; `order` controls row order (default: total desc). */
+function buildPivotRows(
+  byKey: Map<string, { label: string; counts: number[] }>,
+  order?: (a: MonthPivotRow, b: MonthPivotRow) => number,
+): MonthPivotRow[] {
+  const rows = [...byKey.entries()].map(([key, v]) => ({
+    key,
+    label: v.label,
+    counts: v.counts,
+    total: v.counts.reduce((sum, c) => sum + c, 0),
+  }));
+  rows.sort(order ?? ((a, b) => b.total - a.total || a.label.localeCompare(b.label)));
+  return rows;
 }
 
 function parseAmount(raw: string): number {
@@ -63,6 +123,7 @@ interface Summary {
   slaOver: number;
   sites: SiteStat[];
   subCauses: { cause: string; count: number }[];
+  monthly: MonthlyPivots;
 }
 
 function summarize(data: ProblemData): Summary {
@@ -74,6 +135,34 @@ function summarize(data: ProblemData): Summary {
   let waived = 0;
   let slaWithin = 0;
   let slaOver = 0;
+
+  // First pass: discover the distinct months present, in chronological order.
+  const monthSortKeys = new Map<number, string>();
+  if (fields.creationDate) {
+    for (const row of data.rows) {
+      const parsed = parseCreationMonth(row.values[fields.creationDate] ?? "");
+      if (parsed) monthSortKeys.set(parsed.sortKey, parsed.label);
+    }
+  }
+  const monthOrder = [...monthSortKeys.keys()].sort((a, b) => a - b);
+  const months = monthOrder.map((k) => monthSortKeys.get(k) ?? "");
+  const monthIndex = new Map(monthOrder.map((k, i) => [k, i]));
+
+  const ownerByKey = new Map<string, { label: string; counts: number[] }>();
+  const slaByKey = new Map<string, { label: string; counts: number[] }>();
+  const severityByKey = new Map<string, { label: string; counts: number[] }>();
+  const monthTotals = new Array(months.length).fill(0) as number[];
+
+  const bumpPivot = (
+    map: Map<string, { label: string; counts: number[] }>,
+    key: string,
+    idx: number,
+  ): void => {
+    if (!key) return;
+    const entry = map.get(key) ?? { label: key, counts: new Array(months.length).fill(0) };
+    entry.counts[idx] = (entry.counts[idx] ?? 0) + 1;
+    map.set(key, entry);
+  };
 
   for (const row of data.rows) {
     const baht = fields.penaltyBaht ? parseAmount(row.values[fields.penaltyBaht] ?? "") : 0;
@@ -103,6 +192,23 @@ function summarize(data: ProblemData): Summary {
       const cause = (row.values[fields.subCause] ?? "").trim();
       if (cause) byCause.set(cause, (byCause.get(cause) ?? 0) + 1);
     }
+
+    const monthParsed = fields.creationDate
+      ? parseCreationMonth(row.values[fields.creationDate] ?? "")
+      : null;
+    const monthIdx = monthParsed ? monthIndex.get(monthParsed.sortKey) : undefined;
+    if (monthIdx !== undefined) {
+      monthTotals[monthIdx] = (monthTotals[monthIdx] ?? 0) + 1;
+      if (fields.ownerGroup) {
+        // This table matches the reference report, which lists the raw
+        // TRUEOWNERGROUP value (unlike the shortened "Penalty by Site" table).
+        bumpPivot(ownerByKey, (row.values[fields.ownerGroup] ?? "").trim(), monthIdx);
+      }
+      if (sla) bumpPivot(slaByKey, isOver ? "Over" : "Within", monthIdx);
+      if (fields.severity) {
+        bumpPivot(severityByKey, (row.values[fields.severity] ?? "").trim(), monthIdx);
+      }
+    }
   }
 
   const sites = [...bySite.values()].sort(
@@ -113,6 +219,17 @@ function summarize(data: ProblemData): Summary {
   const othersCount = causesSorted.slice(10).reduce((sum, [, count]) => sum + count, 0);
   if (othersCount > 0) subCauses.push({ cause: "Others", count: othersCount });
 
+  const slaOrder = (a: MonthPivotRow, b: MonthPivotRow): number =>
+    (a.key === "Within" ? 0 : 1) - (b.key === "Within" ? 0 : 1);
+  const severityOrder = (a: MonthPivotRow, b: MonthPivotRow): number => {
+    const na = Number(/(\d+)$/.exec(a.key)?.[1]);
+    const nb = Number(/(\d+)$/.exec(b.key)?.[1]);
+    if (!Number.isNaN(na) && !Number.isNaN(nb)) return na - nb;
+    return a.key.localeCompare(b.key);
+  };
+
+  const grandTotal = monthTotals.reduce((sum, c) => sum + c, 0);
+
   return {
     totalTickets: data.rows.length,
     totalPenaltyBaht,
@@ -122,7 +239,74 @@ function summarize(data: ProblemData): Summary {
     slaOver,
     sites,
     subCauses,
+    monthly: {
+      months,
+      owner: buildPivotRows(ownerByKey),
+      sla: buildPivotRows(slaByKey, slaOrder),
+      severity: buildPivotRows(severityByKey, severityOrder),
+      monthTotals,
+      grandTotal,
+    },
   };
+}
+
+const hairline = { borderColor: "var(--hairline)" } as const;
+
+/** Dimension × month pivot with a bold navy header and a tinted "รวม" total row. */
+function MonthPivotTable({
+  dimensionLabel,
+  months,
+  rows,
+  monthTotals,
+  grandTotal,
+}: {
+  dimensionLabel: string;
+  months: string[];
+  rows: MonthPivotRow[];
+  monthTotals: number[];
+  grandTotal: number;
+}): ReactNode {
+  const headerCell = "px-2 py-1.5 text-xs font-bold text-white";
+  const totalTint = "rgba(29, 78, 216, 0.08)";
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full border-collapse text-xs">
+        <thead>
+          <tr style={{ backgroundColor: PENALTY_SUMMARY.tickets.bg }}>
+            <th className={`${headerCell} text-left`}>{dimensionLabel}</th>
+            {months.map((m) => (
+              <th key={m} className={`${headerCell} text-right`}>
+                {m}
+              </th>
+            ))}
+            <th className={`${headerCell} text-right`}>รวม</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.key} className="border-b odd:bg-black/[0.03] dark:odd:bg-white/[0.03]" style={hairline}>
+              <td className="px-2 py-1.5 font-semibold">{row.label}</td>
+              {row.counts.map((c, i) => (
+                <td key={months[i]} className="px-2 py-1.5 text-right tabular-nums">
+                  {formatNumber(c)}
+                </td>
+              ))}
+              <td className="px-2 py-1.5 text-right font-bold tabular-nums">{formatNumber(row.total)}</td>
+            </tr>
+          ))}
+          <tr className="border-t-2 font-bold" style={{ ...hairline, backgroundColor: totalTint }}>
+            <td className="px-2 py-1.5">รวม</td>
+            {monthTotals.map((c, i) => (
+              <td key={months[i]} className="px-2 py-1.5 text-right tabular-nums">
+                {formatNumber(c)}
+              </td>
+            ))}
+            <td className="px-2 py-1.5 text-right tabular-nums">{formatNumber(grandTotal)}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  );
 }
 
 function StatTile({
@@ -161,8 +345,6 @@ export function PenaltySummary({ data }: { data: ProblemData }): ReactNode {
     { name: "Within SLA", value: s.slaWithin, color: PENALTY_SUMMARY.slaWithin },
     { name: "Over SLA", value: s.slaOver, color: PENALTY_SUMMARY.slaOver },
   ].filter((d) => d.value > 0);
-
-  const hairline = { borderColor: "var(--hairline)" } as const;
 
   return (
     <div className="space-y-4">
@@ -342,6 +524,38 @@ export function PenaltySummary({ data }: { data: ProblemData }): ReactNode {
           )}
         </ChartCard>
       </div>
+
+      {s.monthly.months.length > 0 && (
+        <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+          <ChartCard title="Tickets by Site (Monthly)" subtitle="Ticket count per site by month">
+            <MonthPivotTable
+              dimensionLabel="หน่วยงาน"
+              months={s.monthly.months}
+              rows={s.monthly.owner}
+              monthTotals={s.monthly.monthTotals}
+              grandTotal={s.monthly.grandTotal}
+            />
+          </ChartCard>
+          <ChartCard title="SLA Result (Monthly)" subtitle="Within vs over SLA by month">
+            <MonthPivotTable
+              dimensionLabel="ผล SLA"
+              months={s.monthly.months}
+              rows={s.monthly.sla}
+              monthTotals={s.monthly.monthTotals}
+              grandTotal={s.monthly.grandTotal}
+            />
+          </ChartCard>
+          <ChartCard title="Severity (Monthly)" subtitle="Ticket severity by month">
+            <MonthPivotTable
+              dimensionLabel="ระดับ"
+              months={s.monthly.months}
+              rows={s.monthly.severity}
+              monthTotals={s.monthly.monthTotals}
+              grandTotal={s.monthly.grandTotal}
+            />
+          </ChartCard>
+        </div>
+      )}
     </div>
   );
 }
