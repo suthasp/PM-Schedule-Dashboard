@@ -184,7 +184,7 @@ export function PenaltySummary({ data }: { data: ProblemData }): ReactNode {
         <StatTile
           label="Charged"
           value={formatNumber(s.charged)}
-          note={s.totalTickets > 0 ? `(${formatPercent((s.charged / s.totalTickets) * 100, 0)})` : undefined}
+          note={s.totalTickets > 0 ? `(${formatPercent((s.charged / s.totalTickets) * 100, 2)})` : undefined}
           bg={PENALTY_SUMMARY.charged.bg}
           fg={PENALTY_SUMMARY.charged.fg}
         />
