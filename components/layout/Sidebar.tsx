@@ -76,7 +76,7 @@ function Brand({ collapsed = false }: { collapsed?: boolean }): ReactNode {
       </span>
       {!collapsed && (
         <div className="leading-tight">
-          <p className="whitespace-nowrap text-sm font-bold">PM Schedule</p>
+          <p className="whitespace-nowrap text-sm font-bold">CNO Dashboard</p>
           <p className="text-muted whitespace-nowrap text-xs">Maintenance Ops</p>
         </div>
       )}
