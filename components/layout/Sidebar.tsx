@@ -22,7 +22,7 @@ const NAV_ITEMS = [
   { href: "/tracking", label: "Data Tracking", icon: Activity },
   { href: "/problem", label: "Problem", icon: AlertTriangle },
   { href: "/penalty", label: "Tickets Penalty", icon: Ticket },
-  { href: "/pending", label: "Pending Ticket", icon: Hourglass },
+  { href: "/pending", label: "Pending Tickets", icon: Hourglass },
   { href: "/settings", label: "Settings", icon: Settings },
   { href: "/about", label: "About", icon: Info },
 ] as const;
