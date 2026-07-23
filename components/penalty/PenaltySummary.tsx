@@ -70,7 +70,7 @@ function parseCreationMonth(raw: string): { sortKey: number; label: string } | n
   const year = Number(m[1]);
   const month = Number(m[2]);
   if (month < 1 || month > 12) return null;
-  return { sortKey: year * 12 + month, label: THAI_MONTHS_ABBR[month - 1] ?? m[2] };
+  return { sortKey: year * 12 + month, label: THAI_MONTHS_ABBR[month - 1] ?? m[2] ?? "" };
 }
 
 interface MonthPivotRow {
