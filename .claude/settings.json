@@ -57,7 +57,14 @@
       "PowerShell(try { $r = Invoke-WebRequest -Uri \"http://localhost:3000/penalty\" -UseBasicParsing -TimeoutSec 5; \"server up: $\\($r.StatusCode\\)\" } catch { \"server down\" })",
       "PowerShell($env:Path = [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"User\"\\); $sp = \"C:\\\\Users\\\\USER\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--OneDrive-Documents-GitHub-PM-Schedule-Dashboard\\\\6eb407ea-44dc-4889-9cdf-1c92ae535479\\\\scratchpad\"; node \"$sp\\\\shot-slacolor.mjs\" \"$sp\\\\slacolor.png\")",
       "PowerShell($env:Path = [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"User\"\\); $sp = \"C:\\\\Users\\\\USER\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--OneDrive-Documents-GitHub-PM-Schedule-Dashboard\\\\6eb407ea-44dc-4889-9cdf-1c92ae535479\\\\scratchpad\"; node \"$sp\\\\shot-ownergroup.mjs\" \"$sp\\\\ownergroup.png\")",
-      "PowerShell($env:Path = [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"User\"\\); $sp = \"C:\\\\Users\\\\USER\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--OneDrive-Documents-GitHub-PM-Schedule-Dashboard\\\\6eb407ea-44dc-4889-9cdf-1c92ae535479\\\\scratchpad\"; node \"$sp\\\\shot-ownergroup.mjs\" \"$sp\\\\ownergroup-cls.png\")"
+      "PowerShell($env:Path = [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"User\"\\); $sp = \"C:\\\\Users\\\\USER\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--OneDrive-Documents-GitHub-PM-Schedule-Dashboard\\\\6eb407ea-44dc-4889-9cdf-1c92ae535479\\\\scratchpad\"; node \"$sp\\\\shot-ownergroup.mjs\" \"$sp\\\\ownergroup-cls.png\")",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "Bash(disown)",
+      "Read(//tmp/**)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/about)",
+      "Bash('/c/Program Files \\(x86\\)/Microsoft/Edge/Application/msedge.exe' --headless=new --disable-gpu --window-size=1200,1400 --hide-scrollbars --force-color-profile=srgb --virtual-time-budget=8000 '--screenshot=C:\\\\Users\\\\USER\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--OneDrive-Documents-GitHub-PM-Schedule-Dashboard\\\\6eb407ea-44dc-4889-9cdf-1c92ae535479\\\\scratchpad\\\\about-page.png' http://localhost:3000/about)",
+      "Bash(powershell -NoProfile -Command 'Get-NetTCPConnection -LocalPort 3000 -State Listen | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }')"
     ]
   }
 }
