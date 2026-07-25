@@ -64,7 +64,13 @@
       "Read(//tmp/**)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/about)",
       "Bash('/c/Program Files \\(x86\\)/Microsoft/Edge/Application/msedge.exe' --headless=new --disable-gpu --window-size=1200,1400 --hide-scrollbars --force-color-profile=srgb --virtual-time-budget=8000 '--screenshot=C:\\\\Users\\\\USER\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--OneDrive-Documents-GitHub-PM-Schedule-Dashboard\\\\6eb407ea-44dc-4889-9cdf-1c92ae535479\\\\scratchpad\\\\about-page.png' http://localhost:3000/about)",
-      "Bash(powershell -NoProfile -Command 'Get-NetTCPConnection -LocalPort 3000 -State Listen | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }')"
+      "Bash(powershell -NoProfile -Command 'Get-NetTCPConnection -LocalPort 3000 -State Listen | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }')",
+      "Bash(curl -s \"https://docs.google.com/spreadsheets/d/e/2PACX-1vRK3EBk-mmlkd8OLq9FWcZ54hSeR5ohjt0yTSeImXg7FRX3SzIhNB1JAKuaM3RuvooLbIilWycyiqeH/pub?gid=459638642&single=true&output=csv\" -o schedule.csv)",
+      "Bash(curl -s -o schedule.csv -w \"http_code=%{http_code} size=%{size_download}\\\\n\" \"https://docs.google.com/spreadsheets/d/e/2PACX-1vRK3EBk-mmlkd8OLq9FWcZ54hSeR5ohjt0yTSeImXg7FRX3SzIhNB1JAKuaM3RuvooLbIilWycyiqeH/pub?gid=459638642&single=true&output=csv\")",
+      "Bash(curl -sL -o schedule.csv -w \"http_code=%{http_code} size=%{size_download}\\\\n\" \"https://docs.google.com/spreadsheets/d/e/2PACX-1vRK3EBk-mmlkd8OLq9FWcZ54hSeR5ohjt0yTSeImXg7FRX3SzIhNB1JAKuaM3RuvooLbIilWycyiqeH/pub?gid=459638642&single=true&output=csv\")",
+      "Bash(node verify.mjs)",
+      "Bash(node -e \"console.log\\(require\\('papaparse/package.json'\\).version\\)\")",
+      "Bash(node verify2.mjs)"
     ]
   }
 }
