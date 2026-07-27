@@ -127,7 +127,7 @@ const TIGHT_WIDTHS: [RegExp, number][] = [
 ];
 
 /** If any of these columns reads "Over…", the whole row's text turns red. */
-const OVER_FLAG_HEADERS = ["SLA_Flag_Group", "Aging_Flag_Group"];
+const OVER_FLAG_HEADERS = ["SLA_Flag_Group", "Aging_Flag_Group", "ACTIVITY_SLA"];
 
 function getRowClass(p: RowClassParams<ProblemRow>): string | undefined {
   const values = p.data?.values;
