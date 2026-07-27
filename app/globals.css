@@ -167,6 +167,12 @@ div.ag-theme-quartz-dark {
   box-shadow: inset 0 -3px 0 0 #fab219;
 }
 
+/* Rows breaching an SLA/aging "Over" flag: red text across every column */
+.ag-theme-quartz .row-over-flag .ag-cell,
+.ag-theme-quartz-dark .row-over-flag .ag-cell {
+  color: #d03b3b !important;
+}
+
 /* Print: dashboard only */
 @media print {
   .no-print {

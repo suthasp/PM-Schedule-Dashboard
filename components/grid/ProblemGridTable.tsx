@@ -7,6 +7,7 @@ import type {
   GridApi,
   GridReadyEvent,
   ICellRendererParams,
+  RowClassParams,
 } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { Columns3, Download, ExternalLink, Maximize2, RotateCcw } from "lucide-react";
@@ -124,6 +125,16 @@ const TIGHT_WIDTHS: [RegExp, number][] = [
   [/^punch/i, 100],
   [/scope/i, 120],
 ];
+
+/** If any of these columns reads "Over…", the whole row's text turns red. */
+const OVER_FLAG_HEADERS = ["SLA_Flag_Group", "Aging_Flag_Group"];
+
+function getRowClass(p: RowClassParams<ProblemRow>): string | undefined {
+  const values = p.data?.values;
+  if (!values) return undefined;
+  const isOver = OVER_FLAG_HEADERS.some((h) => /over/i.test(values[h] ?? ""));
+  return isOver ? "row-over-flag" : undefined;
+}
 
 function buildProblemColumnDefs(data: ProblemData): ColDef<ProblemRow>[] {
   const cols = data.columns.map<ColDef<ProblemRow>>(({ header, label, kind }) => {
@@ -427,6 +438,7 @@ export function ProblemGridTable({
           onGridReady={onGridReady}
           onFirstDataRendered={onFirstDataRendered}
           getRowId={(p) => p.data.id}
+          getRowClass={getRowClass}
           rowHeight={32}
           pagination
           paginationPageSize={25}
