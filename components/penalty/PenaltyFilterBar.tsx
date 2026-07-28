@@ -2,17 +2,20 @@
 
 import { FilterX } from "lucide-react";
 import type { ReactNode } from "react";
+import { DateRangeFilter, type DateRange } from "@/components/penalty/DateRangeFilter";
 
 export interface PenaltyFilters {
   site: string;
   activitySla: string;
-  month: string;
+  dateFrom: string;
+  dateTo: string;
 }
 
 export const DEFAULT_PENALTY_FILTERS: PenaltyFilters = {
   site: "all",
   activitySla: "all",
-  month: "all",
+  dateFrom: "",
+  dateTo: "",
 };
 
 function FilterSelect({
@@ -49,7 +52,9 @@ function FilterSelect({
 interface PenaltyFilterBarProps {
   siteOptions: string[];
   activitySlaOptions: string[];
-  monthOptions: string[];
+  /** Earliest / latest date (yyyy-mm-dd) present in the unfiltered data. */
+  minDate: string;
+  maxDate: string;
   filters: PenaltyFilters;
   onChange: (filters: PenaltyFilters) => void;
 }
@@ -58,13 +63,16 @@ interface PenaltyFilterBarProps {
 export function PenaltyFilterBar({
   siteOptions,
   activitySlaOptions,
-  monthOptions,
+  minDate,
+  maxDate,
   filters,
   onChange,
 }: PenaltyFilterBarProps): ReactNode {
-  const activeCount = [filters.site, filters.activitySla, filters.month].filter(
-    (v) => v !== "all",
-  ).length;
+  const activeCount = [
+    filters.site !== "all",
+    filters.activitySla !== "all",
+    filters.dateFrom !== "" || filters.dateTo !== "",
+  ].filter(Boolean).length;
 
   return (
     <div className="card no-print grid grid-cols-2 gap-3 p-4 sm:grid-cols-5">
@@ -80,12 +88,16 @@ export function PenaltyFilterBar({
         options={activitySlaOptions}
         onChange={(activitySla) => onChange({ ...filters, activitySla })}
       />
-      <FilterSelect
-        label="Month"
-        value={filters.month}
-        options={monthOptions}
-        onChange={(month) => onChange({ ...filters, month })}
-      />
+      {minDate && maxDate && (
+        <div className="sm:col-span-2">
+          <DateRangeFilter
+            minDate={minDate}
+            maxDate={maxDate}
+            value={{ from: filters.dateFrom, to: filters.dateTo } satisfies DateRange}
+            onChange={(range) => onChange({ ...filters, dateFrom: range.from, dateTo: range.to })}
+          />
+        </div>
+      )}
       <div className="flex items-end">
         <button
           type="button"

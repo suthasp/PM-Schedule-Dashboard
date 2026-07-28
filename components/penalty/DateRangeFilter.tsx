@@ -1,0 +1,111 @@
+"use client";
+
+import type { ReactNode } from "react";
+
+export interface DateRange {
+  /** ISO yyyy-mm-dd, or "" for "from the earliest date in the data". */
+  from: string;
+  /** ISO yyyy-mm-dd, or "" for "to the latest date in the data". */
+  to: string;
+}
+
+function toUtcDays(iso: string): number {
+  const [y, m, d] = iso.split("-").map(Number);
+  return Math.floor(Date.UTC(y ?? 1970, (m ?? 1) - 1, d ?? 1) / 86400000);
+}
+
+function addDays(iso: string, days: number): string {
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(Date.UTC(y ?? 1970, (m ?? 1) - 1, (d ?? 1) + days)).toISOString().slice(0, 10);
+}
+
+/** Shared thumb/track styling for the two overlaid range inputs (WebKit + Firefox). */
+const RANGE_INPUT =
+  "pointer-events-none absolute inset-x-0 top-1/2 w-full -translate-y-1/2 appearance-none bg-transparent " +
+  "[&::-webkit-slider-runnable-track]:h-0 [&::-webkit-slider-runnable-track]:bg-transparent " +
+  "[&::-moz-range-track]:h-0 [&::-moz-range-track]:bg-transparent " +
+  "[&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 " +
+  "[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 " +
+  "[&::-webkit-slider-thumb]:border-accent [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-soft " +
+  "[&::-webkit-slider-thumb]:cursor-pointer dark:[&::-webkit-slider-thumb]:border-accent-dark " +
+  "[&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 " +
+  "[&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-accent " +
+  "[&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:cursor-pointer dark:[&::-moz-range-thumb]:border-accent-dark";
+
+interface DateRangeFilterProps {
+  /** Earliest / latest date (yyyy-mm-dd) present in the unfiltered data. */
+  minDate: string;
+  maxDate: string;
+  value: DateRange;
+  onChange: (value: DateRange) => void;
+}
+
+/** Start/end date pickers plus a dual-handle slider over the data's date span. */
+export function DateRangeFilter({ minDate, maxDate, value, onChange }: DateRangeFilterProps): ReactNode {
+  const from = value.from || minDate;
+  const to = value.to || maxDate;
+  const totalDays = Math.max(1, toUtcDays(maxDate) - toUtcDays(minDate));
+  const clampDay = (d: number): number => Math.min(Math.max(d, 0), totalDays);
+  const startDay = clampDay(toUtcDays(from) - toUtcDays(minDate));
+  const endDay = clampDay(toUtcDays(to) - toUtcDays(minDate));
+
+  const setFrom = (iso: string): void => onChange({ from: iso > to ? to : iso, to: value.to });
+  const setTo = (iso: string): void => onChange({ from: value.from, to: iso < from ? from : iso });
+  const setStartDay = (day: number): void =>
+    onChange({ from: addDays(minDate, Math.min(day, endDay)), to: value.to });
+  const setEndDay = (day: number): void =>
+    onChange({ from: value.from, to: addDays(minDate, Math.max(day, startDay)) });
+
+  return (
+    <div className="flex min-w-0 flex-col gap-1.5 text-xs">
+      <span className="text-muted font-medium">Date Range</span>
+      <div className="flex items-center gap-2">
+        <input
+          type="date"
+          value={from}
+          min={minDate}
+          max={maxDate}
+          onChange={(e) => setFrom(e.target.value)}
+          className="h-9 min-w-0 flex-1 rounded-xl border hairline bg-transparent px-2 text-sm outline-none transition-colors focus:border-accent dark:focus:border-accent-dark"
+          style={{ backgroundColor: "var(--surface)" }}
+        />
+        <input
+          type="date"
+          value={to}
+          min={minDate}
+          max={maxDate}
+          onChange={(e) => setTo(e.target.value)}
+          className="h-9 min-w-0 flex-1 rounded-xl border hairline bg-transparent px-2 text-sm outline-none transition-colors focus:border-accent dark:focus:border-accent-dark"
+          style={{ backgroundColor: "var(--surface)" }}
+        />
+      </div>
+      <div className="relative mt-1 h-4">
+        <div className="absolute inset-x-2 top-1/2 h-1 -translate-y-1/2 rounded-full bg-black/10 dark:bg-white/10" />
+        <div
+          className="absolute top-1/2 h-1 -translate-y-1/2 rounded-full bg-accent dark:bg-accent-dark"
+          style={{ left: `${(startDay / totalDays) * 100}%`, right: `${100 - (endDay / totalDays) * 100}%` }}
+        />
+        <input
+          type="range"
+          min={0}
+          max={totalDays}
+          value={startDay}
+          onChange={(e) => setStartDay(Number(e.target.value))}
+          className={RANGE_INPUT}
+          style={{ zIndex: 3 }}
+          aria-label="Start date (days from earliest)"
+        />
+        <input
+          type="range"
+          min={0}
+          max={totalDays}
+          value={endDay}
+          onChange={(e) => setEndDay(Number(e.target.value))}
+          className={RANGE_INPUT}
+          style={{ zIndex: 4 }}
+          aria-label="End date (days from earliest)"
+        />
+      </div>
+    </div>
+  );
+}

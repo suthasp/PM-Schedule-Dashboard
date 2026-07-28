@@ -12,7 +12,7 @@ import { GridSkeleton } from "@/components/ui/Loading";
 import { usePenaltyData } from "@/hooks/usePenaltyData";
 import { LS_KEYS } from "@/lib/constants";
 import type { ProblemData } from "@/types/problem";
-import { parseCreationMonth, resolvePenaltyFields, shortSite } from "@/utils/penaltyFields";
+import { resolvePenaltyFields, shortSite } from "@/utils/penaltyFields";
 
 // AG Grid is client-only and heavy — code-split it off the main bundle.
 const ProblemGridTable = dynamic(
@@ -31,14 +31,23 @@ function uniqueSorted(values: string[]): string[] {
   );
 }
 
-/** Distinct month labels in chronological order (not alphabetical — "ม.ค." sorts wrong). */
-function monthsInOrder(values: string[]): string[] {
-  const byKey = new Map<number, string>();
+/** "2026-05-02 0:41:30" → "2026-05-02"; empty/unparseable input → "". */
+function datePart(raw: string): string {
+  const m = /^(\d{4}-\d{2}-\d{2})/.exec(raw.trim());
+  return m?.[1] ?? "";
+}
+
+/** Earliest/latest date (yyyy-mm-dd) among the given raw CREATIONDATE values. */
+function dateBounds(values: string[]): { min: string; max: string } {
+  let min = "";
+  let max = "";
   for (const v of values) {
-    const parsed = parseCreationMonth(v);
-    if (parsed) byKey.set(parsed.sortKey, parsed.label);
+    const d = datePart(v);
+    if (!d) continue;
+    if (!min || d < min) min = d;
+    if (!max || d > max) max = d;
   }
-  return [...byKey.keys()].sort((a, b) => a - b).map((k) => byKey.get(k) ?? "");
+  return { min, max };
 }
 
 function PenaltyContent({ data }: { data: ProblemData }): ReactNode {
@@ -53,9 +62,9 @@ function PenaltyContent({ data }: { data: ProblemData }): ReactNode {
       activitySla: fields.activitySla
         ? uniqueSorted(data.rows.map((r) => r.values[fields.activitySla ?? ""] ?? ""))
         : [],
-      months: fields.creationDate
-        ? monthsInOrder(data.rows.map((r) => r.values[fields.creationDate ?? ""] ?? ""))
-        : [],
+      dates: fields.creationDate
+        ? dateBounds(data.rows.map((r) => r.values[fields.creationDate ?? ""] ?? ""))
+        : { min: "", max: "" },
     }),
     [data.rows, fields],
   );
@@ -68,11 +77,10 @@ function PenaltyContent({ data }: { data: ProblemData }): ReactNode {
       const slaOk =
         filters.activitySla === "all" ||
         (fields.activitySla !== null && (values[fields.activitySla] ?? "").trim() === filters.activitySla);
-      const monthOk =
-        filters.month === "all" ||
-        (fields.creationDate !== null &&
-          parseCreationMonth(values[fields.creationDate] ?? "")?.label === filters.month);
-      return siteOk && slaOk && monthOk;
+      const rowDate = fields.creationDate ? datePart(values[fields.creationDate] ?? "") : "";
+      const fromOk = filters.dateFrom === "" || (rowDate !== "" && rowDate >= filters.dateFrom);
+      const toOk = filters.dateTo === "" || (rowDate !== "" && rowDate <= filters.dateTo);
+      return siteOk && slaOk && fromOk && toOk;
     };
     return { ...data, rows: data.rows.filter((r) => matches(r.values)) };
   }, [data, fields, filters]);
@@ -82,7 +90,8 @@ function PenaltyContent({ data }: { data: ProblemData }): ReactNode {
       <PenaltyFilterBar
         siteOptions={options.sites}
         activitySlaOptions={options.activitySla}
-        monthOptions={options.months}
+        minDate={options.dates.min}
+        maxDate={options.dates.max}
         filters={filters}
         onChange={setFilters}
       />
