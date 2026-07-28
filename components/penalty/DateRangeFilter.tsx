@@ -19,18 +19,25 @@ function addDays(iso: string, days: number): string {
   return new Date(Date.UTC(y ?? 1970, (m ?? 1) - 1, (d ?? 1) + days)).toISOString().slice(0, 10);
 }
 
-/** Shared thumb/track styling for the two overlaid range inputs (WebKit + Firefox). */
+/**
+ * Shared thumb/track styling for the two overlaid range inputs (WebKit + Firefox).
+ * Thumbs are solid accent-filled with a white ring so they read clearly against
+ * both a white card (light mode) and a dark card (dark mode) — an outlined
+ * white-fill thumb all but disappeared on a white background.
+ */
 const RANGE_INPUT =
   "pointer-events-none absolute inset-x-0 top-1/2 w-full -translate-y-1/2 appearance-none bg-transparent " +
   "[&::-webkit-slider-runnable-track]:h-0 [&::-webkit-slider-runnable-track]:bg-transparent " +
   "[&::-moz-range-track]:h-0 [&::-moz-range-track]:bg-transparent " +
-  "[&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 " +
-  "[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 " +
-  "[&::-webkit-slider-thumb]:border-accent [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-soft " +
-  "[&::-webkit-slider-thumb]:cursor-pointer dark:[&::-webkit-slider-thumb]:border-accent-dark " +
-  "[&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 " +
-  "[&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-accent " +
-  "[&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:cursor-pointer dark:[&::-moz-range-thumb]:border-accent-dark";
+  "[&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 " +
+  "[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-[3px] " +
+  "[&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:bg-accent " +
+  "[&::-webkit-slider-thumb]:shadow-[0_1px_4px_rgba(0,0,0,0.45)] [&::-webkit-slider-thumb]:cursor-pointer " +
+  "dark:[&::-webkit-slider-thumb]:border-surface-dark dark:[&::-webkit-slider-thumb]:bg-accent-dark " +
+  "[&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:w-5 " +
+  "[&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-[3px] [&::-moz-range-thumb]:border-white " +
+  "[&::-moz-range-thumb]:bg-accent [&::-moz-range-thumb]:shadow-[0_1px_4px_rgba(0,0,0,0.45)] " +
+  "[&::-moz-range-thumb]:cursor-pointer dark:[&::-moz-range-thumb]:border-surface-dark dark:[&::-moz-range-thumb]:bg-accent-dark";
 
 interface DateRangeFilterProps {
   /** Earliest / latest date (yyyy-mm-dd) present in the unfiltered data. */

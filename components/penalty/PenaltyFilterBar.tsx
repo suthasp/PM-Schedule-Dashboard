@@ -98,7 +98,10 @@ export function PenaltyFilterBar({
           />
         </div>
       )}
-      <div className="flex items-end">
+      <div className="flex flex-col gap-1 text-xs">
+        {/* Invisible label spacer so the button lines up with the Site/Activity SLA
+            selects, not the bottom of the taller Date Range cell (which also has a slider row). */}
+        <span className="invisible font-medium">Clear</span>
         <button
           type="button"
           onClick={() => onChange(DEFAULT_PENALTY_FILTERS)}
