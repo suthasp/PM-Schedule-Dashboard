@@ -8,44 +8,13 @@ import { useChartTheme } from "@/hooks/useChartTheme";
 import { PENALTY_SUMMARY } from "@/lib/constants";
 import type { ProblemData } from "@/types/problem";
 import { formatCurrency, formatNumber, formatPercent } from "@/utils/format";
+import { resolvePenaltyFields, shortSite } from "@/utils/penaltyFields";
 
 interface SiteStat {
   site: string;
   tickets: number;
   penaltyBaht: number;
   slaOver: number;
-}
-
-interface PenaltyFields {
-  ticketId: string | null;
-  ownerGroup: string | null;
-  penaltyBaht: string | null;
-  penaltyFlag: string | null;
-  /** Column W — the activity-level SLA, not the ticket-level TICKET_SLA. */
-  activitySla: string | null;
-  subCause: string | null;
-  creationDate: string | null;
-  severity: string | null;
-}
-
-function resolvePenaltyFields(data: ProblemData): PenaltyFields {
-  const find = (patterns: RegExp[]): string | null => {
-    for (const pattern of patterns) {
-      const hit = data.columns.find((c) => pattern.test(c.label));
-      if (hit) return hit.header;
-    }
-    return null;
-  };
-  return {
-    ticketId: find([/^ticketid$/i]),
-    ownerGroup: find([/^trueownergroup$/i]),
-    penaltyBaht: find([/^penaltybaht/i]),
-    penaltyFlag: find([/^penalty_flag$/i]),
-    activitySla: find([/^activity_sla$/i]),
-    subCause: find([/^sub_cause$/i]),
-    creationDate: find([/^creationdate$/i]),
-    severity: find([/^truseverity_desc$/i, /severity/i]),
-  };
 }
 
 const THAI_MONTHS_ABBR = [
@@ -107,11 +76,6 @@ function buildPivotRows(
 function parseAmount(raw: string): number {
   const n = Number(raw.replace(/,/g, "").trim());
   return Number.isFinite(n) ? n : 0;
-}
-
-/** "TRUE-TH-WW-CN-SNK" → "CN-SNK". */
-function shortSite(raw: string): string {
-  return raw.replace(/^TRUE-TH-WW-/i, "").trim() || raw;
 }
 
 interface Summary {
