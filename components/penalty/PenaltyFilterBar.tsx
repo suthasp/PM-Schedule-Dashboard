@@ -6,9 +6,14 @@ import type { ReactNode } from "react";
 export interface PenaltyFilters {
   site: string;
   activitySla: string;
+  month: string;
 }
 
-export const DEFAULT_PENALTY_FILTERS: PenaltyFilters = { site: "all", activitySla: "all" };
+export const DEFAULT_PENALTY_FILTERS: PenaltyFilters = {
+  site: "all",
+  activitySla: "all",
+  month: "all",
+};
 
 function FilterSelect({
   label,
@@ -44,6 +49,7 @@ function FilterSelect({
 interface PenaltyFilterBarProps {
   siteOptions: string[];
   activitySlaOptions: string[];
+  monthOptions: string[];
   filters: PenaltyFilters;
   onChange: (filters: PenaltyFilters) => void;
 }
@@ -52,13 +58,16 @@ interface PenaltyFilterBarProps {
 export function PenaltyFilterBar({
   siteOptions,
   activitySlaOptions,
+  monthOptions,
   filters,
   onChange,
 }: PenaltyFilterBarProps): ReactNode {
-  const activeCount = [filters.site, filters.activitySla].filter((v) => v !== "all").length;
+  const activeCount = [filters.site, filters.activitySla, filters.month].filter(
+    (v) => v !== "all",
+  ).length;
 
   return (
-    <div className="card no-print grid grid-cols-2 gap-3 p-4 sm:grid-cols-4">
+    <div className="card no-print grid grid-cols-2 gap-3 p-4 sm:grid-cols-5">
       <FilterSelect
         label="Site"
         value={filters.site}
@@ -70,6 +79,12 @@ export function PenaltyFilterBar({
         value={filters.activitySla}
         options={activitySlaOptions}
         onChange={(activitySla) => onChange({ ...filters, activitySla })}
+      />
+      <FilterSelect
+        label="Month"
+        value={filters.month}
+        options={monthOptions}
+        onChange={(month) => onChange({ ...filters, month })}
       />
       <div className="flex items-end">
         <button

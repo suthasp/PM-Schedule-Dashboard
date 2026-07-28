@@ -12,7 +12,7 @@ import { GridSkeleton } from "@/components/ui/Loading";
 import { usePenaltyData } from "@/hooks/usePenaltyData";
 import { LS_KEYS } from "@/lib/constants";
 import type { ProblemData } from "@/types/problem";
-import { resolvePenaltyFields, shortSite } from "@/utils/penaltyFields";
+import { parseCreationMonth, resolvePenaltyFields, shortSite } from "@/utils/penaltyFields";
 
 // AG Grid is client-only and heavy — code-split it off the main bundle.
 const ProblemGridTable = dynamic(
@@ -31,6 +31,16 @@ function uniqueSorted(values: string[]): string[] {
   );
 }
 
+/** Distinct month labels in chronological order (not alphabetical — "ม.ค." sorts wrong). */
+function monthsInOrder(values: string[]): string[] {
+  const byKey = new Map<number, string>();
+  for (const v of values) {
+    const parsed = parseCreationMonth(v);
+    if (parsed) byKey.set(parsed.sortKey, parsed.label);
+  }
+  return [...byKey.keys()].sort((a, b) => a - b).map((k) => byKey.get(k) ?? "");
+}
+
 function PenaltyContent({ data }: { data: ProblemData }): ReactNode {
   const [filters, setFilters] = useState<PenaltyFilters>(DEFAULT_PENALTY_FILTERS);
   const fields = useMemo(() => resolvePenaltyFields(data), [data]);
@@ -42,6 +52,9 @@ function PenaltyContent({ data }: { data: ProblemData }): ReactNode {
         : [],
       activitySla: fields.activitySla
         ? uniqueSorted(data.rows.map((r) => r.values[fields.activitySla ?? ""] ?? ""))
+        : [],
+      months: fields.creationDate
+        ? monthsInOrder(data.rows.map((r) => r.values[fields.creationDate ?? ""] ?? ""))
         : [],
     }),
     [data.rows, fields],
@@ -55,7 +68,11 @@ function PenaltyContent({ data }: { data: ProblemData }): ReactNode {
       const slaOk =
         filters.activitySla === "all" ||
         (fields.activitySla !== null && (values[fields.activitySla] ?? "").trim() === filters.activitySla);
-      return siteOk && slaOk;
+      const monthOk =
+        filters.month === "all" ||
+        (fields.creationDate !== null &&
+          parseCreationMonth(values[fields.creationDate] ?? "")?.label === filters.month);
+      return siteOk && slaOk && monthOk;
     };
     return { ...data, rows: data.rows.filter((r) => matches(r.values)) };
   }, [data, fields, filters]);
@@ -65,6 +82,7 @@ function PenaltyContent({ data }: { data: ProblemData }): ReactNode {
       <PenaltyFilterBar
         siteOptions={options.sites}
         activitySlaOptions={options.activitySla}
+        monthOptions={options.months}
         filters={filters}
         onChange={setFilters}
       />

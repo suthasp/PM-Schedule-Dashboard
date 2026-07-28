@@ -8,38 +8,13 @@ import { useChartTheme } from "@/hooks/useChartTheme";
 import { PENALTY_SUMMARY } from "@/lib/constants";
 import type { ProblemData } from "@/types/problem";
 import { formatCurrency, formatNumber, formatPercent } from "@/utils/format";
-import { resolvePenaltyFields, shortSite } from "@/utils/penaltyFields";
+import { parseCreationMonth, resolvePenaltyFields, shortSite } from "@/utils/penaltyFields";
 
 interface SiteStat {
   site: string;
   tickets: number;
   penaltyBaht: number;
   slaOver: number;
-}
-
-const THAI_MONTHS_ABBR = [
-  "ม.ค.",
-  "ก.พ.",
-  "มี.ค.",
-  "เม.ย.",
-  "พ.ค.",
-  "มิ.ย.",
-  "ก.ค.",
-  "ส.ค.",
-  "ก.ย.",
-  "ต.ค.",
-  "พ.ย.",
-  "ธ.ค.",
-] as const;
-
-/** "2026-05-02 0:41:30" → { sortKey: 202605, label: "พ.ค." }, or null. */
-function parseCreationMonth(raw: string): { sortKey: number; label: string } | null {
-  const m = /^(\d{4})-(\d{2})-\d{2}/.exec(raw.trim());
-  if (!m) return null;
-  const year = Number(m[1]);
-  const month = Number(m[2]);
-  if (month < 1 || month > 12) return null;
-  return { sortKey: year * 12 + month, label: THAI_MONTHS_ABBR[month - 1] ?? m[2] ?? "" };
 }
 
 interface MonthPivotRow {
