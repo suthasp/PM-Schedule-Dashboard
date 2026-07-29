@@ -13,6 +13,11 @@ const ProblemGridTable = dynamic(
   { ssr: false, loading: () => <GridSkeleton /> },
 );
 
+const PendingSummary = dynamic(
+  () => import("@/components/pending/PendingSummary").then((m) => m.PendingSummary),
+  { ssr: false },
+);
+
 export default function PendingPage(): ReactNode {
   const { query, refresh } = usePendingData();
 
@@ -23,11 +28,14 @@ export default function PendingPage(): ReactNode {
     );
   }
   return (
-    <ProblemGridTable
-      data={query.data}
-      storageKeyBase={LS_KEYS.pendingGridColumnState}
-      itemLabel="tickets"
-      autoSizeOnLoad
-    />
+    <div className="space-y-4">
+      <PendingSummary data={query.data} />
+      <ProblemGridTable
+        data={query.data}
+        storageKeyBase={LS_KEYS.pendingGridColumnState}
+        itemLabel="tickets"
+        autoSizeOnLoad
+      />
+    </div>
   );
 }
