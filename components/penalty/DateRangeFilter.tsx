@@ -1,5 +1,6 @@
 "use client";
 
+import { Calendar } from "lucide-react";
 import type { ReactNode } from "react";
 
 export interface DateRange {
@@ -7,6 +8,55 @@ export interface DateRange {
   from: string;
   /** ISO yyyy-mm-dd, or "" for "to the latest date in the data". */
   to: string;
+}
+
+/** "2026-05-01" → "01/05/2026". */
+function formatDmy(iso: string): string {
+  const [y, m, d] = iso.split("-");
+  return d && m && y ? `${d}/${m}/${y}` : iso;
+}
+
+/**
+ * A native `<input type="date">`, fully transparent, layered under a
+ * dd/mm/yyyy-formatted label. Native date inputs render their displayed
+ * format from the browser/OS locale (the `lang` attribute does not override
+ * it in Chromium), so this is the only reliable way to force dd/mm/yyyy —
+ * the invisible input still supplies the real calendar picker and keyboard
+ * entry; only the visible text is our own formatting.
+ */
+function DateField({
+  value,
+  min,
+  max,
+  onChange,
+  ariaLabel,
+}: {
+  value: string;
+  min: string;
+  max: string;
+  onChange: (iso: string) => void;
+  ariaLabel: string;
+}): ReactNode {
+  return (
+    <div className="relative h-9 min-w-0 flex-1">
+      <input
+        type="date"
+        aria-label={ariaLabel}
+        value={value}
+        min={min}
+        max={max}
+        onChange={(e) => onChange(e.target.value)}
+        className="peer absolute inset-0 h-9 w-full cursor-pointer opacity-0"
+      />
+      <div
+        className="pointer-events-none flex h-9 items-center justify-between rounded-xl border hairline px-2 text-sm transition-colors peer-focus:border-accent dark:peer-focus:border-accent-dark"
+        style={{ backgroundColor: "var(--surface)" }}
+      >
+        <span>{formatDmy(value)}</span>
+        <Calendar size={14} className="text-muted" aria-hidden />
+      </div>
+    </div>
+  );
 }
 
 function toUtcDays(iso: string): number {
@@ -67,24 +117,8 @@ export function DateRangeFilter({ minDate, maxDate, value, onChange }: DateRange
     <div className="flex min-w-0 flex-col gap-1.5 text-xs">
       <span className="text-muted font-medium">Date Range</span>
       <div className="flex items-center gap-2">
-        <input
-          type="date"
-          value={from}
-          min={minDate}
-          max={maxDate}
-          onChange={(e) => setFrom(e.target.value)}
-          className="h-9 min-w-0 flex-1 rounded-xl border hairline bg-transparent px-2 text-sm outline-none transition-colors focus:border-accent dark:focus:border-accent-dark"
-          style={{ backgroundColor: "var(--surface)" }}
-        />
-        <input
-          type="date"
-          value={to}
-          min={minDate}
-          max={maxDate}
-          onChange={(e) => setTo(e.target.value)}
-          className="h-9 min-w-0 flex-1 rounded-xl border hairline bg-transparent px-2 text-sm outline-none transition-colors focus:border-accent dark:focus:border-accent-dark"
-          style={{ backgroundColor: "var(--surface)" }}
-        />
+        <DateField value={from} min={minDate} max={maxDate} onChange={setFrom} ariaLabel="Start date" />
+        <DateField value={to} min={minDate} max={maxDate} onChange={setTo} ariaLabel="End date" />
       </div>
       <div className="relative mt-1 h-4">
         <div className="absolute inset-x-2 top-1/2 h-1 -translate-y-1/2 rounded-full bg-black/10 dark:bg-white/10" />

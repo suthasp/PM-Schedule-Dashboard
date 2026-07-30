@@ -12,7 +12,7 @@ import { GridSkeleton } from "@/components/ui/Loading";
 import { usePenaltyData } from "@/hooks/usePenaltyData";
 import { LS_KEYS } from "@/lib/constants";
 import type { ProblemData } from "@/types/problem";
-import { resolvePenaltyFields, shortSite } from "@/utils/penaltyFields";
+import { creationDateIso, resolvePenaltyFields, shortSite } from "@/utils/penaltyFields";
 
 // AG Grid is client-only and heavy — code-split it off the main bundle.
 const ProblemGridTable = dynamic(
@@ -31,18 +31,12 @@ function uniqueSorted(values: string[]): string[] {
   );
 }
 
-/** "2026-05-02 0:41:30" → "2026-05-02"; empty/unparseable input → "". */
-function datePart(raw: string): string {
-  const m = /^(\d{4}-\d{2}-\d{2})/.exec(raw.trim());
-  return m?.[1] ?? "";
-}
-
 /** Earliest/latest date (yyyy-mm-dd) among the given raw CREATIONDATE values. */
 function dateBounds(values: string[]): { min: string; max: string } {
   let min = "";
   let max = "";
   for (const v of values) {
-    const d = datePart(v);
+    const d = creationDateIso(v);
     if (!d) continue;
     if (!min || d < min) min = d;
     if (!max || d > max) max = d;
@@ -77,7 +71,7 @@ function PenaltyContent({ data }: { data: ProblemData }): ReactNode {
       const slaOk =
         filters.activitySla === "all" ||
         (fields.activitySla !== null && (values[fields.activitySla] ?? "").trim() === filters.activitySla);
-      const rowDate = fields.creationDate ? datePart(values[fields.creationDate] ?? "") : "";
+      const rowDate = fields.creationDate ? (creationDateIso(values[fields.creationDate] ?? "") ?? "") : "";
       const fromOk = filters.dateFrom === "" || (rowDate !== "" && rowDate >= filters.dateFrom);
       const toOk = filters.dateTo === "" || (rowDate !== "" && rowDate <= filters.dateTo);
       return siteOk && slaOk && fromOk && toOk;
