@@ -24,6 +24,18 @@ interface MonthPivotRow {
   total: number;
 }
 
+interface MonthComparisonRow {
+  key: string;
+  label: string;
+  totalTickets: number;
+  exemptions: number;
+  inScope: number;
+  withinSla: number;
+  overSla: number;
+  pctActual: number;
+  pctExclExempt: number;
+}
+
 interface MonthlyPivots {
   months: string[];
   owner: MonthPivotRow[];
@@ -31,6 +43,8 @@ interface MonthlyPivots {
   severity: MonthPivotRow[];
   monthTotals: number[];
   grandTotal: number;
+  /** Newest month first — a report-style comparison, unlike the other pivots. */
+  comparison: MonthComparisonRow[];
 }
 
 /** Build a month × dimension pivot; `order` controls row order (default: total desc). */
@@ -91,6 +105,10 @@ function summarize(data: ProblemData): Summary {
   const slaByKey = new Map<string, { label: string; counts: number[] }>();
   const severityByKey = new Map<string, { label: string; counts: number[] }>();
   const monthTotals = new Array(months.length).fill(0) as number[];
+  const comparisonByIdx = new Map<
+    number,
+    { total: number; exempt: number; within: number; over: number }
+  >();
 
   const bumpPivot = (
     map: Map<string, { label: string; counts: number[] }>,
@@ -109,7 +127,8 @@ function summarize(data: ProblemData): Summary {
     if (baht > 0) charged++;
 
     const flag = fields.penaltyFlag ? (row.values[fields.penaltyFlag] ?? "").trim() : "";
-    if (/waive/i.test(flag)) waived++;
+    const isExempt = /waive/i.test(flag);
+    if (isExempt) waived++;
 
     const sla = fields.activitySla ? (row.values[fields.activitySla] ?? "").trim() : "";
     const isOver = /^over/i.test(sla);
@@ -147,6 +166,16 @@ function summarize(data: ProblemData): Summary {
       if (fields.severity) {
         bumpPivot(severityByKey, (row.values[fields.severity] ?? "").trim(), monthIdx);
       }
+
+      // Exempted (waived) tickets are excluded from the SLA-achievement
+      // classification entirely — they count toward the month's total but
+      // not toward "in scope" within/over, per the reference report.
+      const cmp = comparisonByIdx.get(monthIdx) ?? { total: 0, exempt: 0, within: 0, over: 0 };
+      cmp.total++;
+      if (isExempt) cmp.exempt++;
+      else if (isOver) cmp.over++;
+      else if (/^within/i.test(sla)) cmp.within++;
+      comparisonByIdx.set(monthIdx, cmp);
     }
   }
 
@@ -169,6 +198,24 @@ function summarize(data: ProblemData): Summary {
 
   const grandTotal = monthTotals.reduce((sum, c) => sum + c, 0);
 
+  // Newest month first, matching the reference monthly-comparison report.
+  const comparison: MonthComparisonRow[] = [];
+  for (let idx = months.length - 1; idx >= 0; idx--) {
+    const cmp = comparisonByIdx.get(idx) ?? { total: 0, exempt: 0, within: 0, over: 0 };
+    const inScope = cmp.within + cmp.over;
+    comparison.push({
+      key: String(monthOrder[idx] ?? idx),
+      label: months[idx] ?? "",
+      totalTickets: cmp.total,
+      exemptions: cmp.exempt,
+      inScope,
+      withinSla: cmp.within,
+      overSla: cmp.over,
+      pctActual: cmp.total === 0 ? 0 : (cmp.within / cmp.total) * 100,
+      pctExclExempt: inScope === 0 ? 0 : (cmp.within / inScope) * 100,
+    });
+  }
+
   return {
     totalTickets: data.rows.length,
     totalPenaltyBaht,
@@ -185,6 +232,7 @@ function summarize(data: ProblemData): Summary {
       severity: buildPivotRows(severityByKey, severityOrder),
       monthTotals,
       grandTotal,
+      comparison,
     },
   };
 }
@@ -244,6 +292,92 @@ function MonthPivotTable({
           </tr>
         </tbody>
       </table>
+    </div>
+  );
+}
+
+/**
+ * Newest-month-first SLA achievement report. "Over Long Limit" mirrors
+ * "Over SLA" (no separate breach-duration threshold is tracked in the
+ * sheet) and "Exemptions" is any ticket with PENALTY_FLAG = "Penalty Waive" —
+ * both confirmed with the user rather than guessed.
+ */
+function MonthlyComparisonTable({ rows }: { rows: MonthComparisonRow[] }): ReactNode {
+  const headerCell = "px-2 py-1.5 text-xs font-bold text-white whitespace-nowrap";
+  const latestTint = "rgba(29, 78, 216, 0.08)";
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full border-collapse text-xs">
+        <thead>
+          <tr style={{ backgroundColor: PENALTY_SUMMARY.tickets.bg }}>
+            <th className={`${headerCell} text-left`}>Month</th>
+            <th className={`${headerCell} text-right`}>% Achieve (Actual)</th>
+            <th className={`${headerCell} text-right`}>% Achieve (Excl. Exempt)</th>
+            <th className={`${headerCell} text-right`}>Total Tickets</th>
+            <th className={`${headerCell} text-right`}>In Scope</th>
+            <th className={`${headerCell} text-right`}>Exemptions</th>
+            <th className={`${headerCell} text-right`}>Within SLA</th>
+            <th className={`${headerCell} text-right`}>Over SLA</th>
+            <th className={`${headerCell} text-right`}>Over Long Limit</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row, i) => (
+            <tr
+              key={row.key}
+              className="border-b odd:bg-black/[0.03] dark:odd:bg-white/[0.03]"
+              style={i === 0 ? { ...hairline, backgroundColor: latestTint } : hairline}
+            >
+              <td
+                className="px-2 py-1.5 font-bold"
+                style={i === 0 ? { color: PENALTY_SUMMARY.tickets.bg } : undefined}
+              >
+                {row.label}
+                {i === 0 ? "*" : ""}
+              </td>
+              <td
+                className="px-2 py-1.5 text-right font-semibold tabular-nums"
+                style={{ color: PENALTY_SUMMARY.slaWithin }}
+              >
+                {formatPercent(row.pctActual, 2)}
+              </td>
+              <td
+                className="px-2 py-1.5 text-right font-semibold tabular-nums"
+                style={{ color: PENALTY_SUMMARY.slaWithin }}
+              >
+                {formatPercent(row.pctExclExempt, 2)}
+              </td>
+              <td className="px-2 py-1.5 text-right tabular-nums">{formatNumber(row.totalTickets)}</td>
+              <td className="px-2 py-1.5 text-right tabular-nums">{formatNumber(row.inScope)}</td>
+              <td
+                className="px-2 py-1.5 text-right tabular-nums"
+                style={{ color: row.exemptions > 0 ? PENALTY_SUMMARY.charged.bg : undefined }}
+              >
+                {formatNumber(row.exemptions)}
+              </td>
+              <td
+                className="px-2 py-1.5 text-right font-semibold tabular-nums"
+                style={{ color: PENALTY_SUMMARY.slaWithin }}
+              >
+                {formatNumber(row.withinSla)}
+              </td>
+              <td
+                className="px-2 py-1.5 text-right tabular-nums"
+                style={{ color: row.overSla > 0 ? PENALTY_SUMMARY.slaOver : undefined }}
+              >
+                {formatNumber(row.overSla)}
+              </td>
+              <td
+                className="px-2 py-1.5 text-right tabular-nums"
+                style={{ color: row.overSla > 0 ? PENALTY_SUMMARY.slaOver : undefined }}
+              >
+                {formatNumber(row.overSla)}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="text-muted mt-1.5 text-[11px]">* Latest month — data may still be incomplete.</p>
     </div>
   );
 }
@@ -494,6 +628,12 @@ export function PenaltySummary({ data }: { data: ProblemData }): ReactNode {
             />
           </ChartCard>
         </div>
+      )}
+
+      {s.monthly.comparison.length > 0 && (
+        <ChartCard title="Monthly Comparison" subtitle="SLA achievement by month, newest first">
+          <MonthlyComparisonTable rows={s.monthly.comparison} />
+        </ChartCard>
       )}
     </div>
   );
