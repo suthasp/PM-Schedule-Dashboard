@@ -17,6 +17,27 @@ interface SiteStat {
   slaOver: number;
 }
 
+const ENGLISH_MONTHS = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+/** sortKey is `year * 12 + month` (1-indexed) — recover the month and name it in full. */
+function englishMonthName(sortKey: number): string {
+  const month = sortKey % 12 || 12;
+  return ENGLISH_MONTHS[month - 1] ?? "";
+}
+
 interface MonthPivotRow {
   key: string;
   label: string;
@@ -205,7 +226,7 @@ function summarize(data: ProblemData): Summary {
     const inScope = cmp.within + cmp.over;
     comparison.push({
       key: String(monthOrder[idx] ?? idx),
-      label: months[idx] ?? "",
+      label: englishMonthName(monthOrder[idx] ?? idx),
       totalTickets: cmp.total,
       exemptions: cmp.exempt,
       inScope,
