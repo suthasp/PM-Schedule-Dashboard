@@ -24,7 +24,8 @@ interface DistributionBarChartProps {
   domain: string[];
   /** Categorical slot index for the single-series hue. */
   colorSlot: number;
-  activeValue: string | "all";
+  /** Whether a given bar's value counts as "selected" (drives full vs. dimmed opacity). */
+  isActive: (value: string) => boolean;
   onSelect: (value: string) => void;
   /** Bars per row height; chart grows with the domain size. */
   sortByCount?: boolean;
@@ -44,7 +45,7 @@ export function DistributionBarChart({
   dimension,
   domain,
   colorSlot,
-  activeValue,
+  isActive,
   onSelect,
   sortByCount = true,
 }: DistributionBarChartProps): ReactNode {
@@ -105,10 +106,7 @@ export function DistributionBarChart({
             className="cursor-pointer"
           >
             {rows.map((r) => (
-              <Cell
-                key={r.name}
-                opacity={activeValue === "all" || activeValue === r.name ? 1 : 0.35}
-              />
+              <Cell key={r.name} opacity={isActive(r.name) ? 1 : 0.35} />
             ))}
             <LabelList
               dataKey="count"

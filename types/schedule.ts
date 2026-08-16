@@ -83,7 +83,8 @@ export interface Filters {
   month: string | "all";
   /** Week header label, e.g. "WK27". */
   week: string | "all";
-  site: string | "all";
+  /** Multi-select: empty array = "All" (no site filter). */
+  site: string[];
   status: JobStatus | "all";
   category: string | "all";
   dutyCycle: string | "all";
@@ -94,7 +95,7 @@ export const DEFAULT_FILTERS: Filters = {
   year: "all",
   month: "all",
   week: "all",
-  site: "all",
+  site: [],
   status: "all",
   category: "all",
   dutyCycle: "all",

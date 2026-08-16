@@ -220,7 +220,7 @@ export function jobMatchesFilters(job: PMJob, filters: Filters): boolean {
   if (filters.year !== "all" && job.week.year !== filters.year) return false;
   if (filters.month !== "all" && job.week.month !== filters.month) return false;
   if (filters.week !== "all" && job.week.label !== filters.week) return false;
-  if (filters.site !== "all" && job.site !== filters.site) return false;
+  if (filters.site.length > 0 && !filters.site.includes(job.site)) return false;
   if (filters.status !== "all" && job.status !== filters.status) return false;
   if (filters.category !== "all" && job.category !== filters.category) return false;
   if (filters.dutyCycle !== "all" && job.dutyCycle !== filters.dutyCycle) return false;
@@ -268,7 +268,8 @@ export function taskMatchesFilters(task: TaskRow, taskJobs: PMJob[], filters: Fi
 function matchesDims(task: TaskRow, filters: Filters): boolean {
   const values = Object.values(task.values).map((v) => v.trim());
   const has = (v: string | "all"): boolean => v === "all" || values.includes(v);
-  return has(filters.site) && has(filters.category) && has(filters.dutyCycle);
+  const siteOk = filters.site.length === 0 || filters.site.some((s) => values.includes(s));
+  return siteOk && has(filters.category) && has(filters.dutyCycle);
 }
 
 export function summarize(jobs: PMJob[]): KpiSummary {

@@ -15,6 +15,8 @@ interface FilterContextValue {
   setFilter: <K extends keyof Filters>(key: K, value: Filters[K]) => void;
   /** Set a filter, or clear it back to "all" when the same value is clicked again. */
   toggleFilter: <K extends keyof Filters>(key: K, value: Filters[K]) => void;
+  /** Add/remove a single site from the multi-select site filter. */
+  toggleSite: (site: string) => void;
   clearFilters: () => void;
   activeCount: number;
 }
@@ -39,19 +41,26 @@ export function FilterProvider({ children }: { children: ReactNode }): ReactNode
     }));
   }, []);
 
+  const toggleSite = useCallback((site: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      site: prev.site.includes(site) ? prev.site.filter((s) => s !== site) : [...prev.site, site],
+    }));
+  }, []);
+
   const clearFilters = useCallback(() => setFilters(DEFAULT_FILTERS), []);
 
-  const activeCount = useMemo(
-    () =>
-      (Object.keys(DEFAULT_FILTERS) as (keyof Filters)[]).filter(
-        (k) => filters[k] !== DEFAULT_FILTERS[k],
-      ).length,
-    [filters],
-  );
+  const activeCount = useMemo(() => {
+    let count = filters.site.length > 0 ? 1 : 0;
+    for (const k of Object.keys(DEFAULT_FILTERS) as (keyof Filters)[]) {
+      if (k !== "site" && filters[k] !== DEFAULT_FILTERS[k]) count++;
+    }
+    return count;
+  }, [filters]);
 
   const value = useMemo(
-    () => ({ filters, setFilter, toggleFilter, clearFilters, activeCount }),
-    [filters, setFilter, toggleFilter, clearFilters, activeCount],
+    () => ({ filters, setFilter, toggleFilter, toggleSite, clearFilters, activeCount }),
+    [filters, setFilter, toggleFilter, toggleSite, clearFilters, activeCount],
   );
 
   return <FilterContext.Provider value={value}>{children}</FilterContext.Provider>;

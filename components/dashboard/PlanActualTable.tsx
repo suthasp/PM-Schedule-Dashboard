@@ -39,11 +39,11 @@ export function PlanActualTable({ data }: { data: ScheduleData }): ReactNode {
   useEffect(() => setMounted(true), []);
   const dark = mounted && resolvedTheme === "dark";
 
-  const { filters, toggleFilter } = useFilters();
+  const { filters, toggleSite } = useFilters();
 
   // Respect every filter except the site itself, so all rows stay comparable.
   const scopedJobs = useMemo(() => {
-    const scope = { ...filters, site: "all" as const };
+    const scope = { ...filters, site: [] };
     return data.jobs.filter((j) => jobMatchesFilters(j, scope));
   }, [data.jobs, filters]);
 
@@ -117,11 +117,11 @@ export function PlanActualTable({ data }: { data: ScheduleData }): ReactNode {
   );
 
   const bodyRow = (row: SiteBreakdown, isGrand: boolean): ReactNode => {
-    const active = !isGrand && filters.site === row.site;
+    const active = !isGrand && filters.site.includes(row.site);
     return (
       <tr
         key={row.site}
-        onClick={isGrand ? undefined : () => toggleFilter("site", row.site)}
+        onClick={isGrand ? undefined : () => toggleSite(row.site)}
         aria-selected={active}
         className={`border-b transition-colors ${
           isGrand

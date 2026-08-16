@@ -56,11 +56,11 @@ function StatRow({
  * Clicking a card toggles the global site filter for the whole app.
  */
 export function SiteSummaryRow({ data }: { data: ScheduleData }): ReactNode {
-  const { filters, toggleFilter } = useFilters();
+  const { filters, toggleSite } = useFilters();
 
   // Respect every filter except the site itself, so all cards stay comparable.
   const scopedJobs = useMemo(() => {
-    const scope = { ...filters, site: "all" as const };
+    const scope = { ...filters, site: [] };
     return data.jobs.filter((j) => jobMatchesFilters(j, scope));
   }, [data.jobs, filters]);
 
@@ -76,7 +76,7 @@ export function SiteSummaryRow({ data }: { data: ScheduleData }): ReactNode {
     >
       {cards.map((c, i) => {
         const headerColor = SITE_COLORS[i % SITE_COLORS.length] ?? "#1d4ed8";
-        const active = filters.site === c.site;
+        const active = filters.site.includes(c.site);
         return (
           <motion.button
             key={c.site}
@@ -84,7 +84,7 @@ export function SiteSummaryRow({ data }: { data: ScheduleData }): ReactNode {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.25, delay: i * 0.02 }}
-            onClick={() => toggleFilter("site", c.site)}
+            onClick={() => toggleSite(c.site)}
             aria-pressed={active}
             className={`card overflow-hidden text-left transition-shadow hover:shadow-soft-lg ${
               active ? "ring-2 ring-accent dark:ring-accent-dark" : ""

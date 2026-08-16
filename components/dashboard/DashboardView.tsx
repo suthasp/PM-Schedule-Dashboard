@@ -23,7 +23,7 @@ import { downloadScreenshot, printDashboard } from "@/utils/export";
 /** Executive dashboard: KPI row + seven interactive charts, all filter-linked. */
 export function DashboardView({ data }: { data: ScheduleData }): ReactNode {
   const { jobs, kpis } = useFilteredData(data);
-  const { filters, toggleFilter } = useFilters();
+  const { filters, toggleFilter, toggleSite } = useFilters();
   const { settings } = useSettings();
   const captureRef = useRef<HTMLDivElement>(null);
 
@@ -98,7 +98,7 @@ export function DashboardView({ data }: { data: ScheduleData }): ReactNode {
               dimension={(j) => j.category}
               domain={data.categories}
               colorSlot={0}
-              activeValue={filters.category}
+              isActive={(v) => filters.category === "all" || filters.category === v}
               onSelect={(v) => toggleFilter("category", v)}
             />
           </ChartCard>
@@ -108,8 +108,8 @@ export function DashboardView({ data }: { data: ScheduleData }): ReactNode {
               dimension={(j) => j.site}
               domain={data.sites}
               colorSlot={1}
-              activeValue={filters.site}
-              onSelect={(v) => toggleFilter("site", v)}
+              isActive={(v) => filters.site.length === 0 || filters.site.includes(v)}
+              onSelect={toggleSite}
             />
           </ChartCard>
           <ChartCard title="Duty-Cycle Workload" subtitle="Jobs per maintenance cycle — click to filter">
@@ -118,7 +118,7 @@ export function DashboardView({ data }: { data: ScheduleData }): ReactNode {
               dimension={(j) => j.dutyCycle}
               domain={data.dutyCycles}
               colorSlot={4}
-              activeValue={filters.dutyCycle}
+              isActive={(v) => filters.dutyCycle === "all" || filters.dutyCycle === v}
               onSelect={(v) => toggleFilter("dutyCycle", v)}
             />
           </ChartCard>

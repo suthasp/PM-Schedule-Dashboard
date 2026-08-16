@@ -47,12 +47,12 @@ function TripleCells({ stat, bold = false }: { stat: CellStat; bold?: boolean })
  * month name or site header toggles the matching global filter.
  */
 export function MonthlySitePivot({ data }: { data: ScheduleData }): ReactNode {
-  const { filters, toggleFilter } = useFilters();
+  const { filters, toggleFilter, toggleSite } = useFilters();
 
   // Months are rows and sites are columns — keep both unfiltered so the
   // pivot stays complete; every other filter applies.
   const scopedJobs = useMemo(() => {
-    const scope = { ...filters, month: "all" as const, site: "all" as const };
+    const scope = { ...filters, month: "all" as const, site: [] };
     return data.jobs.filter((j) => jobMatchesFilters(j, scope));
   }, [data.jobs, filters]);
 
@@ -115,10 +115,10 @@ export function MonthlySitePivot({ data }: { data: ScheduleData }): ReactNode {
               >
                 <button
                   type="button"
-                  onClick={() => toggleFilter("site", site)}
-                  aria-pressed={filters.site === site}
+                  onClick={() => toggleSite(site)}
+                  aria-pressed={filters.site.includes(site)}
                   className={`w-full whitespace-nowrap px-2 py-1.5 text-center font-bold text-white transition-opacity ${
-                    filters.site !== "all" && filters.site !== site ? "opacity-50" : ""
+                    filters.site.length > 0 && !filters.site.includes(site) ? "opacity-50" : ""
                   }`}
                 >
                   {site}

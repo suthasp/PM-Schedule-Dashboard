@@ -3,6 +3,7 @@
 import { FilterX } from "lucide-react";
 import type { ReactNode } from "react";
 import { useFilters } from "@/components/providers/FilterProvider";
+import { MultiSelect } from "@/components/ui/MultiSelect";
 import { JOB_STATUSES, type Filters, type JobStatus, type ScheduleData } from "@/types/schedule";
 
 interface SelectProps<T extends string | number> {
@@ -69,7 +70,12 @@ export function FilterBar({ data }: { data: ScheduleData }): ReactNode {
         }}
       />
       <FilterSelect<string> label="Week" value={filters.week} options={weekOptions} onChange={set("week")} />
-      <FilterSelect<string> label="Site / Data Hall" value={filters.site} options={data.sites} onChange={set("site")} />
+      <MultiSelect
+        label="Site / Data Hall"
+        selected={filters.site}
+        options={data.sites}
+        onChange={set("site")}
+      />
       <FilterSelect<JobStatus>
         label="Status"
         value={filters.status}
