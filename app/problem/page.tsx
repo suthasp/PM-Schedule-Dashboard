@@ -54,11 +54,10 @@ function ProblemContent({ data }: { data: ProblemData }): ReactNode {
     const matches = (values: Record<string, string>): boolean => {
       const has = (field: string | null, wanted: string): boolean =>
         wanted === "all" || (field !== null && (values[field] ?? "").trim() === wanted);
-      return (
-        has(fields.site, filters.site) &&
-        has(fields.scope, filters.scope) &&
-        has(fields.workStatus, filters.status)
-      );
+      const siteOk =
+        filters.site.length === 0 ||
+        (fields.site !== null && filters.site.includes((values[fields.site] ?? "").trim()));
+      return siteOk && has(fields.scope, filters.scope) && has(fields.workStatus, filters.status);
     };
     return { ...data, rows: data.rows.filter((r) => matches(r.values)) };
   }, [data, fields, filters]);
@@ -77,7 +76,12 @@ function ProblemContent({ data }: { data: ProblemData }): ReactNode {
           data={data}
           filters={filters}
           onToggleSite={(site) =>
-            setFilters({ ...filters, site: filters.site === site ? "all" : site })
+            setFilters({
+              ...filters,
+              site: filters.site.includes(site)
+                ? filters.site.filter((s) => s !== site)
+                : [...filters.site, site],
+            })
           }
         />
       </ProblemSummary>

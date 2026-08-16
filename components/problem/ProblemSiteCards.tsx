@@ -62,7 +62,7 @@ export function ProblemSiteCards({
     >
       {cards.map((c, i) => {
         const color = SITE_COLORS[i % SITE_COLORS.length] ?? SITE_COLORS[0];
-        const active = filters.site === c.site;
+        const active = filters.site.includes(c.site);
         return (
           <motion.button
             key={c.site}
