@@ -12,6 +12,7 @@ import { FilterBar } from "@/components/dashboard/FilterBar";
 import { KpiRow } from "@/components/dashboard/KpiRow";
 import { MonthlySitePivot } from "@/components/dashboard/MonthlySitePivot";
 import { PlanActualTable } from "@/components/dashboard/PlanActualTable";
+import { SiteCompletionCombo } from "@/components/dashboard/SiteCompletionCombo";
 import { SiteSummaryRow } from "@/components/dashboard/SiteSummaryRow";
 import { useFilters } from "@/components/providers/FilterProvider";
 import { useSettings } from "@/components/providers/SettingsProvider";
@@ -65,6 +66,13 @@ export function DashboardView({ data }: { data: ScheduleData }): ReactNode {
         <KpiRow kpis={kpis} />
 
         <SiteSummaryRow data={data} />
+
+        <ChartCard
+          title="PM Completion by Site"
+          subtitle="Plan vs actual jobs and % finished per site — click a row to filter"
+        >
+          <SiteCompletionCombo data={data} />
+        </ChartCard>
 
         <ChartCard
           title={`Weekly PM Trend — ${data.weeks[0]?.label ?? ""}/${data.weeks[0]?.year ?? ""} – ${

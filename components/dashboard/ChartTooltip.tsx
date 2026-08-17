@@ -7,6 +7,8 @@ export interface TooltipRow {
   name: string;
   value: number;
   color?: string;
+  /** Override the default number formatting, e.g. to append a "%". */
+  format?: (value: number) => string;
 }
 
 interface ChartTooltipProps {
@@ -32,7 +34,9 @@ export function ChartTooltip({ label, rows }: ChartTooltipProps): ReactNode {
             ) : null}
             <span className="text-secondary">{r.name}</span>
           </span>
-          <span className="font-semibold tabular-nums">{formatNumber(r.value)}</span>
+          <span className="font-semibold tabular-nums">
+            {r.format ? r.format(r.value) : formatNumber(r.value)}
+          </span>
         </p>
       ))}
     </div>

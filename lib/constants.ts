@@ -80,6 +80,19 @@ export const SITE_COLORS = [
   "#57534e", // warm gray (spare)
 ] as const;
 
+/**
+ * "PM Completion by Site" card: navy table chrome plus the combo chart's
+ * Plan / Actual / % Finished series. Its own pairing (blue / green / orange),
+ * distinct from PLAN_ACTUAL_TABLE's amber-and-blue duty-cycle breakdown.
+ */
+export const SITE_COMPLETION = {
+  header: { bg: "#0d366b", fg: "#ffffff" },
+  totalTint: "rgba(13, 54, 107, 0.08)",
+  plan: { light: "#2a78d6", dark: "#3987e5" },
+  actual: { light: "#008300", dark: "#1baf7a" },
+  pct: { light: "#c2410c", dark: "#eb6834" },
+} as const;
+
 /** Monthly per-site pivot: translucent column tints that work on both themes. */
 export const MONTH_PIVOT_TINTS = {
   plan: "rgba(74, 58, 167, 0.10)",
