@@ -7,6 +7,7 @@ import {
   ProblemFilterBar,
   type ProblemFilters,
 } from "@/components/problem/ProblemFilterBar";
+import { ChartCard } from "@/components/ui/ChartCard";
 import { ErrorPage } from "@/components/ui/ErrorPage";
 import { GridSkeleton } from "@/components/ui/Loading";
 import { useProblemData } from "@/hooks/useProblemData";
@@ -26,6 +27,11 @@ const ProblemSummary = dynamic(
 
 const ProblemSiteCards = dynamic(
   () => import("@/components/problem/ProblemSiteCards").then((m) => m.ProblemSiteCards),
+  { ssr: false },
+);
+
+const ProblemInProgressTable = dynamic(
+  () => import("@/components/problem/ProblemInProgressTable").then((m) => m.ProblemInProgressTable),
   { ssr: false },
 );
 
@@ -85,6 +91,12 @@ function ProblemContent({ data }: { data: ProblemData }): ReactNode {
           }
         />
       </ProblemSummary>
+      <ChartCard
+        title="In Progress Problems"
+        subtitle="Open issues by scope — grouped In(AMC) → In(R) → Out"
+      >
+        <ProblemInProgressTable data={filtered} />
+      </ChartCard>
       <ProblemGridTable data={filtered} />
     </div>
   );

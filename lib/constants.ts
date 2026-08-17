@@ -107,6 +107,8 @@ export const PROBLEM_SUMMARY = {
   problem: { bg: "#1d4ed8", fg: "#ffffff" },
   finished: { bg: "#0ca30c", fg: "#ffffff" },
   inProgress: { bg: "#eb6834", fg: "#ffffff" },
+  /** Navy header for the in-progress report table. */
+  reportHeader: { bg: "#0d366b", fg: "#ffffff" },
   scopeAmc: { bg: { light: "#cde2fb", dark: "#1d2f4d" }, ink: { light: "#184f95", dark: "#9ec5f4" } },
   scopeR: { bg: { light: "#fdf0cd", dark: "#3d3113" }, ink: { light: "#8a5a00", dark: "#fab219" } },
   scopeOut: { bg: { light: "#fbdccd", dark: "#43261a" }, ink: { light: "#9a3412", dark: "#eb9a7c" } },
