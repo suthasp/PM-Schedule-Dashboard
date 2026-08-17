@@ -24,6 +24,8 @@ interface Summary {
   inProgress: number;
   inAmc: number;
   inR: number;
+  /** Rows whose scope is a plain "In" — neither AMC nor R. */
+  inPlain: number;
   out: number;
   sites: SiteStat[];
   subCauses: { cause: string; count: number }[];
@@ -38,6 +40,7 @@ function summarize(data: ProblemData): Summary {
   let finished = 0;
   let inAmc = 0;
   let inR = 0;
+  let inPlain = 0;
   let out = 0;
 
   for (const row of data.rows) {
@@ -47,6 +50,7 @@ function summarize(data: ProblemData): Summary {
     const scope = scopeField ? (row.values[scopeField] ?? "").trim() : "";
     if (/^in\s*\(?\s*amc/i.test(scope)) inAmc++;
     else if (/^in\s*\(?\s*r/i.test(scope)) inR++;
+    else if (/^in$/i.test(scope)) inPlain++;
     else if (/^out/i.test(scope)) out++;
 
     const site = siteField ? (row.values[siteField] ?? "").trim() : "";
@@ -74,7 +78,17 @@ function summarize(data: ProblemData): Summary {
   const othersCount = causesSorted.slice(10).reduce((sum, [, count]) => sum + count, 0);
   if (othersCount > 0) subCauses.push({ cause: "Others", count: othersCount });
 
-  return { total: data.rows.length, finished, inProgress: data.rows.length - finished, inAmc, inR, out, sites, subCauses };
+  return {
+    total: data.rows.length,
+    finished,
+    inProgress: data.rows.length - finished,
+    inAmc,
+    inR,
+    inPlain,
+    out,
+    sites,
+    subCauses,
+  };
 }
 
 function StatTile({
@@ -156,7 +170,7 @@ export function ProblemSummary({
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-6">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 xl:grid-cols-7">
         <StatTile
           label="Problem"
           value={s.total}
@@ -180,6 +194,7 @@ export function ProblemSummary({
         />
         <ScopeTile label="In (AMC)" value={s.inAmc} note="In(AMC) items" bg={PROBLEM_SUMMARY.scopeAmc.bg} ink={PROBLEM_SUMMARY.scopeAmc.ink} />
         <ScopeTile label="In (R)" value={s.inR} note="In(R) items" bg={PROBLEM_SUMMARY.scopeR.bg} ink={PROBLEM_SUMMARY.scopeR.ink} />
+        <ScopeTile label="In" value={s.inPlain} note="In items" bg={PROBLEM_SUMMARY.scopeIn.bg} ink={PROBLEM_SUMMARY.scopeIn.ink} />
         <ScopeTile label="Out" value={s.out} note="Out of scope" bg={PROBLEM_SUMMARY.scopeOut.bg} ink={PROBLEM_SUMMARY.scopeOut.ink} />
       </div>
 

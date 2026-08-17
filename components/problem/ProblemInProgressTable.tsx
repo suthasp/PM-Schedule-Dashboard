@@ -112,9 +112,11 @@ export function ProblemInProgressTable({ data }: { data: ProblemData }): ReactNo
       ? "scopeAmc"
       : /^in\s*\(\s*r/i.test(scope)
         ? "scopeR"
-        : /^out/i.test(scope)
-          ? "scopeOut"
-          : null;
+        : /^in$/i.test(scope)
+          ? "scopeIn"
+          : /^out/i.test(scope)
+            ? "scopeOut"
+            : null;
     if (!key) return undefined;
     const tone = PROBLEM_SUMMARY[key];
     return { backgroundColor: tone.bg[mode], color: tone.ink[mode] };

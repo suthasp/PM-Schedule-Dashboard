@@ -111,6 +111,8 @@ export const PROBLEM_SUMMARY = {
   reportHeader: { bg: "#0d366b", fg: "#ffffff" },
   scopeAmc: { bg: { light: "#cde2fb", dark: "#1d2f4d" }, ink: { light: "#184f95", dark: "#9ec5f4" } },
   scopeR: { bg: { light: "#fdf0cd", dark: "#3d3113" }, ink: { light: "#8a5a00", dark: "#fab219" } },
+  /** Plain "In" — in scope, but neither AMC nor R. */
+  scopeIn: { bg: { light: "#d3ede6", dark: "#123330" }, ink: { light: "#0f766e", dark: "#7fd1c1" } },
   scopeOut: { bg: { light: "#fbdccd", dark: "#43261a" }, ink: { light: "#9a3412", dark: "#eb9a7c" } },
 } as const;
 
