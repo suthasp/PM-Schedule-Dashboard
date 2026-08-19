@@ -43,7 +43,7 @@ export function KpiRow({ kpis }: { kpis: KpiSummary }): ReactNode {
       {statusTile("Overdue", kpis.overdue, "Overdue", AlertTriangle)}
       <DashboardCard
         label="Completion Rate"
-        value={formatPercent(kpis.completionRate)}
+        value={formatPercent(kpis.completionRate, 2)}
         icon={TrendingUp}
         color="#0ca30c"
         sub={`${formatNumber(kpis.finished)} of ${formatNumber(kpis.total)}`}
