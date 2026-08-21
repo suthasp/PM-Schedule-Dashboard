@@ -35,6 +35,11 @@ const ProblemInProgressTable = dynamic(
   { ssr: false },
 );
 
+const ProblemScopePivot = dynamic(
+  () => import("@/components/problem/ProblemScopePivot").then((m) => m.ProblemScopePivot),
+  { ssr: false },
+);
+
 function uniqueSorted(values: (string | undefined)[]): string[] {
   return [...new Set(values.map((v) => (v ?? "").trim()).filter((v) => v !== ""))].sort((a, b) =>
     a.localeCompare(b),
@@ -91,6 +96,12 @@ function ProblemContent({ data }: { data: ProblemData }): ReactNode {
           }
         />
       </ProblemSummary>
+      <ChartCard
+        title="Scope / Status Breakdown"
+        subtitle="Problems by In/Out Scope, work status and criteria — one column per site"
+      >
+        <ProblemScopePivot data={filtered} />
+      </ChartCard>
       <ChartCard
         title="In Progress Problems"
         subtitle="Open issues by scope — grouped In(AMC) → In(R) → Out"

@@ -109,6 +109,11 @@ export const PROBLEM_SUMMARY = {
   inProgress: { bg: "#eb6834", fg: "#ffffff" },
   /** Navy header for the in-progress report table. */
   reportHeader: { bg: "#0d366b", fg: "#ffffff" },
+  /** Soft row fills per work status in the scope × status pivot. */
+  statusRow: {
+    finished: { light: "rgba(12,163,12,0.14)", dark: "rgba(12,163,12,0.20)" },
+    inProgress: { light: "rgba(235,104,52,0.14)", dark: "rgba(235,104,52,0.22)" },
+  },
   scopeAmc: { bg: { light: "#cde2fb", dark: "#1d2f4d" }, ink: { light: "#184f95", dark: "#9ec5f4" } },
   scopeR: { bg: { light: "#fdf0cd", dark: "#3d3113" }, ink: { light: "#8a5a00", dark: "#fab219" } },
   /** Plain "In" — in scope, but neither AMC nor R. */
