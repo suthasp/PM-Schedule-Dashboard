@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import type { ReactNode } from "react";
 import { useFilterState } from "@/components/providers/FilterProvider";
+import { ChartCard } from "@/components/ui/ChartCard";
 import { ErrorPage } from "@/components/ui/ErrorPage";
 import { GridSkeleton } from "@/components/ui/Loading";
 import { useAmcData } from "@/hooks/useAmcData";
@@ -25,15 +26,33 @@ const KpiRow = dynamic(() => import("@/components/dashboard/KpiRow").then((m) =>
   ssr: false,
 });
 
+const AmcSiteSummary = dynamic(
+  () => import("@/components/amc/AmcSummaryTables").then((m) => m.AmcSiteSummary),
+  { ssr: false },
+);
+
+const AmcSystemSummary = dynamic(
+  () => import("@/components/amc/AmcSummaryTables").then((m) => m.AmcSystemSummary),
+  { ssr: false },
+);
+
 function AmcContent({ data }: { data: ScheduleData }): ReactNode {
   // Own sheet, own filter state — these dropdowns don't disturb the Dashboard.
   const controller = useFilterState();
-  const { tasks, kpis } = useFilteredData(data, controller.filters);
+  const { jobs, tasks, kpis } = useFilteredData(data, controller.filters);
 
   return (
     <div className="space-y-4">
       <FilterBar data={data} controller={controller} />
       <KpiRow kpis={kpis} controller={controller} />
+      <div className="grid gap-4 lg:grid-cols-2">
+        <ChartCard title="สรุปรายไซต์งาน" subtitle="PM plan vs actual by site">
+          <AmcSiteSummary data={data} jobs={jobs} />
+        </ChartCard>
+        <ChartCard title="สรุปรายระบบอุปกรณ์" subtitle="PM plan vs actual by equipment system">
+          <AmcSystemSummary data={data} jobs={jobs} />
+        </ChartCard>
+      </div>
       <AGGridTable data={data} tasks={tasks} storageKeyBase={LS_KEYS.amcGridColumnState} />
     </div>
   );

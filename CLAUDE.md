@@ -25,7 +25,7 @@ A fourth source, the **Tickets Penalty sheet** (`PENALTY_CSV_URL`, `/penalty`), 
 
 A fifth source, the **Pending Ticket sheet** (`PENDING_CSV_URL`, `/pending`), is a small flat open-ticket log (23 columns) — same reused pipeline, plus `components/pending/PendingSummary.tsx` (per-site count tiles and a TRUEOWNERGROUP × SLA_Flag_Group stacked bar chart) above the grid.
 
-A sixth source, the **AMC Actual sheet** (`AMC_CSV_URL`, `/amc`), is a fiscal-year week matrix like the main PM schedule, so it **reuses that pipeline** instead: `transformCsv` for parsing and `AGGridTable` (parameterised by `storageKeyBase`) for display. It shows the Dashboard's own `FilterBar` dropdowns and `KpiRow` tiles, but over a **page-local** filter state (`useFilterState()` passed as those components' `controller` prop and as `useFilteredData`'s `override`), so it never disturbs the shared Dashboard / PM Schedule filters.
+A sixth source, the **AMC Actual sheet** (`AMC_CSV_URL`, `/amc`), is a fiscal-year week matrix like the main PM schedule, so it **reuses that pipeline** instead: `transformCsv` for parsing and `AGGridTable` (parameterised by `storageKeyBase`) for display. It shows the Dashboard's own `FilterBar` dropdowns and `KpiRow` tiles, but over a **page-local** filter state (`useFilterState()` passed as those components' `controller` prop and as `useFilteredData`'s `override`), so it never disturbs the shared Dashboard / PM Schedule filters. `components/amc/AmcSummaryTables.tsx` adds the two Plan/Actual/Remain roll-ups (by site, by equipment system) above the grid.
 
 ## Data pipeline (the big picture)
 
