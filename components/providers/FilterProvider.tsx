@@ -10,7 +10,7 @@ import {
 } from "react";
 import { DEFAULT_FILTERS, type Filters } from "@/types/schedule";
 
-interface FilterContextValue {
+export interface FilterContextValue {
   filters: Filters;
   setFilter: <K extends keyof Filters>(key: K, value: Filters[K]) => void;
   /** Set a filter, or clear it back to "all" when the same value is clicked again. */
@@ -24,10 +24,11 @@ interface FilterContextValue {
 const FilterContext = createContext<FilterContextValue | null>(null);
 
 /**
- * Global filter state shared by the Dashboard and the PM Schedule grid, so a
- * click on any chart, KPI card or data-hall bar filters both views.
+ * One self-contained instance of the filter state. Backs the global provider,
+ * and can also be held by a page that wants the same controls over its own
+ * dataset without touching the shared Dashboard / PM Schedule filters.
  */
-export function FilterProvider({ children }: { children: ReactNode }): ReactNode {
+export function useFilterState(): FilterContextValue {
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
 
   const setFilter = useCallback(<K extends keyof Filters>(key: K, value: Filters[K]) => {
@@ -58,11 +59,18 @@ export function FilterProvider({ children }: { children: ReactNode }): ReactNode
     return count;
   }, [filters]);
 
-  const value = useMemo(
+  return useMemo(
     () => ({ filters, setFilter, toggleFilter, toggleSite, clearFilters, activeCount }),
     [filters, setFilter, toggleFilter, toggleSite, clearFilters, activeCount],
   );
+}
 
+/**
+ * Global filter state shared by the Dashboard and the PM Schedule grid, so a
+ * click on any chart, KPI card or data-hall bar filters both views.
+ */
+export function FilterProvider({ children }: { children: ReactNode }): ReactNode {
+  const value = useFilterState();
   return <FilterContext.Provider value={value}>{children}</FilterContext.Provider>;
 }
 

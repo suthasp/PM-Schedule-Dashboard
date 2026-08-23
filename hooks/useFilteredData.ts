@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { useFilters } from "@/components/providers/FilterProvider";
-import type { KpiSummary, PMJob, ScheduleData, TaskRow } from "@/types/schedule";
+import type { Filters, KpiSummary, PMJob, ScheduleData, TaskRow } from "@/types/schedule";
 import {
   groupJobsByTask,
   jobMatchesFilters,
@@ -16,9 +16,16 @@ interface FilteredData {
   kpis: KpiSummary;
 }
 
-/** Applies the shared global filters to the derived dataset, memoized. */
-export function useFilteredData(data: ScheduleData | undefined): FilteredData {
-  const { filters } = useFilters();
+/**
+ * Applies the shared global filters to the derived dataset, memoized.
+ * Pass `override` to filter with a page-local state instead.
+ */
+export function useFilteredData(
+  data: ScheduleData | undefined,
+  override?: Filters,
+): FilteredData {
+  const { filters: global } = useFilters();
+  const filters = override ?? global;
 
   return useMemo(() => {
     if (!data) {

@@ -2,7 +2,7 @@
 
 import { FilterX } from "lucide-react";
 import type { ReactNode } from "react";
-import { useFilters } from "@/components/providers/FilterProvider";
+import { useFilters, type FilterContextValue } from "@/components/providers/FilterProvider";
 import { MultiSelect } from "@/components/ui/MultiSelect";
 import { JOB_STATUSES, type Filters, type JobStatus, type ScheduleData } from "@/types/schedule";
 
@@ -46,9 +46,16 @@ function FilterSelect<T extends string | number>({
   );
 }
 
+interface FilterBarProps {
+  data: ScheduleData;
+  /** Page-local filter state; defaults to the shared global filters. */
+  controller?: FilterContextValue;
+}
+
 /** One row of dimension filters; every change re-renders all charts and the grid. */
-export function FilterBar({ data }: { data: ScheduleData }): ReactNode {
-  const { filters, setFilter, clearFilters, activeCount } = useFilters();
+export function FilterBar({ data, controller }: FilterBarProps): ReactNode {
+  const global = useFilters();
+  const { filters, setFilter, clearFilters, activeCount } = controller ?? global;
 
   const set = <K extends keyof Filters>(key: K) => (value: Filters[K]) => setFilter(key, value);
 
