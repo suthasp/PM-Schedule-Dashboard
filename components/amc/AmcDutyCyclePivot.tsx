@@ -1,9 +1,10 @@
 "use client";
 
 import { Fragment, useMemo, type ReactNode } from "react";
-import { SITE_COMPLETION } from "@/lib/constants";
+import { useChartTheme } from "@/hooks/useChartTheme";
+import { SITE_COMPLETION, STATUS_COLORS } from "@/lib/constants";
 import type { PMJob, ScheduleData, TaskRow } from "@/types/schedule";
-import { formatNumber } from "@/utils/format";
+import { formatNumber, formatPercent } from "@/utils/format";
 
 interface PivotLeaf {
   task: string;
@@ -71,6 +72,8 @@ export function AmcDutyCyclePivot({
   tasks: TaskRow[];
   jobs: PMJob[];
 }): ReactNode {
+  const { dark } = useChartTheme();
+  const overdue = STATUS_COLORS.Overdue[dark ? "dark" : "light"];
   const groups = useMemo(() => buildPivot(tasks, jobs, data.fields), [tasks, jobs, data.fields]);
 
   const total = useMemo(() => {
@@ -85,6 +88,26 @@ export function AmcDutyCyclePivot({
 
   const headerCell = "whitespace-nowrap border px-2 py-1.5 text-xs font-bold";
   const cell = "border px-2 py-1 text-right tabular-nums";
+
+  /** Nothing planned means there is no rate to report — a red 0% would mislead. */
+  const pctCell = (plan: number, actual: number, bold: boolean): ReactNode => {
+    if (plan === 0) {
+      return (
+        <td className={`${cell} text-muted`} style={hairline}>
+          –
+        </td>
+      );
+    }
+    const pct = (actual / plan) * 100;
+    return (
+      <td
+        className={`${cell} ${bold ? "font-bold" : "font-semibold"}`}
+        style={{ ...hairline, color: pct === 0 ? overdue : undefined }}
+      >
+        {formatPercent(pct)}
+      </td>
+    );
+  };
 
   return (
     <div className="overflow-x-auto">
@@ -108,6 +131,9 @@ export function AmcDutyCyclePivot({
             <th className={`${headerCell} text-right`} style={hairline}>
               Sum of Remain
             </th>
+            <th className={`${headerCell} text-right`} style={hairline}>
+              % Completed
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -127,6 +153,7 @@ export function AmcDutyCyclePivot({
                 <td className={`${cell} font-bold`} style={hairline}>
                   {formatNumber(g.plan - g.actual)}
                 </td>
+                {pctCell(g.plan, g.actual, true)}
               </tr>
               {g.leaves.map((l) => (
                 <tr key={`${g.duty}-${l.task}`}>
@@ -143,6 +170,7 @@ export function AmcDutyCyclePivot({
                   <td className={cell} style={hairline}>
                     {formatNumber(l.plan - l.actual)}
                   </td>
+                  {pctCell(l.plan, l.actual, false)}
                 </tr>
               ))}
             </Fragment>
@@ -162,6 +190,7 @@ export function AmcDutyCyclePivot({
             <td className={`${cell} font-bold`} style={hairline}>
               {formatNumber(total.plan - total.actual)}
             </td>
+            {pctCell(total.plan, total.actual, true)}
           </tr>
         </tbody>
       </table>
