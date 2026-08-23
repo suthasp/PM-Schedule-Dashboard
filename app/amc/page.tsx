@@ -36,6 +36,16 @@ const AmcSystemSummary = dynamic(
   { ssr: false },
 );
 
+const AmcDutyCyclePivot = dynamic(
+  () => import("@/components/amc/AmcDutyCyclePivot").then((m) => m.AmcDutyCyclePivot),
+  { ssr: false },
+);
+
+const AmcSiteCombo = dynamic(
+  () => import("@/components/amc/AmcSiteCombo").then((m) => m.AmcSiteCombo),
+  { ssr: false },
+);
+
 function AmcContent({ data }: { data: ScheduleData }): ReactNode {
   // Own sheet, own filter state — these dropdowns don't disturb the Dashboard.
   const controller = useFilterState();
@@ -51,6 +61,19 @@ function AmcContent({ data }: { data: ScheduleData }): ReactNode {
         </ChartCard>
         <ChartCard title="Equipment System Summary" subtitle="PM plan vs actual by equipment system">
           <AmcSystemSummary data={data} jobs={jobs} />
+        </ChartCard>
+      </div>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <ChartCard
+          title="Maintenance Cycle Breakdown"
+          subtitle="Plan / Actual / Remain by duty cycle and task — Y yearly · H half-yearly · Q quarterly · 2M every 2 months · M monthly"
+        >
+          <AmcDutyCyclePivot data={data} tasks={tasks} jobs={jobs} />
+        </ChartCard>
+        <ChartCard title="PM Completion by Site" subtitle="Plan vs actual per site with completion rate">
+          <div className="overflow-x-auto">
+            <AmcSiteCombo data={data} jobs={jobs} />
+          </div>
         </ChartCard>
       </div>
       <AGGridTable data={data} tasks={tasks} storageKeyBase={LS_KEYS.amcGridColumnState} />
