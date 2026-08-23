@@ -46,10 +46,10 @@ function AmcContent({ data }: { data: ScheduleData }): ReactNode {
       <FilterBar data={data} controller={controller} />
       <KpiRow kpis={kpis} controller={controller} />
       <div className="grid gap-4 lg:grid-cols-2">
-        <ChartCard title="สรุปรายไซต์งาน" subtitle="PM plan vs actual by site">
+        <ChartCard title="Site Summary" subtitle="PM plan vs actual by site">
           <AmcSiteSummary data={data} jobs={jobs} />
         </ChartCard>
-        <ChartCard title="สรุปรายระบบอุปกรณ์" subtitle="PM plan vs actual by equipment system">
+        <ChartCard title="Equipment System Summary" subtitle="PM plan vs actual by equipment system">
           <AmcSystemSummary data={data} jobs={jobs} />
         </ChartCard>
       </div>
