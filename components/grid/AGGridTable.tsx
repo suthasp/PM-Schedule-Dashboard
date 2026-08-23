@@ -31,14 +31,20 @@ import "ag-grid-community/styles/ag-theme-quartz.css";
 interface AGGridTableProps {
   data: ScheduleData;
   tasks: TaskRow[];
+  /** localStorage key base for column state (defaults to the PM Schedule grid's). */
+  storageKeyBase?: string;
 }
 
 /** Column-state storage is keyed by the header signature so a sheet-schema change resets cleanly. */
-function storageKey(data: ScheduleData): string {
-  return `${LS_KEYS.gridColumnState}:${data.headers.join("|").length}-${data.headers.length}`;
+function storageKey(data: ScheduleData, base: string): string {
+  return `${base}:${data.headers.join("|").length}-${data.headers.length}`;
 }
 
-export function AGGridTable({ data, tasks }: AGGridTableProps): ReactNode {
+export function AGGridTable({
+  data,
+  tasks,
+  storageKeyBase = LS_KEYS.gridColumnState,
+}: AGGridTableProps): ReactNode {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -73,17 +79,20 @@ export function AGGridTable({ data, tasks }: AGGridTableProps): ReactNode {
     const api = apiRef.current;
     if (!api) return;
     try {
-      window.localStorage.setItem(storageKey(data), JSON.stringify(api.getColumnState()));
+      window.localStorage.setItem(
+        storageKey(data, storageKeyBase),
+        JSON.stringify(api.getColumnState()),
+      );
     } catch {
       // storage unavailable — column layout just won't persist
     }
-  }, [data]);
+  }, [data, storageKeyBase]);
 
   const onGridReady = useCallback(
     (e: GridReadyEvent<GridRow>) => {
       apiRef.current = e.api;
       try {
-        const raw = window.localStorage.getItem(storageKey(data));
+        const raw = window.localStorage.getItem(storageKey(data, storageKeyBase));
         if (raw) {
           e.api.applyColumnState({
             state: JSON.parse(raw) as ColumnState[],
@@ -94,7 +103,7 @@ export function AGGridTable({ data, tasks }: AGGridTableProps): ReactNode {
         // corrupted state — ignore and use defaults
       }
     },
-    [data],
+    [data, storageKeyBase],
   );
 
   // Global search doubles as the grid quick filter.
@@ -122,11 +131,11 @@ export function AGGridTable({ data, tasks }: AGGridTableProps): ReactNode {
     apiRef.current?.resetColumnState();
     setHiddenCols(new Set());
     try {
-      window.localStorage.removeItem(storageKey(data));
+      window.localStorage.removeItem(storageKey(data, storageKeyBase));
     } catch {
       // ignore
     }
-  }, [data]);
+  }, [data, storageKeyBase]);
 
   const toggleColumn = useCallback(
     (colId: string) => {

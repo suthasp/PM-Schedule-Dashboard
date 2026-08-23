@@ -25,6 +25,11 @@ export const PENDING_CSV_URL =
 
 export const PENDING_QUERY_KEY = ["pending-ticket"] as const;
 
+export const AMC_CSV_URL =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRK3EBk-mmlkd8OLq9FWcZ54hSeR5ohjt0yTSeImXg7FRX3SzIhNB1JAKuaM3RuvooLbIilWycyiqeH/pub?gid=51474680&single=true&output=csv";
+
+export const AMC_QUERY_KEY = ["amc-actual"] as const;
+
 /** Default auto-refresh interval: 5 minutes. */
 export const DEFAULT_REFRESH_MINUTES = 5;
 
@@ -35,6 +40,7 @@ export const LS_KEYS = {
   trackingGridColumnState: "pmsd:tracking-grid-column-state-v1",
   penaltyGridColumnState: "pmsd:penalty-grid-column-state-v1",
   pendingGridColumnState: "pmsd:pending-grid-column-state-v1",
+  amcGridColumnState: "pmsd:amc-grid-column-state-v1",
   sidebarCollapsed: "pmsd:sidebar-collapsed",
 } as const;
 

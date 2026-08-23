@@ -1,10 +1,11 @@
 import type { ReactNode } from "react";
 import {
+  AMC_CSV_URL,
   CSV_URL,
-  PROBLEM_CSV_URL,
-  TRACKING_CSV_URL,
   PENALTY_CSV_URL,
   PENDING_CSV_URL,
+  PROBLEM_CSV_URL,
+  TRACKING_CSV_URL,
 } from "@/lib/constants";
 
 export const metadata = { title: "About · CNO Dashboard" };
@@ -13,6 +14,7 @@ const SOURCES = [
   { label: "PM Schedule (fiscal-year matrix)", url: CSV_URL },
   { label: "Data Tracking", url: TRACKING_CSV_URL },
   { label: "Problem", url: PROBLEM_CSV_URL },
+  { label: "AMC Actual (fiscal-year matrix)", url: AMC_CSV_URL },
   { label: "Tickets Penalty", url: PENALTY_CSV_URL },
   { label: "Pending Tickets", url: PENDING_CSV_URL },
 ];
@@ -33,6 +35,10 @@ const PAGES = [
   {
     name: "Problem",
     desc: "Flat issue-tracking sheet with an executive summary (KPI tiles, per-site cards, sub-cause table, status donut) plus site / in-out-scope / status filters, on top of the grid.",
+  },
+  {
+    name: "AMC Actual",
+    desc: "Fiscal-year week matrix of the AMC-contracted PM tasks, shown with the same per-week status chips as PM Schedule.",
   },
   {
     name: "Tickets Penalty",

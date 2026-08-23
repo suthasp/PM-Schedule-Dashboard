@@ -25,6 +25,8 @@ A fourth source, the **Tickets Penalty sheet** (`PENALTY_CSV_URL`, `/penalty`), 
 
 A fifth source, the **Pending Ticket sheet** (`PENDING_CSV_URL`, `/pending`), is a small flat open-ticket log (23 columns) — same reused pipeline, plus `components/pending/PendingSummary.tsx` (per-site count tiles and a TRUEOWNERGROUP × SLA_Flag_Group stacked bar chart) above the grid.
 
+A sixth source, the **AMC Actual sheet** (`AMC_CSV_URL`, `/amc`), is a fiscal-year week matrix like the main PM schedule, so it **reuses that pipeline** instead: `transformCsv` for parsing and `AGGridTable` (parameterised by `storageKeyBase`) for display. It is a page of its own and does not join the global dimension filters.
+
 ## Data pipeline (the big picture)
 
 1. **`lib/constants.ts`** holds `CSV_URL` (the published Google Sheet). Change the data source here.
@@ -45,4 +47,4 @@ Provider nesting (in `app/providers.tsx`): ThemeProvider → QueryClientProvider
 - **Status wording:** user-facing terms are **Finished / Remaining / Overdue** (deliberately renamed from Completed/Pending — keep this).
 - **Colors are centralized** in `lib/constants.ts` (`STATUS_COLORS`, `STATUS_TINTS`, `STATUS_CHIPS`, `CATEGORICAL`, `SEQUENTIAL_BLUE`, `CHART_INK`) with light/dark variants; charts read theme-aware values through `hooks/useChartTheme.ts`. Don't hardcode chart colors in components.
 - **Persistence:** localStorage only, keys under `LS_KEYS` in `lib/constants.ts` (settings, AG Grid column state, sidebar collapse). Bump the key suffix (e.g. `-v2`) when changing a persisted shape.
-- Pages: `/` dashboard (Recharts), `/schedule` AG Grid Community table, `/settings`, `/about`. Layout shell in `components/layout/AppShell.tsx`.
+- Pages: `/` dashboard (Recharts), `/schedule` and `/amc` AG Grid Community week-matrix tables, `/settings`, `/about`. Layout shell in `components/layout/AppShell.tsx`.
