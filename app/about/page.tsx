@@ -38,7 +38,7 @@ const PAGES = [
   },
   {
     name: "AMC Actual",
-    desc: "Fiscal-year week matrix of the AMC-contracted PM tasks, with the same per-week status chips and dimension dropdowns as PM Schedule — filtered independently of the other pages.",
+    desc: "Fiscal-year week matrix of the AMC-contracted PM tasks, with the Dashboard's KPI tiles and dimension dropdowns above the same per-week status chips as PM Schedule — filtered independently of the other pages.",
   },
   {
     name: "Tickets Penalty",

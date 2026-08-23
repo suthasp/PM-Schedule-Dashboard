@@ -21,14 +21,19 @@ const FilterBar = dynamic(
   { ssr: false },
 );
 
+const KpiRow = dynamic(() => import("@/components/dashboard/KpiRow").then((m) => m.KpiRow), {
+  ssr: false,
+});
+
 function AmcContent({ data }: { data: ScheduleData }): ReactNode {
   // Own sheet, own filter state — these dropdowns don't disturb the Dashboard.
   const controller = useFilterState();
-  const { tasks } = useFilteredData(data, controller.filters);
+  const { tasks, kpis } = useFilteredData(data, controller.filters);
 
   return (
     <div className="space-y-4">
       <FilterBar data={data} controller={controller} />
+      <KpiRow kpis={kpis} controller={controller} />
       <AGGridTable data={data} tasks={tasks} storageKeyBase={LS_KEYS.amcGridColumnState} />
     </div>
   );

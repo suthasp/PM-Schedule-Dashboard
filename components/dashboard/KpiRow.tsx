@@ -2,15 +2,22 @@
 
 import { AlertTriangle, CheckCircle2, ClipboardList, Clock, TrendingUp } from "lucide-react";
 import type { ReactNode } from "react";
-import { useFilters } from "@/components/providers/FilterProvider";
+import { useFilters, type FilterContextValue } from "@/components/providers/FilterProvider";
 import { DashboardCard } from "@/components/ui/DashboardCard";
 import { STATUS_COLORS } from "@/lib/constants";
 import type { JobStatus, KpiSummary } from "@/types/schedule";
 import { formatNumber, formatPercent } from "@/utils/format";
 
-/** Five KPI tiles; the three status tiles toggle the global status filter. */
-export function KpiRow({ kpis }: { kpis: KpiSummary }): ReactNode {
-  const { filters, toggleFilter } = useFilters();
+interface KpiRowProps {
+  kpis: KpiSummary;
+  /** Page-local filter state; defaults to the shared global filters. */
+  controller?: FilterContextValue;
+}
+
+/** Five KPI tiles; the three status tiles toggle the status filter. */
+export function KpiRow({ kpis, controller }: KpiRowProps): ReactNode {
+  const global = useFilters();
+  const { filters, toggleFilter } = controller ?? global;
 
   const statusTile = (
     label: string,
