@@ -59,8 +59,10 @@ function AmcContent({ data }: { data: ScheduleData }): ReactNode {
         <ChartCard title="Site Summary" subtitle="PM plan vs actual by site">
           <AmcSiteSummary data={data} jobs={jobs} />
         </ChartCard>
-        <ChartCard title="Equipment System Summary" subtitle="PM plan vs actual by equipment system">
-          <AmcSystemSummary data={data} jobs={jobs} />
+        <ChartCard title="PM Completion by Site" subtitle="Plan vs actual per site with completion rate">
+          <div className="overflow-x-auto">
+            <AmcSiteCombo data={data} jobs={jobs} />
+          </div>
         </ChartCard>
       </div>
       <div className="grid gap-4 lg:grid-cols-2">
@@ -70,10 +72,8 @@ function AmcContent({ data }: { data: ScheduleData }): ReactNode {
         >
           <AmcDutyCyclePivot data={data} tasks={tasks} jobs={jobs} />
         </ChartCard>
-        <ChartCard title="PM Completion by Site" subtitle="Plan vs actual per site with completion rate">
-          <div className="overflow-x-auto">
-            <AmcSiteCombo data={data} jobs={jobs} />
-          </div>
+        <ChartCard title="Equipment System Summary" subtitle="PM plan vs actual by equipment system">
+          <AmcSystemSummary data={data} jobs={jobs} />
         </ChartCard>
       </div>
       <AGGridTable data={data} tasks={tasks} storageKeyBase={LS_KEYS.amcGridColumnState} />
