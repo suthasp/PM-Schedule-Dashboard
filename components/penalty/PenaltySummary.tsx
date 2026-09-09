@@ -179,9 +179,9 @@ function summarize(data: ProblemData): Summary {
     if (monthIdx !== undefined) {
       monthTotals[monthIdx] = (monthTotals[monthIdx] ?? 0) + 1;
       if (fields.ownerGroup) {
-        // This table matches the reference report, which lists the raw
-        // TRUEOWNERGROUP value (unlike the shortened "Penalty by Site" table).
-        bumpPivot(ownerByKey, (row.values[fields.ownerGroup] ?? "").trim(), monthIdx);
+        // Shortened like the "Penalty by Site" table — the TRUE-TH-WW- prefix
+        // is the same on every row and only crowds a narrow column.
+        bumpPivot(ownerByKey, shortSite((row.values[fields.ownerGroup] ?? "").trim()), monthIdx);
       }
       if (sla) bumpPivot(slaByKey, isOver ? "Over" : "Within", monthIdx);
       if (fields.severity) {
