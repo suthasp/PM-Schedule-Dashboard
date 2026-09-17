@@ -3,6 +3,7 @@
 import { Camera, Printer } from "lucide-react";
 import { useCallback, useRef, type ReactNode } from "react";
 import { CalendarHeatmap } from "@/components/dashboard/charts/CalendarHeatmap";
+import { CumulativeMonthChart } from "@/components/dashboard/charts/CumulativeMonthChart";
 import { DistributionBarChart } from "@/components/dashboard/charts/DistributionBarChart";
 import { MonthlyBarChart } from "@/components/dashboard/charts/MonthlyBarChart";
 import { StatusPieChart } from "@/components/dashboard/charts/StatusPieChart";
@@ -81,6 +82,13 @@ export function DashboardView({ data }: { data: ScheduleData }): ReactNode {
           subtitle="Jobs per week, stacked by status — click a bar to filter by month"
         >
           <WeeklyBarChart jobs={jobs} data={data} />
+        </ChartCard>
+
+        <ChartCard
+          title="Cumulative PM Progress by Month"
+          subtitle="Jobs per fiscal month stacked by status, with the running total of scheduled jobs — click a bar to filter by month"
+        >
+          <CumulativeMonthChart data={data} />
         </ChartCard>
 
         <ChartCard
