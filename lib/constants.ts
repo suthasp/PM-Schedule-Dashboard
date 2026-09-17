@@ -99,6 +99,16 @@ export const SITE_COMPLETION = {
   pct: { light: "#c2410c", dark: "#eb6834" },
 } as const;
 
+/**
+ * Cumulative monthly progress chart. The completion-rate line takes the
+ * palette's pink, but swapped across themes — a thin line needs the deeper
+ * tone on the light surface and the lighter one on the dark surface.
+ */
+export const PROGRESS_LINE = {
+  cumulative: { light: "#2a78d6", dark: "#3987e5" },
+  pct: { light: "#d55181", dark: "#e87ba4" },
+} as const;
+
 /** Monthly per-site pivot: translucent column tints that work on both themes. */
 export const MONTH_PIVOT_TINTS = {
   plan: "rgba(74, 58, 167, 0.10)",

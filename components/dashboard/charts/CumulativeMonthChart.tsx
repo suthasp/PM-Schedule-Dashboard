@@ -15,7 +15,7 @@ import {
 import { ChartTooltip } from "@/components/dashboard/ChartTooltip";
 import { useFilters } from "@/components/providers/FilterProvider";
 import { useChartTheme } from "@/hooks/useChartTheme";
-import { SITE_COMPLETION } from "@/lib/constants";
+import { PROGRESS_LINE } from "@/lib/constants";
 import { JOB_STATUSES, type ScheduleData } from "@/types/schedule";
 import { formatNumber, formatPercent } from "@/utils/format";
 import { jobMatchesFilters } from "@/utils/transform";
@@ -103,6 +103,45 @@ function MonthTick({
   );
 }
 
+interface LabelProps {
+  x?: number;
+  y?: number;
+  index?: number;
+  points?: MonthPoint[];
+  /** Upper bound of the cumulative line's (hidden) axis. */
+  max?: number;
+  color?: string;
+  halo?: string;
+}
+
+/**
+ * Rate label that sits on whichever side of its point the cumulative line
+ * isn't — the two series cross mid-year, so a fixed side would collide there.
+ */
+function PctLabel({ x = 0, y = 0, index = -1, points = [], max = 0, color, halo }: LabelProps): ReactNode {
+  const row = points[index];
+  if (!row) return null;
+  const above = row.pct / 100 >= (max === 0 ? 0 : row.cumulative / max);
+  return (
+    <text
+      x={x}
+      y={y}
+      dy={above ? -8 : 15}
+      textAnchor="middle"
+      style={{
+        fontSize: 9,
+        fill: color,
+        fontWeight: 600,
+        stroke: halo,
+        strokeWidth: 3,
+        paintOrder: "stroke",
+      }}
+    >
+      {formatPercent(row.pct)}
+    </text>
+  );
+}
+
 /**
  * Jobs per fiscal month stacked by status, with the running total of
  * scheduled jobs on a second axis. Clicking a bar toggles the month filter.
@@ -110,9 +149,9 @@ function MonthTick({
 export function CumulativeMonthChart({ data }: { data: ScheduleData }): ReactNode {
   const theme = useChartTheme();
   const { filters, toggleFilter } = useFilters();
-  const lineColor = SITE_COMPLETION.plan[theme.dark ? "dark" : "light"];
-  // Violet keeps the rate readable against the green / amber / red bars.
-  const pctColor = theme.categorical[4] ?? lineColor;
+  const mode = theme.dark ? "dark" : "light";
+  const lineColor = PROGRESS_LINE.cumulative[mode];
+  const pctColor = PROGRESS_LINE.pct[mode];
 
   const points = useMemo<MonthPoint[]>(() => {
     // Every other filter applies, but not month/week — a cumulative curve only
@@ -157,6 +196,9 @@ export function CumulativeMonthChart({ data }: { data: ScheduleData }): ReactNod
 
   const lastPoint = points[points.length - 1];
   const grandTotal = lastPoint?.cumulative ?? 0;
+  // Headroom keeps the running-total curve clear of the bar-top labels, and
+  // fixes the scale so the rate labels know which series sits higher.
+  const cumMax = Math.max(1, Math.round(grandTotal * 1.18));
 
   const pickMonth = (_: unknown, index: number): void => {
     const row = points[index];
@@ -184,7 +226,7 @@ export function CumulativeMonthChart({ data }: { data: ScheduleData }): ReactNod
         ))}
       </ul>
       <ResponsiveContainer width="100%" height="100%">
-        <ComposedChart data={points} margin={{ top: 22, right: 4, left: -14, bottom: 0 }}>
+        <ComposedChart data={points} margin={{ top: 26, right: 4, left: -14, bottom: 6 }}>
           <CartesianGrid vertical={false} stroke={theme.ink.grid} />
           <XAxis
             dataKey="key"
@@ -203,7 +245,7 @@ export function CumulativeMonthChart({ data }: { data: ScheduleData }): ReactNod
           />
           {/* The running count carries its own data labels, so it needs a scale
               but not an axis — the visible right-hand axis is the rate. */}
-          <YAxis yAxisId="cum" orientation="right" hide />
+          <YAxis yAxisId="cum" orientation="right" domain={[0, cumMax]} hide />
           <YAxis
             yAxisId="pct"
             orientation="right"
@@ -305,7 +347,9 @@ export function CumulativeMonthChart({ data }: { data: ScheduleData }): ReactNod
             strokeWidth={2}
             dot={{ r: 3, fill: pctColor, stroke: pctColor }}
             activeDot={{ r: 5, stroke: theme.surface, strokeWidth: 2 }}
-          />
+          >
+            <LabelList content={<PctLabel points={points} max={cumMax} color={pctColor} halo={theme.surface} />} />
+          </Line>
         </ComposedChart>
       </ResponsiveContainer>
       <p className="text-muted mt-1 text-xs">
