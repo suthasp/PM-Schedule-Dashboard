@@ -17,7 +17,7 @@ import { useFilters } from "@/components/providers/FilterProvider";
 import { useChartTheme } from "@/hooks/useChartTheme";
 import { SITE_COMPLETION } from "@/lib/constants";
 import { JOB_STATUSES, type ScheduleData } from "@/types/schedule";
-import { formatNumber } from "@/utils/format";
+import { formatNumber, formatPercent } from "@/utils/format";
 import { jobMatchesFilters } from "@/utils/transform";
 
 interface MonthPoint {
@@ -32,6 +32,10 @@ interface MonthPoint {
   Overdue: number;
   total: number;
   cumulative: number;
+  /** Running finished count, behind the cumulative completion rate. */
+  cumFinished: number;
+  /** cumFinished / cumulative, as a percentage. */
+  pct: number;
   [k: string]: string | number;
 }
 
@@ -107,6 +111,8 @@ export function CumulativeMonthChart({ data }: { data: ScheduleData }): ReactNod
   const theme = useChartTheme();
   const { filters, toggleFilter } = useFilters();
   const lineColor = SITE_COMPLETION.plan[theme.dark ? "dark" : "light"];
+  // Violet keeps the rate readable against the green / amber / red bars.
+  const pctColor = theme.categorical[4] ?? lineColor;
 
   const points = useMemo<MonthPoint[]>(() => {
     // Every other filter applies, but not month/week — a cumulative curve only
@@ -124,6 +130,8 @@ export function CumulativeMonthChart({ data }: { data: ScheduleData }): ReactNod
       Overdue: 0,
       total: 0,
       cumulative: 0,
+      cumFinished: 0,
+      pct: 0,
     }));
     const byMonth = new Map(rows.map((r) => [r.month, r]));
 
@@ -136,14 +144,19 @@ export function CumulativeMonthChart({ data }: { data: ScheduleData }): ReactNod
     }
 
     let running = 0;
+    let runningDone = 0;
     for (const row of rows) {
       running += row.total;
+      runningDone += row.Finished;
       row.cumulative = running;
+      row.cumFinished = runningDone;
+      row.pct = running === 0 ? 0 : (runningDone / running) * 100;
     }
     return rows;
   }, [data.jobs, data.months, data.weeks, filters]);
 
-  const grandTotal = points[points.length - 1]?.cumulative ?? 0;
+  const lastPoint = points[points.length - 1];
+  const grandTotal = lastPoint?.cumulative ?? 0;
 
   const pickMonth = (_: unknown, index: number): void => {
     const row = points[index];
@@ -153,6 +166,7 @@ export function CumulativeMonthChart({ data }: { data: ScheduleData }): ReactNod
   const legend = [
     ...JOB_STATUSES.map((s) => ({ name: s, color: theme.statusColor(s), line: false })),
     { name: "Cumulative scheduled", color: lineColor, line: true },
+    { name: "% Completed (cumulative)", color: pctColor, line: true },
   ];
 
   return (
@@ -187,13 +201,17 @@ export function CumulativeMonthChart({ data }: { data: ScheduleData }): ReactNod
             allowDecimals={false}
             tick={{ fontSize: 10, fill: theme.ink.muted }}
           />
+          {/* The running count carries its own data labels, so it needs a scale
+              but not an axis — the visible right-hand axis is the rate. */}
+          <YAxis yAxisId="cum" orientation="right" hide />
           <YAxis
-            yAxisId="cum"
+            yAxisId="pct"
             orientation="right"
             tickLine={false}
             axisLine={false}
-            allowDecimals={false}
+            domain={[0, 100]}
             width={44}
+            tickFormatter={(v: number) => formatPercent(v, 0)}
             tick={{ fontSize: 10, fill: theme.ink.muted }}
           />
           <Tooltip
@@ -212,6 +230,12 @@ export function CumulativeMonthChart({ data }: { data: ScheduleData }): ReactNod
                     })),
                     { name: "Month total", value: row.total },
                     { name: "Cumulative", value: row.cumulative, color: lineColor },
+                    {
+                      name: "% Completed (cumulative)",
+                      value: row.pct,
+                      color: pctColor,
+                      format: (v) => formatPercent(v),
+                    },
                   ]}
                 />
               );
@@ -272,10 +296,21 @@ export function CumulativeMonthChart({ data }: { data: ScheduleData }): ReactNod
               }}
             />
           </Line>
+          <Line
+            yAxisId="pct"
+            type="linear"
+            dataKey="pct"
+            name="% Completed (cumulative)"
+            stroke={pctColor}
+            strokeWidth={2}
+            dot={{ r: 3, fill: pctColor, stroke: pctColor }}
+            activeDot={{ r: 5, stroke: theme.surface, strokeWidth: 2 }}
+          />
         </ComposedChart>
       </ResponsiveContainer>
       <p className="text-muted mt-1 text-xs">
-        {formatNumber(grandTotal)} scheduled PM jobs across the fiscal year
+        {formatNumber(grandTotal)} scheduled PM jobs across the fiscal year ·{" "}
+        {formatNumber(lastPoint?.cumFinished ?? 0)} finished ({formatPercent(lastPoint?.pct ?? 0, 2)})
       </p>
     </div>
   );
