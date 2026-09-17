@@ -142,7 +142,7 @@ function PctLabel({ x = 0, y = 0, index = -1, points = [], max = 0, color, halo 
         paintOrder: "stroke",
       }}
     >
-      {formatPercent(row.pct)}
+      {formatPercent(row.pct, 2)}
     </text>
   );
 }
@@ -301,7 +301,7 @@ export function CumulativeMonthChart({ data }: { data: ScheduleData }): ReactNod
                             name: "% Completed (of year plan)",
                             value: row.pct,
                             color: pctColor,
-                            format: (v: number) => formatPercent(v),
+                            format: (v: number) => formatPercent(v, 2),
                           },
                         ]),
                   ]}
