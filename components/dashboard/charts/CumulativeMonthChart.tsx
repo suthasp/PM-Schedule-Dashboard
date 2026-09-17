@@ -21,10 +21,12 @@ import { formatNumber } from "@/utils/format";
 import { jobMatchesFilters } from "@/utils/transform";
 
 interface MonthPoint {
-  /** Axis label, e.g. "2025/07". */
+  /** Unique axis key / tooltip heading, e.g. "July 2026". */
   key: string;
   /** Sheet month name, used when the bar toggles the month filter. */
   month: string;
+  /** Calendar year the fiscal month falls in, shown under the month name. */
+  year: string;
   Finished: number;
   Remaining: number;
   Overdue: number;
@@ -32,6 +34,21 @@ interface MonthPoint {
   cumulative: number;
   [k: string]: string | number;
 }
+
+const MONTH_NAMES = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
 
 const MONTH_PREFIXES = [
   "jan",
@@ -48,10 +65,38 @@ const MONTH_PREFIXES = [
   "dec",
 ];
 
-/** "July" + 2025 → "2025/07"; an unrecognised month name is left as-is. */
-function monthKey(name: string, year: number): string {
+/** Spell the sheet's month header out in full; an unknown name is left as-is. */
+function fullMonthName(name: string): string {
   const i = MONTH_PREFIXES.indexOf(name.trim().toLowerCase().slice(0, 3));
-  return i === -1 ? name : `${year}/${String(i + 1).padStart(2, "0")}`;
+  return MONTH_NAMES[i] ?? name;
+}
+
+interface TickProps {
+  x?: number;
+  y?: number;
+  payload?: { index?: number };
+}
+
+/** Two-line axis tick: the full month name over its calendar year. */
+function MonthTick({
+  x = 0,
+  y = 0,
+  payload,
+  points,
+  fill,
+}: TickProps & { points: MonthPoint[]; fill: string }): ReactNode {
+  const point = points[payload?.index ?? -1];
+  if (!point) return null;
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text x={0} y={0} dy={11} textAnchor="middle" fontSize={10} fill={fill}>
+        {fullMonthName(point.month)}
+      </text>
+      <text x={0} y={0} dy={23} textAnchor="middle" fontSize={9} fill={fill} opacity={0.8}>
+        {point.year}
+      </text>
+    </g>
+  );
 }
 
 /**
@@ -71,8 +116,9 @@ export function CumulativeMonthChart({ data }: { data: ScheduleData }): ReactNod
     for (const w of data.weeks) if (!yearOf.has(w.month)) yearOf.set(w.month, w.year);
 
     const rows = data.months.map<MonthPoint>((month) => ({
-      key: monthKey(month, yearOf.get(month) ?? 0),
+      key: `${fullMonthName(month)} ${yearOf.get(month) ?? ""}`.trim(),
       month,
+      year: String(yearOf.get(month) ?? ""),
       Finished: 0,
       Remaining: 0,
       Overdue: 0,
@@ -131,7 +177,8 @@ export function CumulativeMonthChart({ data }: { data: ScheduleData }): ReactNod
             tickLine={false}
             axisLine={{ stroke: theme.ink.grid }}
             interval={0}
-            tick={{ fontSize: 10, fill: theme.ink.muted }}
+            height={38}
+            tick={(p: TickProps) => <MonthTick {...p} points={points} fill={theme.ink.muted} />}
           />
           <YAxis
             yAxisId="jobs"
@@ -156,7 +203,7 @@ export function CumulativeMonthChart({ data }: { data: ScheduleData }): ReactNod
               if (!row) return null;
               return (
                 <ChartTooltip
-                  label={`${String(label)} · ${row.month}`}
+                  label={String(label)}
                   rows={[
                     ...JOB_STATUSES.filter((s) => row[s] !== 0).map((s) => ({
                       name: s,
