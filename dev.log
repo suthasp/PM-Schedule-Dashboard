@@ -1,0 +1,25 @@
+
+> pm-schedule-dashboard@1.0.0 dev
+> next dev
+
+   ▲ Next.js 15.5.20
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.38:3000
+
+ ✓ Starting...
+ ✓ Ready in 8s
+ ○ Compiling / ...
+ ✓ Compiled / in 10.6s (2673 modules)
+ GET / 200 in 11348ms
+ ✓ Compiled /api/schedule in 421ms (1428 modules)
+ ✓ Compiled in 1046ms (1263 modules)
+ GET /icon.svg?c23cf32de6e0195a 200 in 1791ms
+ GET / 200 in 334ms
+ GET /api/schedule 200 in 4690ms
+ GET / 200 in 289ms
+ GET /icon.svg?c23cf32de6e0195a 200 in 19ms
+ GET /api/schedule 200 in 1160ms
+ GET / 200 in 74ms
+ GET / 200 in 120ms
+ GET /icon.svg?c23cf32de6e0195a 200 in 26ms
+ GET /api/schedule 200 in 924ms

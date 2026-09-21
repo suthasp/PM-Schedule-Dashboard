@@ -119,10 +119,10 @@ interface LabelProps {
 }
 
 /**
- * Rate label that sits on whichever side of its point the cumulative line
- * isn't — the two series cross mid-year, so a fixed side would collide there.
+ * Finished-count label for the pink line. It sits on whichever side of its
+ * point the cumulative-scheduled line isn't, so the two never collide.
  */
-function PctLabel({ x = 0, y = 0, index = -1, points = [], max = 0, color, halo }: LabelProps): ReactNode {
+function FinishedLabel({ x = 0, y = 0, index = -1, points = [], max = 0, color, halo }: LabelProps): ReactNode {
   const row = points[index];
   if (!row || row.pct === null) return null;
   // Below by default; only go above when the count line is well clear underneath.
@@ -142,8 +142,38 @@ function PctLabel({ x = 0, y = 0, index = -1, points = [], max = 0, color, halo 
         paintOrder: "stroke",
       }}
     >
-      {formatPercent(row.pct, 2)}
+      {formatNumber(row.cumFinished)}
     </text>
+  );
+}
+
+interface BadgeProps {
+  x?: number;
+  y?: number;
+  width?: number;
+  index?: number;
+  points?: MonthPoint[];
+  color?: string;
+}
+
+/**
+ * The month's % of year plan finished, as a pill just inside the top of its
+ * bar — a solid badge stays readable over green, amber or red segments alike.
+ */
+function PctBadge({ x = 0, y = 0, width = 0, index = -1, points = [], color }: BadgeProps): ReactNode {
+  const row = points[index];
+  if (!row || row.pct === null) return null;
+  const text = formatPercent(row.pct, 2);
+  const w = text.length * 5.6 + 10;
+  const cx = x + width / 2;
+  const top = y + 6;
+  return (
+    <g pointerEvents="none">
+      <rect x={cx - w / 2} y={top} width={w} height={16} rx={8} fill={color} />
+      <text x={cx} y={top + 11.5} textAnchor="middle" fontSize={9.5} fontWeight={700} fill="#ffffff">
+        {text}
+      </text>
+    </g>
   );
 }
 
@@ -230,7 +260,7 @@ export function CumulativeMonthChart({ data }: { data: ScheduleData }): ReactNod
   const legend = [
     ...JOB_STATUSES.map((s) => ({ name: s, color: theme.statusColor(s), line: false })),
     { name: "Cumulative scheduled", color: lineColor, line: true },
-    { name: "% Completed (of year plan)", color: pctColor, line: true },
+    { name: "Cumulative finished (% of year plan)", color: pctColor, line: true },
   ];
 
   return (
@@ -297,8 +327,9 @@ export function CumulativeMonthChart({ data }: { data: ScheduleData }): ReactNod
                     ...(row.pct === null
                       ? []
                       : [
+                          { name: "Cumulative finished", value: row.cumFinished, color: pctColor },
                           {
-                            name: "% Completed (of year plan)",
+                            name: "% of year plan",
                             value: row.pct,
                             color: pctColor,
                             format: (v: number) => formatPercent(v, 2),
@@ -334,6 +365,7 @@ export function CumulativeMonthChart({ data }: { data: ScheduleData }): ReactNod
                     style={{ fontSize: 10, fill: theme.ink.secondary, fontWeight: 600 }}
                   />
                 )}
+                {last && <LabelList content={<PctBadge points={points} color={pctColor} />} />}
               </Bar>
             );
           })}
@@ -368,14 +400,14 @@ export function CumulativeMonthChart({ data }: { data: ScheduleData }): ReactNod
             yAxisId="pct"
             type="linear"
             dataKey="pct"
-            name="% Completed (of year plan)"
+            name="Cumulative finished (% of year plan)"
             stroke={pctColor}
             strokeWidth={2}
             connectNulls={false}
             dot={{ r: 3, fill: pctColor, stroke: pctColor }}
             activeDot={{ r: 5, stroke: theme.surface, strokeWidth: 2 }}
           >
-            <LabelList content={<PctLabel points={points} max={cumMax} color={pctColor} halo={theme.surface} />} />
+            <LabelList content={<FinishedLabel points={points} max={cumMax} color={pctColor} halo={theme.surface} />} />
           </Line>
         </ComposedChart>
       </ResponsiveContainer>
