@@ -73,6 +73,13 @@ const MONTH_PREFIXES = [
   "dec",
 ];
 
+/** Round up to a tidy axis bound, e.g. 2,849 → 3,000 and 177 → 200. */
+function niceCeil(n: number): number {
+  if (n <= 0) return 1;
+  const step = 10 ** Math.floor(Math.log10(n)) / 2;
+  return Math.ceil(n / step) * step;
+}
+
 /** Spell the sheet's month header out in full; an unknown name is left as-is. */
 function fullMonthName(name: string): string {
   const i = MONTH_PREFIXES.indexOf(name.trim().toLowerCase().slice(0, 3));
@@ -112,26 +119,23 @@ interface LabelProps {
   y?: number;
   index?: number;
   points?: MonthPoint[];
-  /** Upper bound of the cumulative line's (hidden) axis. */
-  max?: number;
   color?: string;
   halo?: string;
 }
 
 /**
- * Finished-count label for the pink line. It sits on whichever side of its
- * point the cumulative-scheduled line isn't, so the two never collide.
+ * Finished-count label for the pink line. Finished never exceeds scheduled, so
+ * the pink line always runs at or below the blue one — its labels go underneath
+ * while the blue labels sit on top.
  */
-function FinishedLabel({ x = 0, y = 0, index = -1, points = [], max = 0, color, halo }: LabelProps): ReactNode {
+function FinishedLabel({ x = 0, y = 0, index = -1, points = [], color, halo }: LabelProps): ReactNode {
   const row = points[index];
   if (!row || row.pct === null) return null;
-  // Below by default; only go above when the count line is well clear underneath.
-  const above = row.pct / 100 - (max === 0 ? 0 : row.cumulative / max) > 0.08;
   return (
     <text
       x={x}
       y={y}
-      dy={above ? -9 : 18}
+      dy={18}
       textAnchor="middle"
       style={{
         fontSize: 9,
@@ -248,9 +252,8 @@ export function CumulativeMonthChart({ data }: { data: ScheduleData }): ReactNod
 
   const lastPoint = points[points.length - 1];
   const grandTotal = lastPoint?.cumulative ?? 0;
-  // Headroom keeps the running-total curve clear of the bar-top labels, and
-  // fixes the scale so the rate labels know which series sits higher.
-  const cumMax = Math.max(1, Math.round(grandTotal * 1.18));
+  // Headroom keeps the running-total curves clear of the bar-top labels.
+  const cumMax = niceCeil(grandTotal * 1.18);
 
   const pickMonth = (_: unknown, index: number): void => {
     const row = points[index];
@@ -260,7 +263,7 @@ export function CumulativeMonthChart({ data }: { data: ScheduleData }): ReactNod
   const legend = [
     ...JOB_STATUSES.map((s) => ({ name: s, color: theme.statusColor(s), line: false })),
     { name: "Cumulative scheduled", color: lineColor, line: true },
-    { name: "Cumulative finished (% of year plan)", color: pctColor, line: true },
+    { name: "Cumulative finished", color: pctColor, line: true },
   ];
 
   return (
@@ -295,17 +298,17 @@ export function CumulativeMonthChart({ data }: { data: ScheduleData }): ReactNod
             allowDecimals={false}
             tick={{ fontSize: 10, fill: theme.ink.muted }}
           />
-          {/* The running count carries its own data labels, so it needs a scale
-              but not an axis — the visible right-hand axis is the rate. */}
-          <YAxis yAxisId="cum" orientation="right" domain={[0, cumMax]} hide />
+          {/* Both running totals share this scale, so finished can never
+              plot above scheduled. The rate itself is shown on the bars. */}
           <YAxis
-            yAxisId="pct"
+            yAxisId="cum"
             orientation="right"
+            domain={[0, cumMax]}
             tickLine={false}
             axisLine={false}
-            domain={[0, 100]}
+            allowDecimals={false}
             width={44}
-            tickFormatter={(v: number) => formatPercent(v, 0)}
+            tickFormatter={(v: number) => formatNumber(v)}
             tick={{ fontSize: 10, fill: theme.ink.muted }}
           />
           <Tooltip
@@ -397,17 +400,17 @@ export function CumulativeMonthChart({ data }: { data: ScheduleData }): ReactNod
             />
           </Line>
           <Line
-            yAxisId="pct"
+            yAxisId="cum"
             type="linear"
-            dataKey="pct"
-            name="Cumulative finished (% of year plan)"
+            dataKey={(r: MonthPoint) => (r.pct === null ? null : r.cumFinished)}
+            name="Cumulative finished"
             stroke={pctColor}
             strokeWidth={2}
             connectNulls={false}
             dot={{ r: 3, fill: pctColor, stroke: pctColor }}
             activeDot={{ r: 5, stroke: theme.surface, strokeWidth: 2 }}
           >
-            <LabelList content={<FinishedLabel points={points} max={cumMax} color={pctColor} halo={theme.surface} />} />
+            <LabelList content={<FinishedLabel points={points} color={pctColor} halo={theme.surface} />} />
           </Line>
         </ComposedChart>
       </ResponsiveContainer>

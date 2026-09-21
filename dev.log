@@ -23,3 +23,21 @@
  GET / 200 in 120ms
  GET /icon.svg?c23cf32de6e0195a 200 in 26ms
  GET /api/schedule 200 in 924ms
+ ✓ Compiled in 864ms (2674 modules)
+ GET / 200 in 270ms
+ GET / 200 in 306ms
+ ✓ Compiled /api/schedule in 257ms (1428 modules)
+ ✓ Compiled (1433 modules)
+ GET /icon.svg?c23cf32de6e0195a 200 in 634ms
+ GET /api/schedule 200 in 13491ms
+ GET / 200 in 273ms
+ GET /icon.svg?c23cf32de6e0195a 200 in 19ms
+ GET /api/schedule 200 in 10578ms
+ ✓ Compiled in 663ms (2696 modules)
+ GET / 200 in 88ms
+ GET / 200 in 192ms
+ GET /icon.svg?c23cf32de6e0195a 200 in 33ms
+ GET /api/schedule 200 in 11955ms
+ GET / 200 in 96ms
+ GET /icon.svg?c23cf32de6e0195a 200 in 18ms
+ GET /api/schedule 200 in 873ms
