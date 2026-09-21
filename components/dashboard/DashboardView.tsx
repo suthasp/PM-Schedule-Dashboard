@@ -76,19 +76,19 @@ export function DashboardView({ data }: { data: ScheduleData }): ReactNode {
         </ChartCard>
 
         <ChartCard
+          title="Cumulative PM Progress by Month"
+          subtitle="Jobs per fiscal month stacked by status, with the running total of scheduled jobs and the share of the full-year plan finished so far — click a bar to filter by month"
+        >
+          <CumulativeMonthChart data={data} />
+        </ChartCard>
+
+        <ChartCard
           title={`Weekly PM Trend — ${data.weeks[0]?.label ?? ""}/${data.weeks[0]?.year ?? ""} – ${
             data.weeks[data.weeks.length - 1]?.label ?? ""
           }/${data.weeks[data.weeks.length - 1]?.year ?? ""}`}
           subtitle="Jobs per week, stacked by status — click a bar to filter by month"
         >
           <WeeklyBarChart jobs={jobs} data={data} />
-        </ChartCard>
-
-        <ChartCard
-          title="Cumulative PM Progress by Month"
-          subtitle="Jobs per fiscal month stacked by status, with the running total of scheduled jobs and the share of the full-year plan finished so far — click a bar to filter by month"
-        >
-          <CumulativeMonthChart data={data} />
         </ChartCard>
 
         <ChartCard
