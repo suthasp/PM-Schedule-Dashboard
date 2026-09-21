@@ -41,3 +41,4 @@
  GET / 200 in 96ms
  GET /icon.svg?c23cf32de6e0195a 200 in 18ms
  GET /api/schedule 200 in 873ms
+ GET /api/schedule 200 in 879ms
