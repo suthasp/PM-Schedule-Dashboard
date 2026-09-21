@@ -63,3 +63,4 @@
  GET /api/schedule 200 in 14091ms
  GET / 200 in 460ms
  GET /api/schedule 200 in 1137ms
+ GET /api/schedule 200 in 12554ms
