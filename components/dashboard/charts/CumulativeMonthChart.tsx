@@ -174,7 +174,14 @@ function PctBadge({ x = 0, y = 0, width = 0, index = -1, points = [], color }: B
   return (
     <g pointerEvents="none">
       <rect x={cx - w / 2} y={top} width={w} height={16} rx={8} fill={color} />
-      <text x={cx} y={top + 11.5} textAnchor="middle" fontSize={9.5} fontWeight={700} fill="#ffffff">
+      <text
+        x={cx}
+        y={top + 11.5}
+        textAnchor="middle"
+        fontSize={9.5}
+        fontWeight={700}
+        fill={PROGRESS_LINE.badgeText}
+      >
         {text}
       </text>
     </g>
@@ -191,6 +198,7 @@ export function CumulativeMonthChart({ data }: { data: ScheduleData }): ReactNod
   const mode = theme.dark ? "dark" : "light";
   const lineColor = PROGRESS_LINE.cumulative[mode];
   const pctColor = PROGRESS_LINE.pct[mode];
+  const pctInk = PROGRESS_LINE.pctInk[mode];
 
   const points = useMemo<MonthPoint[]>(() => {
     // Every other filter applies, but not month/week — a cumulative curve only
@@ -405,12 +413,12 @@ export function CumulativeMonthChart({ data }: { data: ScheduleData }): ReactNod
             dataKey={(r: MonthPoint) => (r.pct === null ? null : r.cumFinished)}
             name="Cumulative finished"
             stroke={pctColor}
-            strokeWidth={2}
+            strokeWidth={2.5}
             connectNulls={false}
             dot={{ r: 3, fill: pctColor, stroke: pctColor }}
             activeDot={{ r: 5, stroke: theme.surface, strokeWidth: 2 }}
           >
-            <LabelList content={<FinishedLabel points={points} color={pctColor} halo={theme.surface} />} />
+            <LabelList content={<FinishedLabel points={points} color={pctInk} halo={theme.surface} />} />
           </Line>
         </ComposedChart>
       </ResponsiveContainer>

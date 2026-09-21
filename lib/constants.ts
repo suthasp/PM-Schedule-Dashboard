@@ -100,13 +100,16 @@ export const SITE_COMPLETION = {
 } as const;
 
 /**
- * Cumulative monthly progress chart. The completion-rate line takes the
- * palette's pink, but swapped across themes — a thin line needs the deeper
- * tone on the light surface and the lighter one on the dark surface.
+ * Cumulative monthly progress chart. The finished series is a light pink;
+ * `pctInk` is the deeper pink used for its text, since light pink alone is
+ * too faint for small labels on the light surface.
  */
 export const PROGRESS_LINE = {
   cumulative: { light: "#2a78d6", dark: "#3987e5" },
-  pct: { light: "#d55181", dark: "#e87ba4" },
+  pct: { light: "#f59ac0", dark: "#f7b3d1" },
+  pctInk: { light: "#c2185b", dark: "#f7b3d1" },
+  /** Text on the light-pink % badge. */
+  badgeText: "#7a1240",
 } as const;
 
 /** Monthly per-site pivot: translucent column tints that work on both themes. */
