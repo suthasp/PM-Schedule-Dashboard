@@ -1,9 +1,11 @@
 "use client";
 
-import { useMemo, type ReactNode } from "react";
+import { Download, Loader2 } from "lucide-react";
+import { useCallback, useMemo, useState, type ReactNode } from "react";
 import { useChartTheme } from "@/hooks/useChartTheme";
 import { BUDGET_STATUS_CHIPS, CRITERIA_CHIPS, PROBLEM_SUMMARY } from "@/lib/constants";
 import type { ProblemData } from "@/types/problem";
+import { exportInProgressXlsx, type InProgressExportRow } from "@/utils/exportInProgressXlsx";
 
 /** Report columns, resolved by label so new sheet columns don't break this. */
 interface ReportFields {
@@ -55,11 +57,18 @@ function scopeRank(scope: string): number {
   return i === -1 ? SCOPE_ORDER.length : i;
 }
 
-/** "93894.09" / "93,894.09" → "93,894.09"; blank or non-numeric passes through. */
-function formatBaht(raw: string): string {
+/** "93,894.09" → 93894.09; blank or non-numeric → null. */
+function parseBaht(raw: string): number | null {
+  if (raw.trim() === "") return null;
   const n = Number(raw.replace(/,/g, "").trim());
-  if (raw.trim() === "" || Number.isNaN(n)) return raw;
-  return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return Number.isNaN(n) ? null : n;
+}
+
+/** 93894.09 → "93,894.09"; null stays blank. */
+function formatBaht(value: number | null): string {
+  return value === null
+    ? ""
+    : value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 /** "3/12/2024" → "03/12/2024"; anything else passes through unchanged. */
@@ -125,21 +134,10 @@ function BudgetStatus({ value }: { value: string }): ReactNode {
   );
 }
 
-interface ReportRow {
+interface ReportRow extends InProgressExportRow {
   id: string;
-  no: string;
-  site: string;
-  recordDate: string;
-  subCause: string;
-  criteria: string;
-  scope: string;
-  description: string;
-  planDate: string;
-  workStatus: string;
+  /** boqValue formatted for display. */
   boqAmount: string;
-  referenceCode: string;
-  budgetStatus: string;
-  remark: string;
 }
 
 /**
@@ -169,7 +167,8 @@ export function ProblemInProgressTable({ data }: { data: ProblemData }): ReactNo
         description: get(r.values, f.description),
         planDate: padDmy(get(r.values, f.planDate)),
         workStatus: get(r.values, f.workStatus),
-        boqAmount: formatBaht(get(r.values, f.boqAmount)),
+        boqValue: parseBaht(get(r.values, f.boqAmount)),
+        boqAmount: formatBaht(parseBaht(get(r.values, f.boqAmount))),
         referenceCode: get(r.values, f.referenceCode),
         budgetStatus: get(r.values, f.budgetStatus),
         remark: get(r.values, f.remark),
@@ -181,6 +180,20 @@ export function ProblemInProgressTable({ data }: { data: ProblemData }): ReactNo
           (Number(a.no) || 0) - (Number(b.no) || 0),
       );
   }, [data]);
+
+  const [exporting, setExporting] = useState(false);
+  const exportExcel = useCallback(async () => {
+    setExporting(true);
+    try {
+      const today = new Date();
+      const stamp = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(
+        today.getDate(),
+      ).padStart(2, "0")}`;
+      await exportInProgressXlsx(rows, `in-progress-problems-${stamp}.xlsx`);
+    } finally {
+      setExporting(false);
+    }
+  }, [rows]);
 
   const scopeStyle = (scope: string): { backgroundColor: string; color: string } | undefined => {
     const key = /^in\s*\(\s*amc/i.test(scope)
@@ -210,81 +223,101 @@ export function ProblemInProgressTable({ data }: { data: ProblemData }): ReactNo
   const cell = "px-1.5 py-1.5";
 
   return (
-    <table className="w-full table-fixed border-collapse text-[11px]">
-      <colgroup>
-        {COLUMNS.map((c) => (
-          <col key={c.label} style={c.width ? { width: c.width } : undefined} />
-        ))}
-      </colgroup>
-      <thead>
-        <tr
-          style={{
-            backgroundColor: PROBLEM_SUMMARY.reportHeader.bg,
-            color: PROBLEM_SUMMARY.reportHeader.fg,
-          }}
+    <div className="space-y-2">
+      <div className="no-print flex items-center justify-between gap-2">
+        <p className="text-secondary text-sm">
+          {rows.length.toLocaleString()} in-progress problems
+        </p>
+        <button
+          type="button"
+          onClick={() => void exportExcel()}
+          disabled={exporting}
+          className="flex h-9 items-center gap-1.5 rounded-xl bg-accent px-3 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60 dark:bg-accent-dark"
         >
+          {exporting ? (
+            <Loader2 size={15} className="animate-spin" aria-hidden />
+          ) : (
+            <Download size={15} aria-hidden />
+          )}
+          Export Excel
+        </button>
+      </div>
+      <table className="w-full table-fixed border-collapse text-[11px]">
+        <colgroup>
           {COLUMNS.map((c) => (
-            <th key={c.label} className={headerCell}>
-              {c.label}
-            </th>
+            <col key={c.label} style={c.width ? { width: c.width } : undefined} />
           ))}
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map((row) => (
+        </colgroup>
+        <thead>
           <tr
-            key={row.id}
-            className="border-b align-top odd:bg-black/[0.03] dark:odd:bg-white/[0.03]"
-            style={hairline}
+            style={{
+              backgroundColor: PROBLEM_SUMMARY.reportHeader.bg,
+              color: PROBLEM_SUMMARY.reportHeader.fg,
+            }}
           >
-            <td className={`${cell} text-center tabular-nums`}>
-              <Fit text={row.no} />
-            </td>
-            <td className={`${cell} text-center`}>
-              <Fit text={row.site} />
-            </td>
-            <td className={`${cell} text-center tabular-nums`}>
-              <Fit text={row.recordDate} />
-            </td>
-            <td className={cell}>
-              <Clamp text={row.subCause} />
-            </td>
-            <td
-              className={`${cell} text-center font-bold`}
-              style={{ color: CRITERIA_CHIPS[row.criteria.toUpperCase()]?.bg }}
-            >
-              <Fit text={row.criteria} />
-            </td>
-            <td className={`${cell} text-center font-semibold`} style={scopeStyle(row.scope)}>
-              <Fit text={row.scope} />
-            </td>
-            <td className={cell}>
-              <Clamp text={row.description} />
-            </td>
-            <td className={`${cell} text-center tabular-nums`}>
-              <Fit text={row.planDate} />
-            </td>
-            <td
-              className={`${cell} text-center font-semibold`}
-              style={{ color: PROBLEM_SUMMARY.inProgress.bg }}
-            >
-              <Fit text={row.workStatus} />
-            </td>
-            <td className={`${cell} text-right tabular-nums`}>
-              <Fit text={row.boqAmount} />
-            </td>
-            <td className={`${cell} text-center`}>
-              <Fit text={row.referenceCode} />
-            </td>
-            <td className={`${cell} text-center`}>
-              <BudgetStatus value={row.budgetStatus} />
-            </td>
-            <td className={cell}>
-              <Clamp text={row.remark} />
-            </td>
+            {COLUMNS.map((c) => (
+              <th key={c.label} className={headerCell}>
+                {c.label}
+              </th>
+            ))}
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr
+              key={row.id}
+              className="border-b align-top odd:bg-black/[0.03] dark:odd:bg-white/[0.03]"
+              style={hairline}
+            >
+              <td className={`${cell} text-center tabular-nums`}>
+                <Fit text={row.no} />
+              </td>
+              <td className={`${cell} text-center`}>
+                <Fit text={row.site} />
+              </td>
+              <td className={`${cell} text-center tabular-nums`}>
+                <Fit text={row.recordDate} />
+              </td>
+              <td className={cell}>
+                <Clamp text={row.subCause} />
+              </td>
+              <td
+                className={`${cell} text-center font-bold`}
+                style={{ color: CRITERIA_CHIPS[row.criteria.toUpperCase()]?.bg }}
+              >
+                <Fit text={row.criteria} />
+              </td>
+              <td className={`${cell} text-center font-semibold`} style={scopeStyle(row.scope)}>
+                <Fit text={row.scope} />
+              </td>
+              <td className={cell}>
+                <Clamp text={row.description} />
+              </td>
+              <td className={`${cell} text-center tabular-nums`}>
+                <Fit text={row.planDate} />
+              </td>
+              <td
+                className={`${cell} text-center font-semibold`}
+                style={{ color: PROBLEM_SUMMARY.inProgress.bg }}
+              >
+                <Fit text={row.workStatus} />
+              </td>
+              <td className={`${cell} text-right tabular-nums`}>
+                <Fit text={row.boqAmount} />
+              </td>
+              <td className={`${cell} text-center`}>
+                <Fit text={row.referenceCode} />
+              </td>
+              <td className={`${cell} text-center`}>
+                <BudgetStatus value={row.budgetStatus} />
+              </td>
+              <td className={cell}>
+                <Clamp text={row.remark} />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
