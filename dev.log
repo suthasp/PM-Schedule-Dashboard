@@ -107,3 +107,5 @@ __barrel_optimize__?names=Download,Loader2!=!./node_modules/lucide-react/dist/es
  GET /icon.svg?c23cf32de6e0195a 200 in 37ms
  GET /api/problem 200 in 1141ms
  GET /api/schedule 200 in 12421ms
+ GET /api/problem 200 in 12395ms
+ GET /api/schedule 200 in 1235ms
