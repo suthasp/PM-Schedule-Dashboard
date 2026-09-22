@@ -69,14 +69,56 @@ function padDmy(raw: string): string {
   return `${(m[1] ?? "").padStart(2, "0")}/${(m[2] ?? "").padStart(2, "0")}/${m[3]}`;
 }
 
+/**
+ * Column headers. Short, fixed-shape values get a pixel width that fits them
+ * whole; the three free-text columns (no width) share whatever is left, so
+ * the table always fits its card and only long prose gets clamped.
+ */
+const COLUMNS: { label: string; width?: number }[] = [
+  { label: "No.", width: 32 },
+  { label: "CN Site", width: 72 },
+  { label: "วันที่ลงบันทึก", width: 74 },
+  { label: "Sub Cause" },
+  { label: "Criteria", width: 54 },
+  { label: "In/Out Scope", width: 60 },
+  { label: "Description รายละเอียดของปัญหาที่พบ" },
+  { label: "Plan Date", width: 74 },
+  { label: "Work Status", width: 72 },
+  { label: "BOQ Amount (Baht)", width: 78 },
+  { label: "Record Reference Code", width: 86 },
+  { label: "Status Budget", width: 118 },
+  { label: "Remark" },
+];
+
+/** One line; overflow ends in "…", and hovering shows the whole value. */
+function Fit({ text }: { text: string }): ReactNode {
+  if (text === "") return null;
+  return (
+    <div className="truncate" title={text}>
+      {text}
+    </div>
+  );
+}
+
+/** Wraps to two lines, then "…"; hovering shows the whole text. */
+function Clamp({ text }: { text: string }): ReactNode {
+  if (text === "") return null;
+  return (
+    <div className="line-clamp-2 break-words" title={text}>
+      {text}
+    </div>
+  );
+}
+
 function BudgetStatus({ value }: { value: string }): ReactNode {
   if (value === "") return null;
   const chip = BUDGET_STATUS_CHIPS.find((c) => c.pattern.test(value));
-  if (!chip) return value;
+  if (!chip) return <Fit text={value} />;
   return (
     <span
-      className="inline-block rounded-full px-2 py-0.5 text-[11px] font-semibold leading-4"
+      className="inline-block max-w-full truncate rounded-full px-2 py-0.5 align-top text-[10.5px] font-semibold leading-4"
       style={{ backgroundColor: chip.bg, color: chip.fg }}
+      title={value}
     >
       {value}
     </span>
@@ -164,73 +206,85 @@ export function ProblemInProgressTable({ data }: { data: ProblemData }): ReactNo
   }
 
   const hairline = { borderColor: "var(--hairline)" } as const;
-  const headerCell = "whitespace-nowrap px-2 py-2 text-center text-xs font-bold";
+  const headerCell = "px-1.5 py-2 text-center text-[11px] font-bold leading-tight";
+  const cell = "px-1.5 py-1.5";
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-[1500px] border-collapse text-xs">
-        <thead>
-          <tr
-            style={{
-              backgroundColor: PROBLEM_SUMMARY.reportHeader.bg,
-              color: PROBLEM_SUMMARY.reportHeader.fg,
-            }}
-          >
-            <th className={headerCell}>No.</th>
-            <th className={headerCell}>CN Site</th>
-            <th className={headerCell}>วันที่ลงบันทึก</th>
-            <th className={headerCell}>Sub Cause</th>
-            <th className={headerCell}>Criteria</th>
-            <th className={headerCell}>In/Out Scope</th>
-            <th className={headerCell}>Description รายละเอียดของปัญหาที่พบ</th>
-            <th className={headerCell}>Plan Date</th>
-            <th className={headerCell}>Work Status</th>
-            <th className={headerCell}>BOQ Amount (Baht)</th>
-            <th className={headerCell}>Record Reference Code</th>
-            <th className={headerCell}>Status Budget</th>
-            <th className={headerCell}>Remark</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr
-              key={row.id}
-              className="border-b align-top odd:bg-black/[0.03] dark:odd:bg-white/[0.03]"
-              style={hairline}
-            >
-              <td className="px-2 py-1.5 text-center tabular-nums">{row.no}</td>
-              <td className="whitespace-nowrap px-2 py-1.5 text-center">{row.site}</td>
-              <td className="whitespace-nowrap px-2 py-1.5 text-center tabular-nums">
-                {row.recordDate}
-              </td>
-              <td className="px-2 py-1.5">{row.subCause}</td>
-              <td
-                className="px-2 py-1.5 text-center font-bold"
-                style={{ color: CRITERIA_CHIPS[row.criteria.toUpperCase()]?.bg }}
-              >
-                {row.criteria}
-              </td>
-              <td className="whitespace-nowrap px-2 py-1.5 text-center font-semibold" style={scopeStyle(row.scope)}>
-                {row.scope}
-              </td>
-              <td className="min-w-[260px] px-2 py-1.5">{row.description}</td>
-              <td className="whitespace-nowrap px-2 py-1.5 text-center tabular-nums">{row.planDate}</td>
-              <td
-                className="whitespace-nowrap px-2 py-1.5 text-center font-semibold"
-                style={{ color: PROBLEM_SUMMARY.inProgress.bg }}
-              >
-                {row.workStatus}
-              </td>
-              <td className="whitespace-nowrap px-2 py-1.5 text-right tabular-nums">{row.boqAmount}</td>
-              <td className="whitespace-nowrap px-2 py-1.5 text-center">{row.referenceCode}</td>
-              <td className="whitespace-nowrap px-2 py-1.5 text-center">
-                <BudgetStatus value={row.budgetStatus} />
-              </td>
-              <td className="min-w-[260px] px-2 py-1.5">{row.remark}</td>
-            </tr>
+    <table className="w-full table-fixed border-collapse text-[11px]">
+      <colgroup>
+        {COLUMNS.map((c) => (
+          <col key={c.label} style={c.width ? { width: c.width } : undefined} />
+        ))}
+      </colgroup>
+      <thead>
+        <tr
+          style={{
+            backgroundColor: PROBLEM_SUMMARY.reportHeader.bg,
+            color: PROBLEM_SUMMARY.reportHeader.fg,
+          }}
+        >
+          {COLUMNS.map((c) => (
+            <th key={c.label} className={headerCell}>
+              {c.label}
+            </th>
           ))}
-        </tbody>
-      </table>
-    </div>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row) => (
+          <tr
+            key={row.id}
+            className="border-b align-top odd:bg-black/[0.03] dark:odd:bg-white/[0.03]"
+            style={hairline}
+          >
+            <td className={`${cell} text-center tabular-nums`}>
+              <Fit text={row.no} />
+            </td>
+            <td className={`${cell} text-center`}>
+              <Fit text={row.site} />
+            </td>
+            <td className={`${cell} text-center tabular-nums`}>
+              <Fit text={row.recordDate} />
+            </td>
+            <td className={cell}>
+              <Clamp text={row.subCause} />
+            </td>
+            <td
+              className={`${cell} text-center font-bold`}
+              style={{ color: CRITERIA_CHIPS[row.criteria.toUpperCase()]?.bg }}
+            >
+              <Fit text={row.criteria} />
+            </td>
+            <td className={`${cell} text-center font-semibold`} style={scopeStyle(row.scope)}>
+              <Fit text={row.scope} />
+            </td>
+            <td className={cell}>
+              <Clamp text={row.description} />
+            </td>
+            <td className={`${cell} text-center tabular-nums`}>
+              <Fit text={row.planDate} />
+            </td>
+            <td
+              className={`${cell} text-center font-semibold`}
+              style={{ color: PROBLEM_SUMMARY.inProgress.bg }}
+            >
+              <Fit text={row.workStatus} />
+            </td>
+            <td className={`${cell} text-right tabular-nums`}>
+              <Fit text={row.boqAmount} />
+            </td>
+            <td className={`${cell} text-center`}>
+              <Fit text={row.referenceCode} />
+            </td>
+            <td className={`${cell} text-center`}>
+              <BudgetStatus value={row.budgetStatus} />
+            </td>
+            <td className={cell}>
+              <Clamp text={row.remark} />
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 }
