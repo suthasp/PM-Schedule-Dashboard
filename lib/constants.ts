@@ -150,6 +150,18 @@ export const PENALTY_SUMMARY = {
   slaOver: "#d03b3b",
 } as const;
 
+/**
+ * Chip fills for the Problem sheet's free-text "Status Budget" column, echoing
+ * the sheet's own cell colours. First match wins; anything else renders plain.
+ */
+export const BUDGET_STATUS_CHIPS: { pattern: RegExp; bg: string; fg: string }[] = [
+  { pattern: /reject|cancel/i, bg: "#d03b3b", fg: "#ffffff" },
+  { pattern: /\bpo\b/i, bg: "#4bc8dd", fg: "#0d366b" },
+  { pattern: /\bpr\b/i, bg: "#fab219", fg: "#0d366b" },
+  { pattern: /approve|fun(d)?\s*code/i, bg: "#eb6834", fg: "#ffffff" },
+  { pattern: /new\s*request/i, bg: "#fbc8ec", fg: "#6b1d52" },
+];
+
 /** Solid chip fills for the Problem sheet's Criteria column. */
 export const CRITERIA_CHIPS: Record<string, { bg: string; fg: string }> = {
   MINOR: { bg: "#fab219", fg: "#0d366b" },

@@ -2,7 +2,7 @@
 
 import { useMemo, type ReactNode } from "react";
 import { useChartTheme } from "@/hooks/useChartTheme";
-import { CRITERIA_CHIPS, PROBLEM_SUMMARY } from "@/lib/constants";
+import { BUDGET_STATUS_CHIPS, CRITERIA_CHIPS, PROBLEM_SUMMARY } from "@/lib/constants";
 import type { ProblemData } from "@/types/problem";
 
 /** Report columns, resolved by label so new sheet columns don't break this. */
@@ -16,6 +16,9 @@ interface ReportFields {
   description: string | null;
   planDate: string | null;
   workStatus: string | null;
+  boqAmount: string | null;
+  referenceCode: string | null;
+  budgetStatus: string | null;
   remark: string | null;
 }
 
@@ -37,6 +40,9 @@ function resolveReportFields(data: ProblemData): ReportFields {
     description: find([/^description/i]),
     planDate: find([/^plan\s*date$/i]),
     workStatus: find([/^work\s*status$/i]),
+    boqAmount: find([/^boq\s*amount/i]),
+    referenceCode: find([/^record\s*reference/i]),
+    budgetStatus: find([/^status\s*budget/i]),
     remark: find([/^remark$/i]),
   };
 }
@@ -49,11 +55,32 @@ function scopeRank(scope: string): number {
   return i === -1 ? SCOPE_ORDER.length : i;
 }
 
+/** "93894.09" / "93,894.09" → "93,894.09"; blank or non-numeric passes through. */
+function formatBaht(raw: string): string {
+  const n = Number(raw.replace(/,/g, "").trim());
+  if (raw.trim() === "" || Number.isNaN(n)) return raw;
+  return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
 /** "3/12/2024" → "03/12/2024"; anything else passes through unchanged. */
 function padDmy(raw: string): string {
   const m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(raw.trim());
   if (!m) return raw;
   return `${(m[1] ?? "").padStart(2, "0")}/${(m[2] ?? "").padStart(2, "0")}/${m[3]}`;
+}
+
+function BudgetStatus({ value }: { value: string }): ReactNode {
+  if (value === "") return null;
+  const chip = BUDGET_STATUS_CHIPS.find((c) => c.pattern.test(value));
+  if (!chip) return value;
+  return (
+    <span
+      className="inline-block rounded-full px-2 py-0.5 text-[11px] font-semibold leading-4"
+      style={{ backgroundColor: chip.bg, color: chip.fg }}
+    >
+      {value}
+    </span>
+  );
 }
 
 interface ReportRow {
@@ -67,6 +94,9 @@ interface ReportRow {
   description: string;
   planDate: string;
   workStatus: string;
+  boqAmount: string;
+  referenceCode: string;
+  budgetStatus: string;
   remark: string;
 }
 
@@ -97,6 +127,9 @@ export function ProblemInProgressTable({ data }: { data: ProblemData }): ReactNo
         description: get(r.values, f.description),
         planDate: padDmy(get(r.values, f.planDate)),
         workStatus: get(r.values, f.workStatus),
+        boqAmount: formatBaht(get(r.values, f.boqAmount)),
+        referenceCode: get(r.values, f.referenceCode),
+        budgetStatus: get(r.values, f.budgetStatus),
         remark: get(r.values, f.remark),
       }))
       .sort(
@@ -135,7 +168,7 @@ export function ProblemInProgressTable({ data }: { data: ProblemData }): ReactNo
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[1180px] border-collapse text-xs">
+      <table className="w-full min-w-[1500px] border-collapse text-xs">
         <thead>
           <tr
             style={{
@@ -152,6 +185,9 @@ export function ProblemInProgressTable({ data }: { data: ProblemData }): ReactNo
             <th className={headerCell}>Description รายละเอียดของปัญหาที่พบ</th>
             <th className={headerCell}>Plan Date</th>
             <th className={headerCell}>Work Status</th>
+            <th className={headerCell}>BOQ Amount (Baht)</th>
+            <th className={headerCell}>Record Reference Code</th>
+            <th className={headerCell}>Status Budget</th>
             <th className={headerCell}>Remark</th>
           </tr>
         </thead>
@@ -184,6 +220,11 @@ export function ProblemInProgressTable({ data }: { data: ProblemData }): ReactNo
                 style={{ color: PROBLEM_SUMMARY.inProgress.bg }}
               >
                 {row.workStatus}
+              </td>
+              <td className="whitespace-nowrap px-2 py-1.5 text-right tabular-nums">{row.boqAmount}</td>
+              <td className="whitespace-nowrap px-2 py-1.5 text-center">{row.referenceCode}</td>
+              <td className="whitespace-nowrap px-2 py-1.5 text-center">
+                <BudgetStatus value={row.budgetStatus} />
               </td>
               <td className="min-w-[260px] px-2 py-1.5">{row.remark}</td>
             </tr>

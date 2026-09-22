@@ -7,60 +7,24 @@
    - Network:      http://192.168.1.38:3000
 
  ✓ Starting...
- ✓ Ready in 8s
- ○ Compiling / ...
- ✓ Compiled / in 10.6s (2673 modules)
- GET / 200 in 11348ms
- ✓ Compiled /api/schedule in 421ms (1428 modules)
- ✓ Compiled in 1046ms (1263 modules)
- GET /icon.svg?c23cf32de6e0195a 200 in 1791ms
- GET / 200 in 334ms
- GET /api/schedule 200 in 4690ms
- GET / 200 in 289ms
- GET /icon.svg?c23cf32de6e0195a 200 in 19ms
- GET /api/schedule 200 in 1160ms
- GET / 200 in 74ms
- GET / 200 in 120ms
- GET /icon.svg?c23cf32de6e0195a 200 in 26ms
- GET /api/schedule 200 in 924ms
- ✓ Compiled in 864ms (2674 modules)
- GET / 200 in 270ms
- GET / 200 in 306ms
- ✓ Compiled /api/schedule in 257ms (1428 modules)
- ✓ Compiled (1433 modules)
- GET /icon.svg?c23cf32de6e0195a 200 in 634ms
- GET /api/schedule 200 in 13491ms
- GET / 200 in 273ms
- GET /icon.svg?c23cf32de6e0195a 200 in 19ms
- GET /api/schedule 200 in 10578ms
- ✓ Compiled in 663ms (2696 modules)
- GET / 200 in 88ms
- GET / 200 in 192ms
- GET /icon.svg?c23cf32de6e0195a 200 in 33ms
- GET /api/schedule 200 in 11955ms
- GET / 200 in 96ms
- GET /icon.svg?c23cf32de6e0195a 200 in 18ms
- GET /api/schedule 200 in 873ms
- GET /api/schedule 200 in 879ms
- ✓ Compiled in 824ms (2674 modules)
- GET / 200 in 280ms
- ✓ Compiled /api/schedule in 285ms (1419 modules)
- GET / 200 in 255ms
- GET / 200 in 319ms
- ✓ Compiled /icon.svg in 295ms (1433 modules)
- GET /icon.svg?c23cf32de6e0195a 200 in 640ms
- GET /api/schedule 200 in 3622ms
- GET /api/schedule 200 in 12671ms
- GET / 200 in 223ms
+ ✓ Ready in 7.3s
+ ○ Compiling /problem ...
+ ✓ Compiled /problem in 8.3s (2619 modules)
+ GET /problem 200 in 8965ms
+ GET /problem 200 in 209ms
+ ✓ Compiled /api/problem in 411ms (1400 modules)
+ ✓ Compiled in 501ms (1237 modules)
+ GET /icon.svg?c23cf32de6e0195a 200 in 1296ms
+ GET /problem 200 in 321ms
+ GET /api/problem 200 in 2183ms
+ GET /api/schedule 200 in 4241ms
+ GET /problem 200 in 262ms
  GET /icon.svg?c23cf32de6e0195a 200 in 16ms
- GET /api/schedule 200 in 985ms
- ✓ Compiled in 1844ms (2674 modules)
- ✓ Compiled in 184ms (1263 modules)
- GET / 200 in 563ms
- ✓ Compiled /api/schedule in 301ms (1428 modules)
- ✓ Compiled (1433 modules)
- GET /icon.svg?c23cf32de6e0195a 200 in 802ms
- GET /api/schedule 200 in 14091ms
- GET / 200 in 460ms
- GET /api/schedule 200 in 1137ms
- GET /api/schedule 200 in 12554ms
+ GET /api/problem 200 in 1769ms
+ GET /api/schedule 200 in 14058ms
+ ○ Compiling / ...
+ ✓ Compiled / in 1048ms (2731 modules)
+ GET / 200 in 1416ms
+ GET /api/schedule 200 in 912ms
+ GET /problem 200 in 38ms
+ GET /api/problem 200 in 1714ms
