@@ -36,6 +36,7 @@ export default function OpexPage(): ReactNode {
       data={query.data}
       columnIndexes={COLUMN_INDEXES}
       columnLabels={COLUMN_LABELS}
+      sortByIndex={1}
       storageKeyBase={LS_KEYS.opexGridColumnState}
     />
   );

@@ -24,6 +24,11 @@ interface SheetColumnsViewProps {
   columnLabels: string[];
   /** localStorage key base for the grid's column state. */
   storageKeyBase: string;
+  /**
+   * Sheet position of the column the rows are ordered by, newest first.
+   * Compared naturally, so "CPW26-0999" sorts below "CPW26-1000".
+   */
+  sortByIndex: number;
 }
 
 /**
@@ -35,6 +40,7 @@ export function SheetColumnsView({
   columnIndexes,
   columnLabels,
   storageKeyBase,
+  sortByIndex,
 }: SheetColumnsViewProps): ReactNode {
   const [search, setSearch] = useState("");
 
@@ -45,8 +51,19 @@ export function SheetColumnsView({
         return col ? { ...col, label: columnLabels[n] ?? col.label } : null;
       })
       .filter((c): c is NonNullable<typeof c> => c !== null);
-    return { ...data, columns };
-  }, [data, columnIndexes, columnLabels]);
+
+    const sortHeader = data.columns[sortByIndex]?.header;
+    const rows =
+      sortHeader === undefined
+        ? data.rows
+        : [...data.rows].sort((a, b) =>
+            (b.values[sortHeader] ?? "").localeCompare(a.values[sortHeader] ?? "", undefined, {
+              numeric: true,
+              sensitivity: "base",
+            }),
+          );
+    return { ...data, columns, rows };
+  }, [data, columnIndexes, columnLabels, sortByIndex]);
 
   const filtered = useMemo<ProblemData>(() => {
     const q = search.trim().toLowerCase();

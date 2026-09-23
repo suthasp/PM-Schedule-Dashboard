@@ -28,7 +28,11 @@ export default function CapexPage(): ReactNode {
   if (query.isPending) return <GridSkeleton />;
   if (query.isError) {
     return (
-      <ErrorPage title="Could not load CAPEX data" message={query.error.message} onRetry={refresh} />
+      <ErrorPage
+        title="Could not load CAPEX data"
+        message={query.error.message}
+        onRetry={refresh}
+      />
     );
   }
   return (
@@ -36,6 +40,7 @@ export default function CapexPage(): ReactNode {
       data={query.data}
       columnIndexes={COLUMN_INDEXES}
       columnLabels={COLUMN_LABELS}
+      sortByIndex={1}
       storageKeyBase={LS_KEYS.capexGridColumnState}
     />
   );
