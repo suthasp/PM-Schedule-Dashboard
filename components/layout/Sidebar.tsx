@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   Activity,
   AlertTriangle,
+  Banknote,
   Hourglass,
   Info,
   LayoutDashboard,
@@ -27,6 +28,7 @@ const NAV_ITEMS = [
   { href: "/penalty", label: "Tickets Penalty", icon: Ticket },
   { href: "/pending", label: "Pending Tickets", icon: Hourglass },
   { href: "/opex", label: "OPEX2026", icon: Wallet },
+  { href: "/capex", label: "CAPEX2026", icon: Banknote },
   { href: "/settings", label: "Settings", icon: Settings },
   { href: "/about", label: "About", icon: Info },
 ] as const;

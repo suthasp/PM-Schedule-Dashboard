@@ -35,6 +35,11 @@ export const OPEX_CSV_URL =
 
 export const OPEX_QUERY_KEY = ["opex-2026"] as const;
 
+export const CAPEX_CSV_URL =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vT1wdQs-QYgFhkMh3ik1wwkIwhi40UsFFthLSx0Er3K-piRHgJgJABwhN7lBUnMP5dN1A9LF5oUk_QK/pub?gid=1993846865&single=true&output=csv";
+
+export const CAPEX_QUERY_KEY = ["capex-2026"] as const;
+
 /** Default auto-refresh interval: 5 minutes. */
 export const DEFAULT_REFRESH_MINUTES = 5;
 
@@ -47,6 +52,7 @@ export const LS_KEYS = {
   pendingGridColumnState: "pmsd:pending-grid-column-state-v1",
   amcGridColumnState: "pmsd:amc-grid-column-state-v1",
   opexGridColumnState: "pmsd:opex-grid-column-state-v1",
+  capexGridColumnState: "pmsd:capex-grid-column-state-v1",
   sidebarCollapsed: "pmsd:sidebar-collapsed",
 } as const;
 

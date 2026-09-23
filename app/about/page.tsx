@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import {
   AMC_CSV_URL,
+  CAPEX_CSV_URL,
   CSV_URL,
   OPEX_CSV_URL,
   PENALTY_CSV_URL,
@@ -19,6 +20,7 @@ const SOURCES = [
   { label: "Tickets Penalty", url: PENALTY_CSV_URL },
   { label: "Pending Tickets", url: PENDING_CSV_URL },
   { label: "OPEX 2026", url: OPEX_CSV_URL },
+  { label: "CAPEX 2026", url: CAPEX_CSV_URL },
 ];
 
 const PAGES = [
@@ -49,6 +51,10 @@ const PAGES = [
   {
     name: "OPEX2026",
     desc: "Operating-expense request log — the nine reported sheet columns as a grid, with a free-text search across all of them.",
+  },
+  {
+    name: "CAPEX2026",
+    desc: "Capital-expenditure request log — the nine reported sheet columns as a grid, with a free-text search across all of them.",
   },
   {
     name: "Pending Tickets",
