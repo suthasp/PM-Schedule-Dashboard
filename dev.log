@@ -109,3 +109,13 @@ __barrel_optimize__?names=Download,Loader2!=!./node_modules/lucide-react/dist/es
  GET /api/schedule 200 in 12421ms
  GET /api/problem 200 in 12395ms
  GET /api/schedule 200 in 1235ms
+ GET /api/problem 200 in 1045ms
+ GET /api/schedule 200 in 2097ms
+ GET /api/schedule 200 in 2157ms
+ GET /api/problem 200 in 2165ms
+ GET / 200 in 308ms
+ GET /problem 200 in 105ms
+ GET /api/problem 200 in 1130ms
+ GET / 200 in 101ms
+ GET /api/schedule 200 in 14166ms
+ GET /api/schedule 200 in 2093ms

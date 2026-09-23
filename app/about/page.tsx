@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import {
   AMC_CSV_URL,
   CSV_URL,
+  OPEX_CSV_URL,
   PENALTY_CSV_URL,
   PENDING_CSV_URL,
   PROBLEM_CSV_URL,
@@ -17,6 +18,7 @@ const SOURCES = [
   { label: "AMC Actual (fiscal-year matrix)", url: AMC_CSV_URL },
   { label: "Tickets Penalty", url: PENALTY_CSV_URL },
   { label: "Pending Tickets", url: PENDING_CSV_URL },
+  { label: "OPEX 2026", url: OPEX_CSV_URL },
 ];
 
 const PAGES = [
@@ -43,6 +45,10 @@ const PAGES = [
   {
     name: "Tickets Penalty",
     desc: "SLA/penalty ticket log with a summary dashboard (KPI tiles, per-site penalty table, top causes, SLA donut) and monthly pivot tables by site, SLA result and severity.",
+  },
+  {
+    name: "OPEX2026",
+    desc: "Operating-expense request log — the nine reported sheet columns as a grid, with a free-text search across all of them.",
   },
   {
     name: "Pending Tickets",

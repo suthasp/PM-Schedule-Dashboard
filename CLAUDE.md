@@ -27,6 +27,8 @@ A fifth source, the **Pending Ticket sheet** (`PENDING_CSV_URL`, `/pending`), is
 
 A sixth source, the **AMC Actual sheet** (`AMC_CSV_URL`, `/amc`), is a fiscal-year week matrix like the main PM schedule, so it **reuses that pipeline** instead: `transformCsv` for parsing and `AGGridTable` (parameterised by `storageKeyBase`) for display. It shows the Dashboard's own `FilterBar` dropdowns and `KpiRow` tiles, but over a **page-local** filter state (`useFilterState()` passed as those components' `controller` prop and as `useFilteredData`'s `override`), so it never disturbs the shared Dashboard / PM Schedule filters. Above the grid sit two report cards, both fed from the page's filtered jobs: `components/amc/AmcDutyCyclePivot.tsx` (duty cycle → task, rows come from `tasks` so zero-plan tasks still appear) and `AmcSiteCombo.tsx` (bars + completion-rate line over an Excel-style data table whose columns line up with the bars via matching axis gutters).
 
+A seventh source, the **OPEX 2026 sheet** (`OPEX_CSV_URL`, `/opex`), is flat as well and reuses the Problem pipeline. `app/opex/page.tsx` narrows `data.columns` to the nine reported sheet positions (B, E, J, S, T, X, Y, AB, AC) — by index, since those headers are long Thai sentences — relabels them, and adds a page-local free-text search over the visible columns before handing the dataset to `ProblemGridTable`.
+
 ## Data pipeline (the big picture)
 
 1. **`lib/constants.ts`** holds `CSV_URL` (the published Google Sheet). Change the data source here.

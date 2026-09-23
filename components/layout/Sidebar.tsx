@@ -9,6 +9,7 @@ import {
   LayoutDashboard,
   Settings,
   ShieldCheck,
+  Wallet,
   Table2,
   Ticket,
   Wrench,
@@ -25,6 +26,7 @@ const NAV_ITEMS = [
   { href: "/amc", label: "AMC Actual", icon: ShieldCheck },
   { href: "/penalty", label: "Tickets Penalty", icon: Ticket },
   { href: "/pending", label: "Pending Tickets", icon: Hourglass },
+  { href: "/opex", label: "OPEX2026", icon: Wallet },
   { href: "/settings", label: "Settings", icon: Settings },
   { href: "/about", label: "About", icon: Info },
 ] as const;
