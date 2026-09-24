@@ -34,6 +34,13 @@ function groupBy(data: ProblemData, header: string | null, amountHeader: string 
 
 const hairline = { borderColor: "var(--hairline)" } as const;
 
+/** The pinned total row needs an opaque base, or rows scroll through its tint. */
+const totalCell = {
+  ...hairline,
+  backgroundColor: "var(--surface)",
+  backgroundImage: `linear-gradient(${SITE_COMPLETION.totalTint}, ${SITE_COMPLETION.totalTint})`,
+} as const;
+
 function StatusChip({ value }: { value: string }): ReactNode {
   const chip = EXPENSE_STATUS_CHIPS.find((c) => c.pattern.test(value));
   if (!chip) return <span>{value}</span>;
@@ -77,9 +84,12 @@ function GroupTable({
   }
 
   return (
-    <div className="overflow-x-auto">
+    // Capped so a long list (CAPEX has dozens of sites) scrolls inside the
+    // card instead of stretching it past its neighbour; header and total row
+    // stay pinned. The cap fits the status table (10 rows) without scrolling.
+    <div className="max-h-[330px] overflow-auto">
       <table className="w-full border-collapse text-xs">
-        <thead>
+        <thead className="sticky top-0 z-10">
           <tr
             style={{ backgroundColor: SITE_COMPLETION.header.bg, color: SITE_COMPLETION.header.fg }}
           >
@@ -114,21 +124,23 @@ function GroupTable({
               </td>
             </tr>
           ))}
-          <tr style={{ backgroundColor: SITE_COMPLETION.totalTint }}>
-            <td className="border px-2 py-1 font-bold" style={hairline}>
+        </tbody>
+        <tfoot className="sticky bottom-0">
+          <tr>
+            <td className="border px-2 py-1 font-bold" style={totalCell}>
               รวม
             </td>
-            <td className={`${cell} font-bold`} style={hairline}>
+            <td className={`${cell} font-bold`} style={totalCell}>
               {formatNumber(total.count)}
             </td>
-            <td className={`${cell} font-bold`} style={hairline}>
+            <td className={`${cell} font-bold`} style={totalCell}>
               {formatCurrency(total.amount)}
             </td>
-            <td className={`${cell} font-bold`} style={hairline}>
+            <td className={`${cell} font-bold`} style={totalCell}>
               {formatPercent(total.amount === 0 ? 0 : 100)}
             </td>
           </tr>
-        </tbody>
+        </tfoot>
       </table>
     </div>
   );
