@@ -20,6 +20,7 @@ interface ReportFields {
   subCause: string | null;
   criteria: string | null;
   scope: string | null;
+  sla: string | null;
   description: string | null;
   planDate: string | null;
   workStatus: string | null;
@@ -46,6 +47,7 @@ function resolveReportFields(data: ProblemData): ReportFields {
     subCause: find([/^sub\s*cause/i]),
     criteria: find([/^criteria/i]),
     scope: find([/scope/i]),
+    sla: find([/^sla\s*\(/i, /^sla/i]),
     description: find([/^description/i]),
     planDate: find([/^plan\s*date$/i]),
     workStatus: find([/^work\s*status$/i]),
@@ -88,27 +90,30 @@ function padDmy(raw: string): string {
 }
 
 /**
- * Column headers. Short, fixed-shape values get a pixel width that fits them
- * whole; the three free-text columns (no width) share whatever is left, so
- * the table always fits its card and only long prose gets clamped.
+ * Column headers and their pixel widths. Every column is sized for its own
+ * content rather than squeezed into the card, so the prose columns stay
+ * readable; the table scrolls sideways when the total exceeds the card.
  */
-const COLUMNS: { label: string; width?: number }[] = [
-  { label: "No.", width: 32 },
-  { label: "CN Site", width: 72 },
-  { label: "วันที่ลงบันทึก", width: 74 },
-  { label: "Sub Cause" },
-  { label: "Criteria", width: 54 },
-  { label: "In/Out Scope", width: 60 },
-  { label: "Description รายละเอียดของปัญหาที่พบ" },
-  { label: "Plan Date", width: 74 },
-  { label: "Work Status", width: 72 },
-  { label: "BOQ Amount (Baht)", width: 78 },
-  { label: "Record Reference Code", width: 86 },
-  { label: "Status Budget", width: 112 },
-  { label: "Risk Level", width: 74 },
-  { label: "Risk Impact" },
-  { label: "Remark" },
+const COLUMNS: { label: string; width: number }[] = [
+  { label: "No.", width: 40 },
+  { label: "CN Site", width: 84 },
+  { label: "วันที่ลงบันทึก", width: 82 },
+  { label: "Sub Cause", width: 150 },
+  { label: "Criteria", width: 62 },
+  { label: "In/Out Scope", width: 74 },
+  { label: "SLA (Day)", width: 58 },
+  { label: "Description รายละเอียดของปัญหาที่พบ", width: 250 },
+  { label: "Plan Date", width: 82 },
+  { label: "Work Status", width: 80 },
+  { label: "BOQ Amount (Baht)", width: 96 },
+  { label: "Record Reference Code", width: 104 },
+  { label: "Status Budget", width: 124 },
+  { label: "Risk Level", width: 78 },
+  { label: "Risk Impact", width: 230 },
+  { label: "Remark", width: 210 },
 ];
+
+const TABLE_WIDTH = COLUMNS.reduce((sum, c) => sum + c.width, 0);
 
 /** One line; overflow ends in "…", and hovering shows the whole value. */
 function Fit({ text }: { text: string }): ReactNode {
@@ -190,6 +195,7 @@ export function ProblemInProgressTable({ data }: { data: ProblemData }): ReactNo
         subCause: get(r.values, f.subCause),
         criteria: get(r.values, f.criteria),
         scope: get(r.values, f.scope),
+        sla: get(r.values, f.sla),
         description: get(r.values, f.description),
         planDate: padDmy(get(r.values, f.planDate)),
         workStatus: get(r.values, f.workStatus),
@@ -270,26 +276,38 @@ export function ProblemInProgressTable({ data }: { data: ProblemData }): ReactNo
           Export Excel
         </button>
       </div>
-      <table className="w-full table-fixed border-collapse text-[11px]">
-        <colgroup>
-          {COLUMNS.map((c) => (
-            <col key={c.label} style={c.width ? { width: c.width } : undefined} />
-          ))}
-        </colgroup>
-        <thead>
-          <tr
-            style={{
-              backgroundColor: PROBLEM_SUMMARY.reportHeader.bg,
-              color: PROBLEM_SUMMARY.reportHeader.fg,
-            }}
-          >
+      {/* Both axes scroll inside the card: sideways for the full column set,
+          down for the row list, with the header pinned either way. */}
+      <div
+        className="max-h-[72vh] overflow-auto rounded-card border"
+        style={hairline}
+        tabIndex={0}
+        role="region"
+        aria-label="In Progress Problems table"
+      >
+        <table
+          className="table-fixed border-collapse text-[11px]"
+          style={{ width: TABLE_WIDTH, minWidth: "100%" }}
+        >
+          <colgroup>
             {COLUMNS.map((c) => (
-              <th key={c.label} className={headerCell}>
-                {c.label}
-              </th>
+              <col key={c.label} style={{ width: c.width }} />
             ))}
-          </tr>
-        </thead>
+          </colgroup>
+          <thead className="sticky top-0 z-10">
+            <tr
+              style={{
+                backgroundColor: PROBLEM_SUMMARY.reportHeader.bg,
+                color: PROBLEM_SUMMARY.reportHeader.fg,
+              }}
+            >
+              {COLUMNS.map((c) => (
+                <th key={c.label} className={headerCell}>
+                  {c.label}
+                </th>
+              ))}
+            </tr>
+          </thead>
         <tbody>
           {rows.map((row) => (
             <tr
@@ -317,6 +335,9 @@ export function ProblemInProgressTable({ data }: { data: ProblemData }): ReactNo
               </td>
               <td className={`${cell} text-center font-semibold`} style={scopeStyle(row.scope)}>
                 <Fit text={row.scope} />
+              </td>
+              <td className={`${cell} text-center tabular-nums`}>
+                <Fit text={row.sla} />
               </td>
               <td className={cell}>
                 <Clamp text={row.description} />
@@ -351,7 +372,8 @@ export function ProblemInProgressTable({ data }: { data: ProblemData }): ReactNo
             </tr>
           ))}
         </tbody>
-      </table>
+        </table>
+      </div>
     </div>
   );
 }

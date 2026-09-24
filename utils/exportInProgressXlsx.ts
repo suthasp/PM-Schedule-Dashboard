@@ -13,6 +13,7 @@ export interface InProgressExportRow {
   subCause: string;
   criteria: string;
   scope: string;
+  sla: string;
   description: string;
   planDate: string;
   workStatus: string;
@@ -41,6 +42,11 @@ const SHEET_COLUMNS: {
   { header: "Sub Cause", width: 22, value: (r) => r.subCause },
   { header: "Criteria", width: 10, value: (r) => r.criteria },
   { header: "In/Out Scope", width: 11, value: (r) => r.scope },
+  {
+    header: "SLA (Day)",
+    width: 10,
+    value: (r) => (r.sla !== "" && !Number.isNaN(Number(r.sla)) ? Number(r.sla) : r.sla),
+  },
   { header: "Description รายละเอียดของปัญหาที่พบ", width: 50, value: (r) => r.description },
   { header: "Plan Date", width: 13, value: (r) => r.planDate },
   { header: "Work Status", width: 13, value: (r) => r.workStatus },
@@ -51,6 +57,9 @@ const SHEET_COLUMNS: {
   { header: "Risk Impact", width: 50, value: (r) => r.riskImpact },
   { header: "Remark", width: 50, value: (r) => r.remark },
 ];
+
+/** 1-based Excel column number of a header, so styling survives reordering. */
+const col = (header: string): number => SHEET_COLUMNS.findIndex((c) => c.header === header) + 1;
 
 /** "#0d366b" → "FF0D366B", the ARGB form Excel styles expect. */
 const argb = (hex: string): string => `FF${hex.replace("#", "").toUpperCase()}`;
@@ -100,34 +109,60 @@ export async function exportInProgressXlsx(
     const row = sheet.addRow(SHEET_COLUMNS.map((c) => c.value(r)));
     row.alignment = { vertical: "top", wrapText: true };
 
-    row.getCell(10).numFmt = "#,##0.00";
+    row.getCell(col("BOQ Amount (Baht)")).numFmt = "#,##0.00";
 
     const criteria = CRITERIA_CHIPS[r.criteria.toUpperCase()];
-    if (criteria) row.getCell(5).font = { bold: true, color: { argb: argb(criteria.bg) } };
+    if (criteria) {
+      row.getCell(col("Criteria")).font = { bold: true, color: { argb: argb(criteria.bg) } };
+    }
 
     const scope = scopeFill(r.scope);
     if (scope) {
-      row.getCell(6).fill = { type: "pattern", pattern: "solid", fgColor: { argb: argb(scope) } };
+      row.getCell(col("In/Out Scope")).fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: argb(scope) },
+      };
     }
 
-    row.getCell(9).font = { bold: true, color: { argb: argb(PROBLEM_SUMMARY.inProgress.bg) } };
+    row.getCell(col("Work Status")).font = {
+      bold: true,
+      color: { argb: argb(PROBLEM_SUMMARY.inProgress.bg) },
+    };
 
     const budget = BUDGET_STATUS_CHIPS.find((c) => c.pattern.test(r.budgetStatus));
     if (budget && r.budgetStatus !== "") {
-      const cell = row.getCell(12);
+      const cell = row.getCell(col("Status Budget"));
       cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: argb(budget.bg) } };
       cell.font = { bold: true, color: { argb: argb(budget.fg) } };
     }
 
     const risk = RISK_LEVEL_CHIPS[r.riskLevel.trim().toUpperCase()];
     if (risk) {
-      const cell = row.getCell(13);
+      const cell = row.getCell(col("Risk Level"));
       cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: argb(risk.bg) } };
       cell.font = { bold: true, color: { argb: argb(risk.fg) } };
     }
 
-    for (const col of [1, 2, 3, 5, 6, 8, 9, 11, 12, 13]) {
-      row.getCell(col).alignment = { horizontal: "center", vertical: "top", wrapText: true };
+    const centered = [
+      "No.",
+      "CN Site",
+      "วันที่ลงบันทึก",
+      "Criteria",
+      "In/Out Scope",
+      "SLA (Day)",
+      "Plan Date",
+      "Work Status",
+      "Record Reference Code",
+      "Status Budget",
+      "Risk Level",
+    ];
+    for (const header of centered) {
+      row.getCell(col(header)).alignment = {
+        horizontal: "center",
+        vertical: "top",
+        wrapText: true,
+      };
     }
   }
 
