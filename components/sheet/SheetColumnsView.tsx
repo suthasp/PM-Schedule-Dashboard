@@ -130,6 +130,10 @@ export function SheetColumnsView({
         storageKeyBase={storageKeyBase}
         itemLabel="records"
         autoSizeOnLoad
+        // These pages carry a summary above the grid, so give the table more
+        // room and a page of rows tall enough to fill it.
+        heightClass="h-[85vh] min-h-[620px]"
+        pageSize={50}
       />
     </div>
   );

@@ -12,14 +12,7 @@ import type {
 import { AgGridReact } from "ag-grid-react";
 import { Columns3, Download, ExternalLink, Maximize2, RotateCcw } from "lucide-react";
 import { useTheme } from "next-themes";
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useFilters } from "@/components/providers/FilterProvider";
 import { useSettings } from "@/components/providers/SettingsProvider";
 import {
@@ -43,6 +36,10 @@ interface ProblemGridTableProps {
   itemLabel?: string;
   /** Size every column to its header + content on first visit (no saved layout). */
   autoSizeOnLoad?: boolean;
+  /** Tailwind height for the grid body (defaults to 68vh). */
+  heightClass?: string;
+  /** Rows per page (defaults to 25). */
+  pageSize?: number;
 }
 
 /** Column-state storage is keyed by the header signature so a sheet-schema change resets cleanly. */
@@ -243,7 +240,11 @@ function buildProblemColumnDefs(data: ProblemData): ColDef<ProblemRow>[] {
   });
 
   // Pin the row-id and site columns for orientation while scrolling wide.
-  const pinnedIdWidths = new Map([["No.", 70], ["Index", 70], ["TICKETID", 150]]);
+  const pinnedIdWidths = new Map([
+    ["No.", 70],
+    ["Index", 70],
+    ["TICKETID", 150],
+  ]);
   const pinnedSiteWidths = new Map([
     ["CN Site", 120],
     ["RN SiteID", 120],
@@ -268,6 +269,8 @@ export function ProblemGridTable({
   storageKeyBase = LS_KEYS.problemGridColumnState,
   itemLabel = "problems",
   autoSizeOnLoad = false,
+  heightClass = "h-[68vh] min-h-[420px]",
+  pageSize = 25,
 }: ProblemGridTableProps): ReactNode {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -293,7 +296,10 @@ export function ProblemGridTable({
     const api = apiRef.current;
     if (!api) return;
     try {
-      window.localStorage.setItem(storageKey(data, storageKeyBase), JSON.stringify(api.getColumnState()));
+      window.localStorage.setItem(
+        storageKey(data, storageKeyBase),
+        JSON.stringify(api.getColumnState()),
+      );
     } catch {
       // storage unavailable — column layout just won't persist
     }
@@ -454,7 +460,7 @@ export function ProblemGridTable({
       </div>
 
       <div
-        className={`${dark ? "ag-theme-quartz-dark" : "ag-theme-quartz"} h-[68vh] min-h-[420px] w-full overflow-hidden rounded-card shadow-soft`}
+        className={`${dark ? "ag-theme-quartz-dark" : "ag-theme-quartz"} ${heightClass} w-full overflow-hidden rounded-card shadow-soft`}
         onClick={() => columnsMenuOpen && setColumnsMenuOpen(false)}
       >
         <AgGridReact<ProblemRow>
@@ -467,7 +473,7 @@ export function ProblemGridTable({
           getRowClass={getRowClass}
           rowHeight={32}
           pagination
-          paginationPageSize={25}
+          paginationPageSize={pageSize}
           paginationPageSizeSelector={[25, 50, 100, 200]}
           rowSelection={{ mode: "multiRow", checkboxes: true, headerCheckbox: true }}
           enableCellTextSelection
