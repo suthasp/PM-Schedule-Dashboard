@@ -140,6 +140,8 @@ export const PROBLEM_SUMMARY = {
   inProgress: { bg: "#eb6834", fg: "#ffffff" },
   /** Navy header for the in-progress report table. */
   reportHeader: { bg: "#0d366b", fg: "#ffffff" },
+  /** Risk columns, called out in yellow and red as the sheet does. */
+  reportHeaderRisk: { bg: "#ffe600", fg: "#d90000" },
   /** Soft row fills per work status in the scope × status pivot. */
   statusRow: {
     finished: { light: "rgba(12,163,12,0.14)", dark: "rgba(12,163,12,0.20)" },

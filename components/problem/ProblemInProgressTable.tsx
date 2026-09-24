@@ -94,7 +94,7 @@ function padDmy(raw: string): string {
  * content rather than squeezed into the card, so the prose columns stay
  * readable; the table scrolls sideways when the total exceeds the card.
  */
-const COLUMNS: { label: string; width: number }[] = [
+const COLUMNS: { label: string; width: number; risk?: boolean }[] = [
   { label: "No.", width: 40 },
   { label: "CN Site", width: 84 },
   { label: "วันที่ลงบันทึก", width: 82 },
@@ -108,8 +108,8 @@ const COLUMNS: { label: string; width: number }[] = [
   { label: "BOQ Amount (Baht)", width: 96 },
   { label: "Record Reference Code", width: 104 },
   { label: "Status Budget", width: 124 },
-  { label: "Risk Level", width: 78 },
-  { label: "Risk Impact", width: 230 },
+  { label: "Risk Level", width: 78, risk: true },
+  { label: "Risk Impact", width: 230, risk: true },
   { label: "Remark", width: 210 },
 ];
 
@@ -302,7 +302,18 @@ export function ProblemInProgressTable({ data }: { data: ProblemData }): ReactNo
               }}
             >
               {COLUMNS.map((c) => (
-                <th key={c.label} className={headerCell}>
+                <th
+                  key={c.label}
+                  className={headerCell}
+                  style={
+                    c.risk
+                      ? {
+                          backgroundColor: PROBLEM_SUMMARY.reportHeaderRisk.bg,
+                          color: PROBLEM_SUMMARY.reportHeaderRisk.fg,
+                        }
+                      : undefined
+                  }
+                >
                   {c.label}
                 </th>
               ))}

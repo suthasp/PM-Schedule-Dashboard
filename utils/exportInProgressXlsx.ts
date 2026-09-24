@@ -58,6 +58,9 @@ const SHEET_COLUMNS: {
   { header: "Remark", width: 50, value: (r) => r.remark },
 ];
 
+/** Headers that get the yellow/red treatment instead of the navy one. */
+const RISK_HEADERS = ["Risk Level", "Risk Impact"];
+
 /** 1-based Excel column number of a header, so styling survives reordering. */
 const col = (header: string): number => SHEET_COLUMNS.findIndex((c) => c.header === header) + 1;
 
@@ -95,13 +98,13 @@ export async function exportInProgressXlsx(
   sheet.columns = SHEET_COLUMNS.map((c) => ({ header: c.header, width: c.width }));
   const header = sheet.getRow(1);
   header.height = 32;
-  header.eachCell((cell) => {
-    cell.font = { bold: true, color: { argb: argb(PROBLEM_SUMMARY.reportHeader.fg) } };
-    cell.fill = {
-      type: "pattern",
-      pattern: "solid",
-      fgColor: { argb: argb(PROBLEM_SUMMARY.reportHeader.bg) },
-    };
+  header.eachCell((cell, n) => {
+    // The risk columns carry the sheet's own yellow-and-red call-out.
+    const tone = RISK_HEADERS.includes(SHEET_COLUMNS[n - 1]?.header ?? "")
+      ? PROBLEM_SUMMARY.reportHeaderRisk
+      : PROBLEM_SUMMARY.reportHeader;
+    cell.font = { bold: true, color: { argb: argb(tone.fg) } };
+    cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: argb(tone.bg) } };
     cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
   });
 
