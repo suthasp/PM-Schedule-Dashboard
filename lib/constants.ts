@@ -174,6 +174,28 @@ export const BUDGET_STATUS_CHIPS: { pattern: RegExp; bg: string; fg: string }[] 
   { pattern: /new\s*request/i, bg: "#fbc8ec", fg: "#6b1d52" },
 ];
 
+/**
+ * Chip fills for the OPEX / CAPEX "Last Status" columns. Both sheets use the
+ * same workflow with slightly different wording (and CAPEX prefixes a step
+ * number), so match on keywords, first match wins — order matters, e.g. the
+ * FSO/SVM approval steps must be tested before the generic "approve".
+ */
+export const EXPENSE_STATUS_CHIPS: { pattern: RegExp; bg: string; fg: string }[] = [
+  { pattern: /reject/i, bg: "#d03b3b", fg: "#ffffff" },
+  { pattern: /cancel/i, bg: "#57534e", fg: "#ffffff" },
+  { pattern: /gr\s*partial/i, bg: "#15803d", fg: "#ffffff" },
+  { pattern: /gr\s*(completed|finish)/i, bg: "#0ca30c", fg: "#ffffff" },
+  { pattern: /new\s*request/i, bg: "#fbc8ec", fg: "#6b1d52" },
+  // Ahead of the PO/PR rules: this step's own text mentions both.
+  { pattern: /requester|plan\s*open/i, bg: "#0369a1", fg: "#ffffff" },
+  { pattern: /\bpo\b/i, bg: "#4bc8dd", fg: "#0d366b" },
+  { pattern: /\bpr\b/i, bg: "#fab219", fg: "#0d366b" },
+  { pattern: /fso|rnsa/i, bg: "#4a3aa7", fg: "#ffffff" },
+  { pattern: /svm/i, bg: "#a21caf", fg: "#ffffff" },
+  { pattern: /budget\s*approve/i, bg: "#eb6834", fg: "#ffffff" },
+  { pattern: /fund\s*code|เติมงบ/i, bg: "#7c3aed", fg: "#ffffff" },
+];
+
 /** Solid chip fills for the Problem sheet's Criteria column. */
 export const CRITERIA_CHIPS: Record<string, { bg: string; fg: string }> = {
   MINOR: { bg: "#fab219", fg: "#0d366b" },

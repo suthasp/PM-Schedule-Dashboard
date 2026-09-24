@@ -22,7 +22,13 @@ import {
 } from "react";
 import { useFilters } from "@/components/providers/FilterProvider";
 import { useSettings } from "@/components/providers/SettingsProvider";
-import { CRITERIA_CHIPS, LS_KEYS, PENALTY_SUMMARY, PROBLEM_SUMMARY } from "@/lib/constants";
+import {
+  CRITERIA_CHIPS,
+  EXPENSE_STATUS_CHIPS,
+  LS_KEYS,
+  PENALTY_SUMMARY,
+  PROBLEM_SUMMARY,
+} from "@/lib/constants";
 import type { ProblemData, ProblemRow } from "@/types/problem";
 import { parseDmyMs } from "@/utils/problemTransform";
 
@@ -67,6 +73,23 @@ function LinkCell(p: ICellRendererParams<ProblemRow>): ReactNode {
       Open
       <ExternalLink size={12} aria-hidden />
     </a>
+  );
+}
+
+/** OPEX / CAPEX workflow step, as a colour-coded chip. */
+function LastStatusCell(p: ICellRendererParams<ProblemRow>): ReactNode {
+  const value = typeof p.value === "string" ? p.value.trim() : "";
+  if (!value) return null;
+  const chip = EXPENSE_STATUS_CHIPS.find((c) => c.pattern.test(value));
+  if (!chip) return value;
+  return (
+    <span
+      className="inline-block max-w-full truncate rounded-full px-2 py-0.5 text-[11px] font-semibold leading-4"
+      style={{ backgroundColor: chip.bg, color: chip.fg }}
+      title={value}
+    >
+      {value}
+    </span>
   );
 }
 
@@ -195,6 +218,9 @@ function buildProblemColumnDefs(data: ProblemData): ColDef<ProblemRow>[] {
       default: {
         if (/^criteria/i.test(label)) {
           return { ...base, width: 110, cellRenderer: CriteriaCell };
+        }
+        if (/last\s*status/i.test(label)) {
+          return { ...base, width: 190, cellRenderer: LastStatusCell };
         }
         if (/^work\s*status$/i.test(label)) {
           return { ...base, width: 130, cellRenderer: WorkStatusCell };
