@@ -3,7 +3,12 @@
 import { Download, Loader2 } from "lucide-react";
 import { useCallback, useMemo, useState, type ReactNode } from "react";
 import { useChartTheme } from "@/hooks/useChartTheme";
-import { BUDGET_STATUS_CHIPS, CRITERIA_CHIPS, PROBLEM_SUMMARY } from "@/lib/constants";
+import {
+  BUDGET_STATUS_CHIPS,
+  CRITERIA_CHIPS,
+  PROBLEM_SUMMARY,
+  RISK_LEVEL_CHIPS,
+} from "@/lib/constants";
 import type { ProblemData } from "@/types/problem";
 import { exportInProgressXlsx, type InProgressExportRow } from "@/utils/exportInProgressXlsx";
 
@@ -21,6 +26,8 @@ interface ReportFields {
   boqAmount: string | null;
   referenceCode: string | null;
   budgetStatus: string | null;
+  riskLevel: string | null;
+  riskImpact: string | null;
   remark: string | null;
 }
 
@@ -45,6 +52,8 @@ function resolveReportFields(data: ProblemData): ReportFields {
     boqAmount: find([/^boq\s*amount/i]),
     referenceCode: find([/^record\s*reference/i]),
     budgetStatus: find([/^status\s*budget/i]),
+    riskLevel: find([/^risk\s*level/i]),
+    riskImpact: find([/^risk\s*impact/i]),
     remark: find([/^remark$/i]),
   };
 }
@@ -95,7 +104,9 @@ const COLUMNS: { label: string; width?: number }[] = [
   { label: "Work Status", width: 72 },
   { label: "BOQ Amount (Baht)", width: 78 },
   { label: "Record Reference Code", width: 86 },
-  { label: "Status Budget", width: 118 },
+  { label: "Status Budget", width: 112 },
+  { label: "Risk Level", width: 74 },
+  { label: "Risk Impact" },
   { label: "Remark" },
 ];
 
@@ -126,6 +137,21 @@ function BudgetStatus({ value }: { value: string }): ReactNode {
   return (
     <span
       className="inline-block max-w-full truncate rounded-full px-2 py-0.5 align-top text-[10.5px] font-semibold leading-4"
+      style={{ backgroundColor: chip.bg, color: chip.fg }}
+      title={value}
+    >
+      {value}
+    </span>
+  );
+}
+
+function RiskLevel({ value }: { value: string }): ReactNode {
+  if (value === "") return null;
+  const chip = RISK_LEVEL_CHIPS[value.trim().toUpperCase()];
+  if (!chip) return <Fit text={value} />;
+  return (
+    <span
+      className="inline-block max-w-full truncate rounded px-1.5 py-0.5 align-top text-[10.5px] font-semibold leading-4"
       style={{ backgroundColor: chip.bg, color: chip.fg }}
       title={value}
     >
@@ -171,6 +197,8 @@ export function ProblemInProgressTable({ data }: { data: ProblemData }): ReactNo
         boqAmount: formatBaht(parseBaht(get(r.values, f.boqAmount))),
         referenceCode: get(r.values, f.referenceCode),
         budgetStatus: get(r.values, f.budgetStatus),
+        riskLevel: get(r.values, f.riskLevel),
+        riskImpact: get(r.values, f.riskImpact),
         remark: get(r.values, f.remark),
       }))
       .sort(
@@ -310,6 +338,12 @@ export function ProblemInProgressTable({ data }: { data: ProblemData }): ReactNo
               </td>
               <td className={`${cell} text-center`}>
                 <BudgetStatus value={row.budgetStatus} />
+              </td>
+              <td className={`${cell} text-center`}>
+                <RiskLevel value={row.riskLevel} />
+              </td>
+              <td className={cell}>
+                <Clamp text={row.riskImpact} />
               </td>
               <td className={cell}>
                 <Clamp text={row.remark} />

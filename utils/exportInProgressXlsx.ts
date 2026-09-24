@@ -1,4 +1,9 @@
-import { BUDGET_STATUS_CHIPS, CRITERIA_CHIPS, PROBLEM_SUMMARY } from "@/lib/constants";
+import {
+  BUDGET_STATUS_CHIPS,
+  CRITERIA_CHIPS,
+  PROBLEM_SUMMARY,
+  RISK_LEVEL_CHIPS,
+} from "@/lib/constants";
 
 /** One row of the In Progress Problems report, as displayed. */
 export interface InProgressExportRow {
@@ -15,6 +20,8 @@ export interface InProgressExportRow {
   boqValue: number | null;
   referenceCode: string;
   budgetStatus: string;
+  riskLevel: string;
+  riskImpact: string;
   remark: string;
 }
 
@@ -40,6 +47,8 @@ const SHEET_COLUMNS: {
   { header: "BOQ Amount (Baht)", width: 16, value: (r) => r.boqValue },
   { header: "Record Reference Code", width: 16, value: (r) => r.referenceCode },
   { header: "Status Budget", width: 22, value: (r) => r.budgetStatus },
+  { header: "Risk Level", width: 11, value: (r) => r.riskLevel },
+  { header: "Risk Impact", width: 50, value: (r) => r.riskImpact },
   { header: "Remark", width: 50, value: (r) => r.remark },
 ];
 
@@ -110,7 +119,14 @@ export async function exportInProgressXlsx(
       cell.font = { bold: true, color: { argb: argb(budget.fg) } };
     }
 
-    for (const col of [1, 2, 3, 5, 6, 8, 9, 11, 12]) {
+    const risk = RISK_LEVEL_CHIPS[r.riskLevel.trim().toUpperCase()];
+    if (risk) {
+      const cell = row.getCell(13);
+      cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: argb(risk.bg) } };
+      cell.font = { bold: true, color: { argb: argb(risk.fg) } };
+    }
+
+    for (const col of [1, 2, 3, 5, 6, 8, 9, 11, 12, 13]) {
       row.getCell(col).alignment = { horizontal: "center", vertical: "top", wrapText: true };
     }
   }

@@ -203,6 +203,13 @@ export const CRITERIA_CHIPS: Record<string, { bg: string; fg: string }> = {
   CRITICAL: { bg: "#d03b3b", fg: "#ffffff" },
 };
 
+/** Solid fills for the Problem sheet's Risk Level column, as in the sheet. */
+export const RISK_LEVEL_CHIPS: Record<string, { bg: string; fg: string }> = {
+  LOW: { bg: "#fbe08a", fg: "#0d366b" },
+  MEDIUM: { bg: "#eb9a4e", fg: "#3d1a00" },
+  HIGH: { bg: "#d03b3b", fg: "#ffffff" },
+};
+
 /** Soft row/background tints per status for grid rows and badges. */
 export const STATUS_TINTS: Record<JobStatus, { light: string; dark: string }> = {
   Finished: { light: "rgba(12,163,12,0.10)", dark: "rgba(12,163,12,0.16)" },
