@@ -41,6 +41,8 @@ export default function CapexPage(): ReactNode {
       columnIndexes={COLUMN_INDEXES}
       columnLabels={COLUMN_LABELS}
       sortByIndex={1}
+      // This sheet has no BU column; Site Name carries the same codes.
+      summary={{ statusIndex: 2, amountIndex: 14, buIndex: 9, buLabel: "Site Name" }}
       storageKeyBase={LS_KEYS.capexGridColumnState}
     />
   );

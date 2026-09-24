@@ -3,6 +3,7 @@
 import { Search, X } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useMemo, useState, type ReactNode } from "react";
+import { SheetSummary } from "@/components/sheet/SheetSummary";
 import { GridSkeleton } from "@/components/ui/Loading";
 import type { ProblemData } from "@/types/problem";
 
@@ -29,6 +30,8 @@ interface SheetColumnsViewProps {
    * Compared naturally, so "CPW26-0999" sorts below "CPW26-1000".
    */
   sortByIndex: number;
+  /** Sheet positions feeding the summary above the grid. */
+  summary: { statusIndex: number; amountIndex: number; buIndex: number; buLabel: string };
 }
 
 /**
@@ -41,6 +44,7 @@ export function SheetColumnsView({
   columnLabels,
   storageKeyBase,
   sortByIndex,
+  summary,
 }: SheetColumnsViewProps): ReactNode {
   const [search, setSearch] = useState("");
 
@@ -77,6 +81,8 @@ export function SheetColumnsView({
     };
   }, [scoped, search]);
 
+  const headerAt = (i: number): string | null => data.columns[i]?.header ?? null;
+
   return (
     <div className="space-y-3">
       <div className="card no-print flex items-center gap-3 p-3">
@@ -110,6 +116,14 @@ export function SheetColumnsView({
           {filtered.rows.length.toLocaleString()} of {scoped.rows.length.toLocaleString()} records
         </p>
       </div>
+
+      <SheetSummary
+        data={filtered}
+        statusHeader={headerAt(summary.statusIndex)}
+        amountHeader={headerAt(summary.amountIndex)}
+        buHeader={headerAt(summary.buIndex)}
+        buLabel={summary.buLabel}
+      />
 
       <ProblemGridTable
         data={filtered}
