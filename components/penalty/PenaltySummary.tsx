@@ -620,8 +620,14 @@ export function PenaltySummary({ data }: { data: ProblemData }): ReactNode {
       </div>
 
       {s.monthly.months.length > 0 && (
+        /* Two columns: the site pivot has the most rows and columns, so it
+           takes two thirds; the two short pivots stack in the last third. */
         <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-          <ChartCard title="Tickets by Site (Monthly)" subtitle="Ticket count per site by month">
+          <ChartCard
+            title="Tickets by Site (Monthly)"
+            subtitle="Ticket count per site by month"
+            className="xl:col-span-2"
+          >
             <MonthPivotTable
               dimensionLabel="หน่วยงาน"
               months={s.monthly.months}
@@ -630,24 +636,26 @@ export function PenaltySummary({ data }: { data: ProblemData }): ReactNode {
               grandTotal={s.monthly.grandTotal}
             />
           </ChartCard>
-          <ChartCard title="SLA Result (Monthly)" subtitle="Within vs over SLA by month">
-            <MonthPivotTable
-              dimensionLabel="ผล SLA"
-              months={s.monthly.months}
-              rows={s.monthly.sla}
-              monthTotals={s.monthly.monthTotals}
-              grandTotal={s.monthly.grandTotal}
-            />
-          </ChartCard>
-          <ChartCard title="Severity (Monthly)" subtitle="Ticket severity by month">
-            <MonthPivotTable
-              dimensionLabel="ระดับ"
-              months={s.monthly.months}
-              rows={s.monthly.severity}
-              monthTotals={s.monthly.monthTotals}
-              grandTotal={s.monthly.grandTotal}
-            />
-          </ChartCard>
+          <div className="flex flex-col gap-4">
+            <ChartCard title="SLA Result (Monthly)" subtitle="Within vs over SLA by month">
+              <MonthPivotTable
+                dimensionLabel="ผล SLA"
+                months={s.monthly.months}
+                rows={s.monthly.sla}
+                monthTotals={s.monthly.monthTotals}
+                grandTotal={s.monthly.grandTotal}
+              />
+            </ChartCard>
+            <ChartCard title="Severity (Monthly)" subtitle="Ticket severity by month">
+              <MonthPivotTable
+                dimensionLabel="ระดับ"
+                months={s.monthly.months}
+                rows={s.monthly.severity}
+                monthTotals={s.monthly.monthTotals}
+                grandTotal={s.monthly.grandTotal}
+              />
+            </ChartCard>
+          </div>
         </div>
       )}
 
