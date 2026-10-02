@@ -267,12 +267,15 @@ function MonthPivotTable({
   rows,
   monthTotals,
   grandTotal,
+  alertRow,
 }: {
   dimensionLabel: string;
   months: string[];
   rows: MonthPivotRow[];
   monthTotals: number[];
   grandTotal: number;
+  /** Rows whose label matches read in the breach colour, e.g. "Over" SLA. */
+  alertRow?: RegExp;
 }): ReactNode {
   const headerCell = "px-2 py-1.5 text-xs font-bold text-white";
   const totalTint = "rgba(29, 78, 216, 0.08)";
@@ -292,7 +295,15 @@ function MonthPivotTable({
         </thead>
         <tbody>
           {rows.map((row) => (
-            <tr key={row.key} className="border-b odd:bg-black/[0.03] dark:odd:bg-white/[0.03]" style={hairline}>
+            <tr
+              key={row.key}
+              className="border-b odd:bg-black/[0.03] dark:odd:bg-white/[0.03]"
+              style={
+                alertRow?.test(row.label)
+                  ? { ...hairline, color: PENALTY_SUMMARY.slaOver }
+                  : hairline
+              }
+            >
               <td className="px-2 py-1.5 font-semibold">{row.label}</td>
               {row.counts.map((c, i) => (
                 <td key={months[i]} className="px-2 py-1.5 text-right tabular-nums">
@@ -644,6 +655,7 @@ export function PenaltySummary({ data }: { data: ProblemData }): ReactNode {
                 rows={s.monthly.sla}
                 monthTotals={s.monthly.monthTotals}
                 grandTotal={s.monthly.grandTotal}
+                alertRow={/^over/i}
               />
             </ChartCard>
             <ChartCard title="Severity (Monthly)" subtitle="Ticket severity by month">
