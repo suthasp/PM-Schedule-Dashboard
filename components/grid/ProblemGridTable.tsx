@@ -217,7 +217,13 @@ function buildProblemColumnDefs(data: ProblemData): ColDef<ProblemRow>[] {
           return { ...base, width: 110, cellRenderer: CriteriaCell };
         }
         if (/last\s*status/i.test(label)) {
-          return { ...base, width: 190, cellRenderer: LastStatusCell };
+          // The column these budget sheets are read for — amber header.
+          return {
+            ...base,
+            width: 190,
+            cellRenderer: LastStatusCell,
+            headerClass: "last-status-header",
+          };
         }
         if (/^work\s*status$/i.test(label)) {
           return { ...base, width: 130, cellRenderer: WorkStatusCell };

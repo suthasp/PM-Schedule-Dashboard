@@ -167,6 +167,19 @@ div.ag-theme-quartz-dark {
   box-shadow: inset 0 -3px 0 0 #fab219;
 }
 
+/* Last Status: the column the OPEX/CAPEX sheets are read for, so it gets an
+   amber header that stands out from the navy bar */
+.ag-theme-quartz .last-status-header,
+.ag-theme-quartz-dark .last-status-header {
+  background-color: #fab219;
+  box-shadow: inset 0 -3px 0 0 #eb6834;
+}
+.ag-theme-quartz .last-status-header .ag-header-cell-text,
+.ag-theme-quartz-dark .last-status-header .ag-header-cell-text {
+  color: #0d366b;
+  font-weight: 700;
+}
+
 /* Rows breaching an SLA/aging "Over" flag: red text across every column */
 .ag-theme-quartz .row-over-flag .ag-cell,
 .ag-theme-quartz-dark .row-over-flag .ag-cell {
