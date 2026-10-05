@@ -180,6 +180,28 @@ div.ag-theme-quartz-dark {
   font-weight: 700;
 }
 
+/* CAPEX: the two other columns read alongside the status */
+.ag-theme-quartz .site-name-header,
+.ag-theme-quartz-dark .site-name-header {
+  background-color: #4bc8dd;
+  box-shadow: inset 0 -3px 0 0 #0369a1;
+}
+.ag-theme-quartz .site-name-header .ag-header-cell-text,
+.ag-theme-quartz-dark .site-name-header .ag-header-cell-text {
+  color: #0d366b;
+  font-weight: 700;
+}
+.ag-theme-quartz .reject-detail-header,
+.ag-theme-quartz-dark .reject-detail-header {
+  background-color: #d03b3b;
+  box-shadow: inset 0 -3px 0 0 #7f1d1d;
+}
+.ag-theme-quartz .reject-detail-header .ag-header-cell-text,
+.ag-theme-quartz-dark .reject-detail-header .ag-header-cell-text {
+  color: #ffffff;
+  font-weight: 700;
+}
+
 /* Rows breaching an SLA/aging "Over" flag: red text across every column */
 .ag-theme-quartz .row-over-flag .ag-cell,
 .ag-theme-quartz-dark .row-over-flag .ag-cell {

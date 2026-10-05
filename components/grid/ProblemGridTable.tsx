@@ -225,6 +225,18 @@ function buildProblemColumnDefs(data: ProblemData): ColDef<ProblemRow>[] {
             headerClass: "last-status-header",
           };
         }
+        if (/^site\s*name$/i.test(label)) {
+          return { ...base, width: 130, headerClass: "site-name-header" };
+        }
+        if (/reject\s*detail/i.test(label)) {
+          return {
+            ...base,
+            flex: 2,
+            minWidth: 240,
+            headerClass: "reject-detail-header",
+            tooltipValueGetter: (p) => p.data?.values[header] ?? "",
+          };
+        }
         if (/^work\s*status$/i.test(label)) {
           return { ...base, width: 130, cellRenderer: WorkStatusCell };
         }
