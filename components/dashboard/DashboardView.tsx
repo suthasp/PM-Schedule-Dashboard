@@ -75,10 +75,7 @@ export function DashboardView({ data }: { data: ScheduleData }): ReactNode {
           <SiteCompletionCombo data={data} />
         </ChartCard>
 
-        <ChartCard
-          title="Cumulative PM Progress by Month"
-          subtitle="Jobs per fiscal month stacked by status, with the running total of scheduled jobs and the share of the full-year plan finished so far — click a bar to filter by month"
-        >
+        <ChartCard title="Cumulative PM Progress by Month">
           <CumulativeMonthChart data={data} />
         </ChartCard>
 
