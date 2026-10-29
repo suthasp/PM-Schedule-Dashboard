@@ -631,14 +631,12 @@ export function PenaltySummary({ data }: { data: ProblemData }): ReactNode {
       </div>
 
       {s.monthly.months.length > 0 && (
-        /* Two columns: the site pivot has the most rows and columns, so it
-           takes two thirds; the two short pivots stack in the last third. */
-        <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-          <ChartCard
-            title="Tickets by Site (Monthly)"
-            subtitle="Ticket count per site by month"
-            className="xl:col-span-2"
-          >
+        /* Two equal columns: the site pivot on the left, the two short pivots
+           stacked on the right. Equal halves give the short pivots enough room
+           to drop their scroll bars, and the cards hug their own content
+           instead of stretching to the tallest in the row. */
+        <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-2">
+          <ChartCard title="Tickets by Site (Monthly)" subtitle="Ticket count per site by month">
             <MonthPivotTable
               dimensionLabel="หน่วยงาน"
               months={s.monthly.months}
