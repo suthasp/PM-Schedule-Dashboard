@@ -349,7 +349,13 @@ function MonthlyComparisonTable({ rows }: { rows: MonthComparisonRow[] }): React
             <th className={`${headerCell} text-right`}>In Scope</th>
             <th className={`${headerCell} text-right`}>Exemptions</th>
             <th className={`${headerCell} text-right`}>Within SLA</th>
-            <th className={`${headerCell} text-right`}>Over SLA</th>
+            {/* The breach column, called out in the same red as its figures. */}
+            <th
+              className={`${headerCell} text-right`}
+              style={{ backgroundColor: PENALTY_SUMMARY.slaOver }}
+            >
+              Over SLA
+            </th>
             <th className={`${headerCell} text-right`}>Over Long Limit</th>
           </tr>
         </thead>
