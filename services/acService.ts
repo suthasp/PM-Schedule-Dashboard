@@ -36,6 +36,25 @@ export function uniquifyHeaders(headerRow: string[]): string[] {
   });
 }
 
+/**
+ * Short display labels for headers that are a whole sentence in the sheet.
+ * Only the label changes — the header key stays as the sheet writes it, so
+ * row values still resolve.
+ */
+const SHORT_LABELS: { pattern: RegExp; label: string }[] = [
+  { pattern: /^แบบบันทึกผลการบำรุงรักษา.*ครั้งที่$/, label: "PM ครั้งที่" },
+];
+
+function shortenLabels(data: ProblemData): ProblemData {
+  return {
+    ...data,
+    columns: data.columns.map((c) => {
+      const hit = SHORT_LABELS.find((s) => s.pattern.test(c.label));
+      return hit ? { ...c, label: hit.label } : c;
+    }),
+  };
+}
+
 async function fetchSheet(path: string, label: string): Promise<ProblemData> {
   const res = await fetch(path, { cache: "no-store" });
   if (!res.ok) {
@@ -57,7 +76,7 @@ async function fetchSheet(path: string, label: string): Promise<ProblemData> {
   const rows = [...parsed.data];
   const head = rows[0];
   if (head) rows[0] = uniquifyHeaders(head);
-  return transformProblemCsv(rows);
+  return shortenLabels(transformProblemCsv(rows));
 }
 
 /** Fetch the AMC Air Condition Preventive (PM) sheet via the local proxy. */
