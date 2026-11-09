@@ -144,6 +144,7 @@ const TIGHT_WIDTHS: [RegExp, number][] = [
   [/^region\s*tra?ck/i, 130],
   [/^punch/i, 100],
   [/scope/i, 120],
+  [/^pm\s*ครั้งที่$/i, 140],
 ];
 
 /** If any of these columns reads "Over…", the whole row's text turns red. */

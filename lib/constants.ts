@@ -63,7 +63,9 @@ export const LS_KEYS = {
   amcGridColumnState: "pmsd:amc-grid-column-state-v1",
   opexGridColumnState: "pmsd:opex-grid-column-state-v1",
   capexGridColumnState: "pmsd:capex-grid-column-state-v1",
-  acPmGridColumnState: "pmsd:ac-preventive-grid-column-state-v1",
+  // v2: "PM ครั้งที่" was shortened, so saved widths from the long header
+  // would otherwise keep that column stretched.
+  acPmGridColumnState: "pmsd:ac-preventive-grid-column-state-v2",
   acCmGridColumnState: "pmsd:ac-corrective-grid-column-state-v1",
   sidebarCollapsed: "pmsd:sidebar-collapsed",
 } as const;
