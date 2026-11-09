@@ -14,6 +14,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { monthOrder, plausibleMonth } from "@/components/aircon/airconFilters";
 import { ChartTooltip } from "@/components/dashboard/ChartTooltip";
 import { ChartCard } from "@/components/ui/ChartCard";
 import { useChartTheme } from "@/hooks/useChartTheme";
@@ -21,39 +22,6 @@ import { CATEGORICAL, PENALTY_SUMMARY, SITE_COMPLETION } from "@/lib/constants";
 import type { ProblemData } from "@/types/problem";
 import { formatNumber } from "@/utils/format";
 import { parseDmyMs } from "@/utils/problemTransform";
-
-/** Thai abbreviated months as the sheets write them, in calendar order. */
-const THAI_MONTHS = [
-  "ม.ค.",
-  "ก.พ.",
-  "มี.ค.",
-  "เม.ย.",
-  "พ.ค.",
-  "มิ.ย.",
-  "ก.ค.",
-  "ส.ค.",
-  "ก.ย.",
-  "ต.ค.",
-  "พ.ย.",
-  "ธ.ค.",
-];
-
-/** "ก.ค.2024" → sortable 202406; unparseable text sorts last. */
-function monthOrder(label: string): number {
-  const m = /^(.+?)(\d{4})$/.exec(label.trim());
-  if (!m) return Number.MAX_SAFE_INTEGER;
-  const idx = THAI_MONTHS.indexOf((m[1] ?? "").trim());
-  if (idx === -1) return Number.MAX_SAFE_INTEGER;
-  return Number(m[2]) * 12 + idx;
-}
-
-/** A year outside this window is a typo in the sheet, not a real record. */
-function plausibleMonth(label: string): boolean {
-  const m = /^(.+?)(\d{4})$/.exec(label.trim());
-  if (!m) return false;
-  const year = Number(m[2]);
-  return year >= 2000 && year <= 2100;
-}
 
 interface Tally {
   key: string;

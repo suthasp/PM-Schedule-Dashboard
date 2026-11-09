@@ -3,7 +3,14 @@
 import { Download, Loader2, Search, X } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useCallback, useMemo, useState, type ReactNode } from "react";
+import { AirconFilterBar } from "@/components/aircon/AirconFilterBar";
 import { AirconSummary } from "@/components/aircon/AirconSummary";
+import {
+  applyAirconFilters,
+  EMPTY_AIRCON_FILTERS,
+  resolveAirconFields,
+  type AirconFilters,
+} from "@/components/aircon/airconFilters";
 import { GridSkeleton } from "@/components/ui/Loading";
 import type { ProblemData } from "@/types/problem";
 import { exportSheetXlsx } from "@/utils/exportSheetXlsx";
@@ -32,17 +39,24 @@ export function AirconView({
   exportName,
 }: AirconViewProps): ReactNode {
   const [search, setSearch] = useState("");
+  const [filters, setFilters] = useState<AirconFilters>(EMPTY_AIRCON_FILTERS);
   const [exporting, setExporting] = useState(false);
 
+  const fields = useMemo(() => resolveAirconFields(data), [data]);
+
+  // Dropdowns first, then the free-text search over what they left.
   const filtered = useMemo<ProblemData>(() => {
+    const narrowed = applyAirconFilters(data, fields, filters);
     const q = search.trim().toLowerCase();
-    if (q === "") return data;
-    const headers = data.columns.map((c) => c.header);
+    if (q === "") return narrowed;
+    const headers = narrowed.columns.map((c) => c.header);
     return {
-      ...data,
-      rows: data.rows.filter((r) => headers.some((h) => (r.values[h] ?? "").toLowerCase().includes(q))),
+      ...narrowed,
+      rows: narrowed.rows.filter((r) =>
+        headers.some((h) => (r.values[h] ?? "").toLowerCase().includes(q)),
+      ),
     };
-  }, [data, search]);
+  }, [data, fields, filters, search]);
 
   const exportExcel = useCallback(async () => {
     setExporting(true);
@@ -60,6 +74,10 @@ export function AirconView({
 
   return (
     <div className="space-y-3">
+      {fields.length > 0 && (
+        <AirconFilterBar data={data} fields={fields} filters={filters} onChange={setFilters} />
+      )}
+
       <div className="card no-print flex flex-wrap items-center gap-3 p-3">
         <div className="relative w-full max-w-md">
           <Search
