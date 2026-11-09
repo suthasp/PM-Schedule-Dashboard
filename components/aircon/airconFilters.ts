@@ -40,25 +40,28 @@ export function plausibleMonth(label: string): boolean {
   return year >= 2000 && year <= 2100;
 }
 
-/** The seven dimensions the pages can be narrowed by; "" means All. */
+/**
+ * The seven dimensions the pages can be narrowed by. An empty list means All;
+ * the multi-select dimensions may hold several values at once.
+ */
 export interface AirconFilters {
-  year: string;
-  month: string;
-  airType: string;
-  round: string;
-  contractor: string;
-  region: string;
-  site: string;
+  year: string[];
+  month: string[];
+  airType: string[];
+  round: string[];
+  contractor: string[];
+  region: string[];
+  site: string[];
 }
 
 export const EMPTY_AIRCON_FILTERS: AirconFilters = {
-  year: "",
-  month: "",
-  airType: "",
-  round: "",
-  contractor: "",
-  region: "",
-  site: "",
+  year: [],
+  month: [],
+  airType: [],
+  round: [],
+  contractor: [],
+  region: [],
+  site: [],
 };
 
 export interface AirconField {
@@ -68,6 +71,8 @@ export interface AirconField {
   get: (row: ProblemRow) => string;
   /** Calendar order for months, count-then-name elsewhere. */
   sort: "month" | "desc" | "text";
+  /** Several values can be ticked at once. */
+  multi: boolean;
 }
 
 /**
@@ -90,25 +95,27 @@ export function resolveAirconFields(data: ProblemData): AirconField[] {
       label: "Year",
       get: (row) => splitMonthLabel(row.values[monthHeader] ?? "")?.year ?? "",
       sort: "desc",
+      multi: false,
     });
     fields.push({
       key: "month",
       label: "Month",
       get: (row) => splitMonthLabel(row.values[monthHeader] ?? "")?.month ?? "",
       sort: "month",
+      multi: true,
     });
   }
 
-  const pairs: [keyof AirconFilters, string, RegExp][] = [
-    ["airType", "ชนิดแอร์", /^แอร์ชนิด$/],
-    ["round", "PM ครั้งที่", /ครั้งที่/],
-    ["contractor", "Sub Contractor", /^sub\s*contractor$/i],
-    ["region", "Region", /^region$/i],
-    ["site", "Site", /^site$/i],
+  const pairs: [keyof AirconFilters, string, RegExp, boolean][] = [
+    ["airType", "ชนิดแอร์", /^แอร์ชนิด$/, false],
+    ["round", "PM ครั้งที่", /ครั้งที่/, false],
+    ["contractor", "Sub Contractor", /^sub\s*contractor$/i, false],
+    ["region", "Region", /^region$/i, true],
+    ["site", "Site", /^site$/i, true],
   ];
-  for (const [key, label, pattern] of pairs) {
+  for (const [key, label, pattern, multi] of pairs) {
     const header = find(pattern);
-    if (header !== null) fields.push({ key, label, get: read(header), sort: "text" });
+    if (header !== null) fields.push({ key, label, get: read(header), sort: "text", multi });
   }
   return fields;
 }
@@ -128,9 +135,9 @@ function matching(
   filters: AirconFilters,
   except?: keyof AirconFilters,
 ): ProblemRow[] {
-  const active = fields.filter((f) => f.key !== except && filters[f.key] !== "");
+  const active = fields.filter((f) => f.key !== except && filters[f.key].length > 0);
   if (active.length === 0) return data.rows;
-  return data.rows.filter((row) => active.every((f) => f.get(row) === filters[f.key]));
+  return data.rows.filter((row) => active.every((f) => filters[f.key].includes(f.get(row))));
 }
 
 /**
@@ -148,10 +155,9 @@ export function facetOptions(
     const v = field.get(row);
     if (v !== "") set.add(v);
   }
-  // Keep a chosen value listed even if other filters have since excluded it,
-  // so the dropdown never shows a blank selection.
-  const chosen = filters[field.key];
-  if (chosen !== "") set.add(chosen);
+  // Keep chosen values listed even if other filters have since excluded them,
+  // so a ticked box never vanishes from its own dropdown.
+  for (const chosen of filters[field.key]) set.add(chosen);
   return sortValues([...set], field.sort);
 }
 
@@ -161,6 +167,6 @@ export function applyAirconFilters(
   fields: AirconField[],
   filters: AirconFilters,
 ): ProblemData {
-  if (fields.every((f) => filters[f.key] === "")) return data;
+  if (fields.every((f) => filters[f.key].length === 0)) return data;
   return { ...data, rows: matching(data, fields, filters) };
 }

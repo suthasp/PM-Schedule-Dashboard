@@ -2,6 +2,7 @@
 
 import { FilterX } from "lucide-react";
 import type { ReactNode } from "react";
+import { MultiSelect } from "@/components/aircon/MultiSelect";
 import {
   EMPTY_AIRCON_FILTERS,
   facetOptions,
@@ -25,19 +26,32 @@ export function AirconFilterBar({
   filters,
   onChange,
 }: AirconFilterBarProps): ReactNode {
-  const anyActive = fields.some((f) => filters[f.key] !== "");
+  const anyActive = fields.some((f) => filters[f.key].length > 0);
 
   return (
     <div className="card no-print p-3">
       <div className="flex flex-wrap items-end gap-3">
         {fields.map((field) => {
           const options = facetOptions(data, fields, filters, field);
+          if (field.multi) {
+            return (
+              <MultiSelect
+                key={field.key}
+                label={field.label}
+                options={options}
+                selected={filters[field.key]}
+                onChange={(next) => onChange({ ...filters, [field.key]: next })}
+              />
+            );
+          }
           return (
             <label key={field.key} className="flex min-w-[130px] flex-1 flex-col gap-1">
               <span className="text-muted text-xs font-medium">{field.label}</span>
               <select
-                value={filters[field.key]}
-                onChange={(e) => onChange({ ...filters, [field.key]: e.target.value })}
+                value={filters[field.key][0] ?? ""}
+                onChange={(e) =>
+                  onChange({ ...filters, [field.key]: e.target.value === "" ? [] : [e.target.value] })
+                }
                 className="h-9 rounded-xl border hairline px-2 text-sm outline-none transition-colors focus:border-accent dark:focus:border-accent-dark"
                 style={{ backgroundColor: "var(--surface)" }}
               >
