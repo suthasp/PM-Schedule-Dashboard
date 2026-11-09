@@ -3,8 +3,10 @@
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Activity,
+  AirVent,
   AlertTriangle,
   Banknote,
+  ChevronDown,
   Hourglass,
   Info,
   LayoutDashboard,
@@ -14,30 +16,122 @@ import {
   Table2,
   Ticket,
   Wrench,
+  type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
-const NAV_ITEMS = [
+interface NavItem {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+  /** Expandable sub-menu; the parent itself is then not a link. */
+  children?: { href: string; label: string }[];
+}
+
+const NAV_ITEMS: NavItem[] = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/schedule", label: "PM Schedule", icon: Table2 },
   { href: "/tracking", label: "Data Tracking", icon: Activity },
   { href: "/problem", label: "Problem", icon: AlertTriangle },
   { href: "/amc", label: "AMC Actual", icon: ShieldCheck },
+  {
+    href: "/ac",
+    label: "AMC Air Condition",
+    icon: AirVent,
+    children: [
+      { href: "/ac/preventive", label: "Preventive" },
+      { href: "/ac/corrective", label: "Corrective" },
+    ],
+  },
   { href: "/penalty", label: "Tickets Penalty", icon: Ticket },
   { href: "/pending", label: "Pending Tickets", icon: Hourglass },
   { href: "/opex", label: "OPEX2026", icon: Wallet },
   { href: "/capex", label: "CAPEX2026", icon: Banknote },
   { href: "/settings", label: "Settings", icon: Settings },
   { href: "/about", label: "About", icon: Info },
-] as const;
+];
 
 interface SidebarProps {
   open: boolean;
   onClose: () => void;
   /** Desktop icon-rail mode (toggled by the header hamburger). */
   collapsed?: boolean;
+}
+
+const rowBase = "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors";
+const activeRow = "bg-accent/10 text-accent dark:bg-accent-dark/15 dark:text-accent-dark";
+const idleRow = "text-secondary hover:bg-black/5 dark:hover:bg-white/5";
+
+/** A nav entry that expands to reveal its sub-pages. */
+function NavGroup({
+  item,
+  collapsed,
+  onNavigate,
+}: {
+  item: NavItem;
+  collapsed: boolean;
+  onNavigate?: () => void;
+}): ReactNode {
+  const pathname = usePathname();
+  const children = item.children ?? [];
+  const inSection = pathname.startsWith(`${item.href}/`);
+  // Opens itself when one of its pages is showing, and stays user-togglable.
+  const [open, setOpen] = useState(inSection);
+  const expanded = open || inSection;
+  const Icon = item.icon;
+
+  // On the icon rail there is no room for a sub-list: link straight to the
+  // first page and let the tooltip name the section.
+  if (collapsed) {
+    return (
+      <Link
+        href={children[0]?.href ?? item.href}
+        onClick={onNavigate}
+        title={item.label}
+        aria-label={item.label}
+        className={`${rowBase} justify-center px-0 ${inSection ? activeRow : idleRow}`}
+      >
+        <Icon size={18} strokeWidth={2} className="shrink-0" aria-hidden />
+      </Link>
+    );
+  }
+
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={() => setOpen(!expanded)}
+        aria-expanded={expanded}
+        className={`${rowBase} w-full ${inSection ? activeRow : idleRow}`}
+      >
+        <Icon size={18} strokeWidth={2} className="shrink-0" aria-hidden />
+        <span className="truncate">{item.label}</span>
+        <ChevronDown
+          size={15}
+          aria-hidden
+          className={`ml-auto shrink-0 transition-transform ${expanded ? "rotate-180" : ""}`}
+        />
+      </button>
+      {expanded && (
+        <div className="mt-1 flex flex-col gap-1 pl-7">
+          {children.map((child) => (
+            <Link
+              key={child.href}
+              href={child.href}
+              onClick={onNavigate}
+              className={`rounded-lg px-3 py-2 text-sm transition-colors ${
+                pathname === child.href ? activeRow : idleRow
+              }`}
+            >
+              {child.label}
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 function NavLinks({
@@ -49,8 +143,19 @@ function NavLinks({
 }): ReactNode {
   const pathname = usePathname();
   return (
-    <nav className="flex flex-col gap-1 px-3">
-      {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+    <nav className="flex flex-col gap-1 overflow-y-auto px-3 pb-4">
+      {NAV_ITEMS.map((item) => {
+        if (item.children) {
+          return (
+            <NavGroup
+              key={item.href}
+              item={item}
+              collapsed={collapsed}
+              onNavigate={onNavigate}
+            />
+          );
+        }
+        const { href, label, icon: Icon } = item;
         const active = pathname === href;
         return (
           <Link
@@ -59,12 +164,8 @@ function NavLinks({
             onClick={onNavigate}
             title={collapsed ? label : undefined}
             aria-label={label}
-            className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
-              collapsed ? "justify-center px-0" : ""
-            } ${
-              active
-                ? "bg-accent/10 text-accent dark:bg-accent-dark/15 dark:text-accent-dark"
-                : "text-secondary hover:bg-black/5 dark:hover:bg-white/5"
+            className={`${rowBase} ${collapsed ? "justify-center px-0" : ""} ${
+              active ? activeRow : idleRow
             }`}
           >
             <Icon size={18} strokeWidth={2} className="shrink-0" aria-hidden />

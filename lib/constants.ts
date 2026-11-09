@@ -40,6 +40,16 @@ export const CAPEX_CSV_URL =
 
 export const CAPEX_QUERY_KEY = ["capex-2026"] as const;
 
+export const AC_PM_CSV_URL =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQT_kYRb6046P3S6NXTZB7yTk4Za3pAY2gb1rA0fuwb4t12GhrM79lEhVXLru0odwXJRzgDHuRKSW-m/pub?gid=0&single=true&output=csv";
+
+export const AC_PM_QUERY_KEY = ["ac-preventive"] as const;
+
+export const AC_CM_CSV_URL =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQT_kYRb6046P3S6NXTZB7yTk4Za3pAY2gb1rA0fuwb4t12GhrM79lEhVXLru0odwXJRzgDHuRKSW-m/pub?gid=526059949&single=true&output=csv";
+
+export const AC_CM_QUERY_KEY = ["ac-corrective"] as const;
+
 /** Default auto-refresh interval: 5 minutes. */
 export const DEFAULT_REFRESH_MINUTES = 5;
 
@@ -53,6 +63,8 @@ export const LS_KEYS = {
   amcGridColumnState: "pmsd:amc-grid-column-state-v1",
   opexGridColumnState: "pmsd:opex-grid-column-state-v1",
   capexGridColumnState: "pmsd:capex-grid-column-state-v1",
+  acPmGridColumnState: "pmsd:ac-preventive-grid-column-state-v1",
+  acCmGridColumnState: "pmsd:ac-corrective-grid-column-state-v1",
   sidebarCollapsed: "pmsd:sidebar-collapsed",
 } as const;
 

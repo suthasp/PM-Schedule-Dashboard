@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 import {
+  AC_CM_CSV_URL,
+  AC_PM_CSV_URL,
   AMC_CSV_URL,
   CAPEX_CSV_URL,
   CSV_URL,
@@ -21,6 +23,8 @@ const SOURCES = [
   { label: "Pending Tickets", url: PENDING_CSV_URL },
   { label: "OPEX 2026", url: OPEX_CSV_URL },
   { label: "CAPEX 2026", url: CAPEX_CSV_URL },
+  { label: "AMC Air Condition — Preventive", url: AC_PM_CSV_URL },
+  { label: "AMC Air Condition — Corrective", url: AC_CM_CSV_URL },
 ];
 
 const PAGES = [
@@ -59,6 +63,10 @@ const PAGES = [
   {
     name: "Pending Tickets",
     desc: "Flat open-ticket log shown as a grid.",
+  },
+  {
+    name: "AMC Air Condition",
+    desc: "Air-conditioning service records, split into Preventive (PM) and Corrective (CM). Each page opens with a dashboard (volume tiles, monthly trend, and rankings by site, region, sub contractor and brand), then every record as a grid, with a free-text search and an Excel export.",
   },
 ];
 

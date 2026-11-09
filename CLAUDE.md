@@ -29,6 +29,8 @@ A sixth source, the **AMC Actual sheet** (`AMC_CSV_URL`, `/amc`), is a fiscal-ye
 
 A seventh and eighth source, the **OPEX 2026** and **CAPEX 2026 sheets** (`OPEX_CSV_URL` / `/opex`, `CAPEX_CSV_URL` / `/capex`), are flat as well and reuse the Problem pipeline. Both pages render `components/sheet/SheetColumnsView.tsx`, which narrows `data.columns` to the reported sheet positions — by index, since those headers are long Thai sentences — relabels them, and adds a page-local free-text search over the visible columns before handing the dataset to `ProblemGridTable`.
 
+A ninth and tenth source, the **AMC Air Condition** sheets (`AC_PM_CSV_URL` / `/ac/preventive`, `AC_CM_CSV_URL` / `/ac/corrective`), are flat and reuse the Problem pipeline through `services/acService.ts`. That service runs `uniquifyHeaders` first, because the Preventive sheet names its five trailing geography columns all `Region1` and `transformProblemCsv` keeps only a header's first occurrence — they are renamed to the Corrective sheet's Region / Location / Region1 / Region2 / Province. Both pages render `components/aircon/AirconView.tsx` (search + `AirconSummary` dashboard + full `ProblemGridTable` + Excel export via `utils/exportSheetXlsx.ts`, a generic styled-workbook exporter for any `ProblemData`). These are the only nav entries with a sub-menu — `components/layout/Sidebar.tsx`'s `NavGroup` renders `NavItem.children`, and on the collapsed icon rail it links to the first child instead.
+
 ## Data pipeline (the big picture)
 
 1. **`lib/constants.ts`** holds `CSV_URL` (the published Google Sheet). Change the data source here.
