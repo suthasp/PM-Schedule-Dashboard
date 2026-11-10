@@ -93,8 +93,12 @@ export default function AboutPage(): ReactNode {
         <h3 className="font-semibold">How PM Schedule statuses are derived</h3>
         <ul className="text-secondary mt-1 list-disc space-y-1 pl-5">
           <li>
-            A week cell marked <strong>F</strong>, <strong>DONE</strong>, <strong>C</strong> or{" "}
-            <strong>OK</strong> is <strong>Finished</strong>.
+            A week cell marked <strong>C</strong> (รอการแก้ไข / Correction) is <strong>Overdue</strong>,
+            whatever week it sits in — the job still needs rework.
+          </li>
+          <li>
+            A week cell marked <strong>F</strong>, <strong>DONE</strong> or <strong>OK</strong> is{" "}
+            <strong>Finished</strong>.
           </li>
           <li>
             Any other mark in a past week is <strong>Overdue</strong>.

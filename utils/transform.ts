@@ -14,7 +14,14 @@ import { currentWeekMondayTime, isoWeekMonday, isoWeekOf, toIsoDate } from "@/ut
 const WEEK_HEADER = /^WK\s*(\d{1,2})$/i;
 
 /** Marks that mean "done" in the sheet's week cells. */
-const FINISHED_MARKS = new Set(["F", "DONE", "C", "OK"]);
+const FINISHED_MARKS = new Set(["F", "DONE", "OK"]);
+
+/**
+ * Marks that always count as Overdue, whatever week they sit in.
+ * "C" = รอการแก้ไข (Correction): the job was attempted but still needs rework,
+ * so it is outstanding even when its week has not passed yet.
+ */
+const OVERDUE_MARKS = new Set(["C"]);
 
 function findHeader(headers: string[], patterns: RegExp[], fallbackIndex: number): string {
   for (const pattern of patterns) {
@@ -88,7 +95,9 @@ function buildWeeks(monthRow: string[], headerRow: string[], now: Date): WeekInf
 }
 
 function statusFor(mark: string, weekStart: string, nowWeekMonday: number): JobStatus {
-  if (FINISHED_MARKS.has(mark.trim().toUpperCase())) return "Finished";
+  const normalized = mark.trim().toUpperCase();
+  if (OVERDUE_MARKS.has(normalized)) return "Overdue";
+  if (FINISHED_MARKS.has(normalized)) return "Finished";
   const weekTime = new Date(`${weekStart}T00:00:00Z`).getTime();
   if (weekTime < nowWeekMonday) return "Overdue";
   return "Remaining";
