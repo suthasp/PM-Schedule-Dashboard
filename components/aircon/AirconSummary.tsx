@@ -115,70 +115,100 @@ function Tile({ label, value, sub }: { label: string; value: string; sub?: strin
 
 const hairline = { borderColor: "var(--hairline)" } as const;
 
-/** Ranked list of one dimension, with a share-of-total bar behind each row. */
+/** The pinned total row needs an opaque base, or rows scroll through its tint. */
+const rankTotalCell = {
+  ...hairline,
+  backgroundColor: "var(--surface)",
+  backgroundImage: `linear-gradient(${SITE_COMPLETION.totalTint}, ${SITE_COMPLETION.totalTint})`,
+} as const;
+
+/**
+ * Ranked list of one dimension — every value, with a share-of-total bar so the
+ * shape of the distribution reads at a glance. Long lists scroll inside the
+ * card with the heading and total row pinned.
+ */
 function RankTable({
   label,
   rows,
   total,
-  max = 10,
 }: {
   label: string;
   rows: Tally[];
   total: number;
-  max?: number;
 }): ReactNode {
   if (rows.length === 0) {
     return <p className="text-muted py-6 text-center text-sm">No data in this sheet.</p>;
   }
-  const shown = rows.slice(0, max);
-  const rest = rows.slice(max).reduce((s, r) => s + r.count, 0);
   const headerCell = "whitespace-nowrap border px-2 py-1.5 text-xs font-bold";
+  const top = rows[0]?.count ?? 1;
+  const share = (n: number): string => (total === 0 ? "0.0%" : `${((n / total) * 100).toFixed(1)}%`);
+
   return (
-    <div className="max-h-[330px] overflow-auto">
+    <div className="max-h-[420px] overflow-auto">
       <table className="w-full border-collapse text-xs">
         <thead className="sticky top-0 z-10">
           <tr
             style={{ backgroundColor: SITE_COMPLETION.header.bg, color: SITE_COMPLETION.header.fg }}
           >
+            <th className={`${headerCell} w-8 text-center`} style={hairline}>
+              #
+            </th>
             <th className={`${headerCell} text-left`} style={hairline}>
               {label}
             </th>
-            <th className={`${headerCell} text-right`} style={hairline}>
+            <th className={`${headerCell} w-16 text-right`} style={hairline}>
               จำนวน
             </th>
-            <th className={`${headerCell} text-right`} style={hairline}>
+            <th className={`${headerCell} w-24 text-right`} style={hairline}>
               สัดส่วน
             </th>
           </tr>
         </thead>
         <tbody>
-          {shown.map((r) => (
-            <tr key={r.key}>
+          {rows.map((r, i) => (
+            <tr key={r.key} className="odd:bg-black/[0.02] dark:odd:bg-white/[0.03]">
+              <td className="text-muted border px-2 py-1 text-center tabular-nums" style={hairline}>
+                {i + 1}
+              </td>
               <td className="border px-2 py-1" style={hairline}>
                 {r.key}
               </td>
-              <td className="border px-2 py-1 text-right tabular-nums" style={hairline}>
+              <td
+                className="border px-2 py-1 text-right font-semibold tabular-nums"
+                style={hairline}
+              >
                 {formatNumber(r.count)}
               </td>
-              <td className="border px-2 py-1 text-right tabular-nums" style={hairline}>
-                {total === 0 ? "0.0%" : `${((r.count / total) * 100).toFixed(1)}%`}
+              {/* Bar is relative to the biggest value, so even a long tail of
+                  small shares stays readable. */}
+              <td className="relative border px-2 py-1 text-right tabular-nums" style={hairline}>
+                <span
+                  aria-hidden
+                  className="absolute inset-y-[2px] left-[2px] rounded-sm"
+                  style={{
+                    width: `calc((100% - 4px) * ${top === 0 ? 0 : r.count / top})`,
+                    backgroundColor: SITE_COMPLETION.rankBar,
+                  }}
+                />
+                <span className="relative">{share(r.count)}</span>
               </td>
             </tr>
           ))}
-          {rest > 0 && (
-            <tr>
-              <td className="text-muted border px-2 py-1 italic" style={hairline}>
-                อื่นๆ ({formatNumber(rows.length - max)} รายการ)
-              </td>
-              <td className="border px-2 py-1 text-right tabular-nums" style={hairline}>
-                {formatNumber(rest)}
-              </td>
-              <td className="border px-2 py-1 text-right tabular-nums" style={hairline}>
-                {total === 0 ? "0.0%" : `${((rest / total) * 100).toFixed(1)}%`}
-              </td>
-            </tr>
-          )}
         </tbody>
+        <tfoot className="sticky bottom-0">
+          <tr className="font-bold">
+            <td className="border px-2 py-1 text-center" style={rankTotalCell} />
+            <td className="border px-2 py-1" style={rankTotalCell}>
+              รวม ({formatNumber(rows.length)} รายการ)
+            </td>
+            <td className="border px-2 py-1 text-right tabular-nums" style={rankTotalCell}>
+              {formatNumber(total)}
+            </td>
+            <td className="border px-2 py-1 text-right tabular-nums" style={rankTotalCell}>
+              {total === 0 ? "0.0%" : "100.0%"}
+            </td>
+          </tr>
+        </tfoot>
       </table>
     </div>
   );
@@ -351,7 +381,7 @@ export function AirconSummary({ data, kind }: AirconSummaryProps): ReactNode {
         )}
         {s.bySpare.length > 0 && (
           <ChartCard title="Spare Part" subtitle="สัดส่วนงานที่ต้องเปลี่ยนอะไหล่">
-            <RankTable label="Spare Part" rows={s.bySpare} total={s.total} max={6} />
+            <RankTable label="Spare Part" rows={s.bySpare} total={s.total} />
           </ChartCard>
         )}
       </div>

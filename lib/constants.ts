@@ -123,6 +123,8 @@ export const SITE_COMPLETION = {
   plan: { light: "#2a78d6", dark: "#3987e5" },
   actual: { light: "#008300", dark: "#1baf7a" },
   pct: { light: "#c2410c", dark: "#eb6834" },
+  /** Share-of-total bar behind the percentage in the AC rank tables. */
+  rankBar: "rgba(42, 120, 214, 0.18)",
 } as const;
 
 /**
