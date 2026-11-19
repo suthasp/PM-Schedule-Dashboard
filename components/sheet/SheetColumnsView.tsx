@@ -1,10 +1,11 @@
 "use client";
 
-import { Search, X } from "lucide-react";
+import { FilterX, Search, X } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useMemo, useState, type ReactNode } from "react";
 import { SheetSummary } from "@/components/sheet/SheetSummary";
 import { GridSkeleton } from "@/components/ui/Loading";
+import { MultiSelect } from "@/components/ui/MultiSelect";
 import type { ProblemData } from "@/types/problem";
 
 // AG Grid is client-only and heavy — code-split it off the main bundle.
@@ -47,6 +48,8 @@ export function SheetColumnsView({
   summary,
 }: SheetColumnsViewProps): ReactNode {
   const [search, setSearch] = useState("");
+  /** Empty = All. Values of the summary's status column. */
+  const [status, setStatus] = useState<string[]>([]);
 
   const scoped = useMemo<ProblemData>(() => {
     const columns = columnIndexes
@@ -69,23 +72,46 @@ export function SheetColumnsView({
     return { ...data, columns, rows };
   }, [data, columnIndexes, columnLabels, sortByIndex]);
 
+  const headerAt = (i: number): string | null => data.columns[i]?.header ?? null;
+
+  const statusHeader = headerAt(summary.statusIndex);
+  /** Label the dropdown exactly as that column is labelled in the grid. */
+  const statusLabel =
+    columnLabels[columnIndexes.indexOf(summary.statusIndex)] ?? "Last Status";
+
+  const statusOptions = useMemo(() => {
+    if (statusHeader === null) return [];
+    const seen = new Set<string>();
+    for (const r of scoped.rows) {
+      const v = (r.values[statusHeader] ?? "").trim();
+      if (v !== "") seen.add(v);
+    }
+    // Natural sort, so "00.Reject" … "09.GR Completed" keep the sheet's own order.
+    return [...seen].sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
+  }, [scoped, statusHeader]);
+
   const filtered = useMemo<ProblemData>(() => {
     const q = search.trim().toLowerCase();
-    if (q === "") return scoped;
     const headers = scoped.columns.map((c) => c.header);
+    const picked = new Set(status);
+    if (q === "" && picked.size === 0) return scoped;
     return {
       ...scoped,
-      rows: scoped.rows.filter((r) =>
-        headers.some((h) => (r.values[h] ?? "").toLowerCase().includes(q)),
-      ),
+      rows: scoped.rows.filter((r) => {
+        if (picked.size > 0) {
+          if (statusHeader === null) return false;
+          if (!picked.has((r.values[statusHeader] ?? "").trim())) return false;
+        }
+        return q === "" || headers.some((h) => (r.values[h] ?? "").toLowerCase().includes(q));
+      }),
     };
-  }, [scoped, search]);
+  }, [scoped, search, status, statusHeader]);
 
-  const headerAt = (i: number): string | null => data.columns[i]?.header ?? null;
+  const activeCount = (search.trim() === "" ? 0 : 1) + (status.length > 0 ? 1 : 0);
 
   return (
     <div className="space-y-3">
-      <div className="card no-print flex items-center gap-3 p-3">
+      <div className="card no-print flex flex-wrap items-end gap-3 p-3">
         <div className="relative w-full max-w-md">
           <Search
             size={15}
@@ -112,7 +138,31 @@ export function SheetColumnsView({
             </button>
           )}
         </div>
-        <p className="text-secondary text-sm">
+        {statusHeader !== null && statusOptions.length > 0 && (
+          <div className="w-[220px] shrink-0">
+            <MultiSelect
+              label={statusLabel}
+              options={statusOptions}
+              selected={status}
+              onChange={setStatus}
+            />
+          </div>
+        )}
+
+        <button
+          type="button"
+          onClick={() => {
+            setSearch("");
+            setStatus([]);
+          }}
+          disabled={activeCount === 0}
+          className="flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-xl border hairline px-3 text-sm font-medium transition-colors hover:bg-black/5 disabled:opacity-40 dark:hover:bg-white/5"
+        >
+          <FilterX size={15} aria-hidden />
+          Clear{activeCount > 0 ? ` (${activeCount})` : ""}
+        </button>
+
+        <p className="text-secondary pb-2 text-sm">
           {filtered.rows.length.toLocaleString()} of {scoped.rows.length.toLocaleString()} records
         </p>
       </div>
