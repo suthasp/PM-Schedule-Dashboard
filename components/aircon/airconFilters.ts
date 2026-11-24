@@ -109,7 +109,7 @@ export function resolveAirconFields(data: ProblemData): AirconField[] {
   const pairs: [keyof AirconFilters, string, RegExp, boolean][] = [
     ["airType", "ชนิดแอร์", /^แอร์ชนิด$/, false],
     ["round", "PM ครั้งที่", /ครั้งที่/, true],
-    ["contractor", "Sub Contractor", /^sub\s*contractor$/i, false],
+    ["contractor", "Sub Contractor", /^sub\s*contractor$/i, true],
     ["region", "Region", /^region$/i, true],
     ["site", "Site", /^site$/i, true],
   ];
